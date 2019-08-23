@@ -1,6 +1,6 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import { Releases } from './releases';
+import { Releases } from './Releases';
 
 async function run() {
   try {
