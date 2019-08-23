@@ -7,10 +7,14 @@ async function run() {
     const token = core.getInput('token');
     const context = github.context
     const git = new github.GitHub(token);
-    const release = new Releases(context, git)
-    
-    const myInput = core.getInput('token');
-    core.debug(`Token ${myInput}`);
+    const releases = new Releases(context, git)
+    await releases.create()
+    .catch(error => {
+      core.warning(error)
+    })
+    .then(response => {
+      core.warning(`response: ${response}`)
+    })
   } catch (error) {
     core.setFailed(error.message);
   }

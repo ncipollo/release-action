@@ -11,13 +11,13 @@ export class Releases {
         this.git = git;
     }
 
-    create(): Promise<Response<ReposCreateReleaseResponse>>   {
-        this.context.ref
+    async create(): Promise<Response<ReposCreateReleaseResponse>> {
         return this.git.repos.createRelease({
             name: "Test release",
             draft: true,
-            owner :this.context.repo.owner,
-            repo: this.context.repo.owner,
+            owner: this.context.repo.owner,
+            repo: this.context.repo.repo,
+            target_commitish: "master",
             tag_name: "0.0.666"
         })
     }
