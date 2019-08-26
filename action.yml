@@ -1,4 +1,4 @@
-name: 'Node 12 Template Action'
+name: 'Release'
 description: 'Creates github releases'
 author: 'Nick Cipollo'
 inputs:
