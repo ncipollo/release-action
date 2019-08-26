@@ -2,8 +2,27 @@ name: 'Node 12 Template Action'
 description: 'Creates github releases'
 author: 'Nick Cipollo'
 inputs:
+  artifact:
+    description: 'A path to an optional artifact to upload to the release.'
+    default: ''
+  commit:
+    description: 'An optional commit reference. This will be used to create the tag if it doesn't exist.'
+    default: ''
+  description:
+    description: 'An optional description for the release.'
+    default: ''
+  descriptionFile:
+    description: 'An optional description file for the release. This should be the path to the file'
+    default: ''
+  name:
+    description: 'An optional name for the release. If this is omitted the tag will be used.'
+    default: ''
+  tag:
+    description: 'An optional tag for the release. If this is omitted the git ref will be used (if it's a tag).'
+    default: ''
   token:
-    description: 'Github Token'
+    description: 'The Github token.'
+    required: true
     default: ''
 runs:
   using: 'node12'

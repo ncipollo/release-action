@@ -33,7 +33,7 @@ export class Inputs {
     }
 
     get name(): string {
-        const name = core.getInput('tag')
+        const name = core.getInput('name')
         if (name) {
             return name
         }
