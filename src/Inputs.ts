@@ -1,7 +1,6 @@
 import * as core from '@actions/core';
 import { Context } from "@actions/github/lib/context";
-import { isObject } from 'util';
-import { fstat, readFileSync } from 'fs';
+import { readFileSync, statSync } from 'fs';
 
 export class Inputs {
     private context: Context
@@ -14,18 +13,31 @@ export class Inputs {
         return core.getInput('artifact')
     }
 
+    get artifactContentType(): string {
+        const type = core.getInput('artifactContentType')
+        if(type) {
+            return type;
+        }
+
+        return 'raw'
+    }
+
+    get artifactContentLength(): number {
+        return statSync(this.artifact).size
+    }
+
     get commit(): string {
         return core.getInput('commit')
     }
 
     get description(): string {
         const description = core.getInput('description')
-        if(description) {
+        if (description) {
             return description
         }
-        
+
         const descriptionFile = core.getInput('descriptionFile')
-        if(descriptionFile) {
+        if (descriptionFile) {
             return this.stringFromFile(descriptionFile)
         }
 
@@ -41,10 +53,6 @@ export class Inputs {
         return this.tag
     }
 
-    get token(): string {
-        return core.getInput('token', { required: true })
-    }
-
     get tag(): string {
         const tag = core.getInput('tag')
         if (tag) {
@@ -58,6 +66,10 @@ export class Inputs {
         }
 
         throw Error("No tag found in ref or input!")
+    }
+
+    get token(): string {
+        return core.getInput('token', { required: true })
     }
 
     private stringFromFile(path: string): string {

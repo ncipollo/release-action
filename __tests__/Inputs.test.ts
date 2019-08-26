@@ -1,5 +1,6 @@
 const mockGetInput = jest.fn();
 const mockReadFileSync = jest.fn();
+const mockStatSync = jest.fn();
 
 import { Inputs } from "../src/Inputs";
 import { Context } from "@actions/github/lib/context";
@@ -10,7 +11,10 @@ jest.mock('@actions/core', () => {
 });
 
 jest.mock('fs', () => {
-    return { readFileSync: mockReadFileSync };
+    return { 
+        readFileSync: mockReadFileSync,
+        statSync: mockStatSync
+     };
 });
 
 describe('Inputs', () => {
@@ -27,6 +31,12 @@ describe('Inputs', () => {
         expect(inputs.artifact).toBe("a/path")
     })
 
+    it('returns artifactContentLength', () => {
+        mockGetInput.mockReturnValue("a/path")
+        mockStatSync.mockReturnValue({size: 100})
+        expect(inputs.artifactContentLength).toBe(100)
+    })
+
     it('returns targetCommit', () => {
         mockGetInput.mockReturnValue("42")
         expect(inputs.commit).toBe("42")
@@ -35,6 +45,17 @@ describe('Inputs', () => {
     it('returns token', () => {
         mockGetInput.mockReturnValue("42")
         expect(inputs.token).toBe("42")
+    })
+
+    describe('artifactContentType', () => {
+        it('returns input content-type', () => {
+            mockGetInput.mockReturnValue("type")
+            expect(inputs.artifactContentType).toBe("type")
+        })
+
+        it('returns raw as default', () => {
+            expect(inputs.artifactContentType).toBe("raw")
+        })
     })
 
     describe('description', () => {

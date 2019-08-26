@@ -5,6 +5,9 @@ inputs:
   artifact:
     description: 'A path to an optional artifact to upload to the release.'
     default: ''
+  artifactContentType:
+    description: 'The content type of the artifact. Defaults to raw'
+    default: ''
   commit:
     description: 'An optional commit reference. This will be used to create the tag if it doesn't exist.'
     default: ''
