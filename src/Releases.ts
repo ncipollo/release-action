@@ -3,12 +3,12 @@ import { GitHub } from "@actions/github";
 import { Response, ReposCreateReleaseResponse } from "@octokit/rest";
 
 export class Releases {
-    context: Context;
-    git: GitHub;
+    context: Context
+    git: GitHub
 
     constructor(context: Context, git: GitHub) {
-        this.context = context;
-        this.git = git;
+        this.context = context
+        this.git = git
     }
 
     async create(tag: string, commitHash?: string): Promise<Response<ReposCreateReleaseResponse>> {
