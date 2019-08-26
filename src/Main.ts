@@ -1,5 +1,6 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
+import { Inputs } from './Inputs';
 import { Releases } from './Releases';
 
 async function run() {
@@ -8,7 +9,8 @@ async function run() {
     const context = github.context
     const git = new github.GitHub(token);
     const releases = new Releases(context, git)
-    await releases.create()
+    const inputs = new Inputs(context)
+    await releases.create(inputs.tag)
     .catch(error => {
       core.warning(error)
     })
