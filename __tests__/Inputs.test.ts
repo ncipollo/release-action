@@ -1,4 +1,5 @@
 const mockGetInput = jest.fn();
+const mockReadFileSync = jest.fn();
 
 import { Inputs } from "../src/Inputs";
 import { Context } from "@actions/github/lib/context";
@@ -8,35 +9,81 @@ jest.mock('@actions/core', () => {
     return { getInput: mockGetInput };
 });
 
+jest.mock('fs', () => {
+    return { readFileSync: mockReadFileSync };
+});
+
 describe('Inputs', () => {
     let context: Context;
     let inputs: Inputs;
     beforeEach(() => {
+        mockGetInput.mockReturnValue(null)
         context = new Context()
         inputs = new Inputs(context)
     })
 
-    it('token method returns input token', () => {
+    it('returns artifact', () => {
+        mockGetInput.mockReturnValue("a/path")
+        expect(inputs.artifact).toBe("a/path")
+    })
+
+    it('returns targetCommit', () => {
+        mockGetInput.mockReturnValue("42")
+        expect(inputs.commit).toBe("42")
+    })
+
+    it('returns token', () => {
         mockGetInput.mockReturnValue("42")
         expect(inputs.token).toBe("42")
     })
 
+    describe('description', () => {
+        it('returns input description', () => {
+            mockGetInput.mockReturnValue("description")
+            expect(inputs.description).toBe("description")
+        })
+
+        it('returns description file contents', () => {
+            mockGetInput.mockReturnValueOnce("").mockReturnValueOnce("a/path")
+            mockReadFileSync.mockReturnValue("file")
+
+            expect(inputs.description).toBe("file")
+        })
+
+        it('returns empty', () => {
+            expect(inputs.description).toBe("")
+        })
+    })
+
+    describe('name', () => {
+        it('returns input name', () => {
+            mockGetInput.mockReturnValue("name")
+            expect(inputs.name).toBe("name")
+        })
+
+        it('returns tag', () => {
+            mockGetInput.mockReturnValue("")
+            context.ref = "refs/tags/sha-tag"
+            expect(inputs.name).toBe("sha-tag")
+        })
+    })
+
     describe('tag', () => {
-        it('tag property returns input tag', () => {
+        it('returns input tag', () => {
             mockGetInput.mockReturnValue("tag")
             expect(inputs.tag).toBe("tag")
         })
-        it('tag property returns context sha when input is empty', () => {
+        it('returns context sha when input is empty', () => {
             mockGetInput.mockReturnValue("")
             context.ref = "refs/tags/sha-tag"
             expect(inputs.tag).toBe("sha-tag")
         })
-        it('tag property returns context sha when input is null', () => {
+        it('returns context sha when input is null', () => {
             mockGetInput.mockReturnValue(null)
             context.ref = "refs/tags/sha-tag"
             expect(inputs.tag).toBe("sha-tag")
         })
-        it('tag property throws if no tag', () => {
+        it('throws if no tag', () => {
             expect(() => inputs.tag).toThrow()
         })
     })
