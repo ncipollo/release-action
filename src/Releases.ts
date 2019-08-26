@@ -11,7 +11,7 @@ export class Releases {
         this.git = git
     }
 
-    create(
+    async create(
         tag: string,
         body?: string,
         commitHash?: string,
@@ -29,7 +29,7 @@ export class Releases {
         })
     }
 
-    uploadArtifact(
+    async uploadArtifact(
         assetUrl: string,
         contentLength: number,
         contentType: string,
