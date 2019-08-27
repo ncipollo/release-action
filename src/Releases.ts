@@ -2,7 +2,25 @@ import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github";
 import { AnyResponse, Response, ReposCreateReleaseResponse } from "@octokit/rest";
 
-export class Releases {
+export interface Releases {
+    create(
+        tag: string,
+        body?: string,
+        commitHash?: string,
+        draft?: boolean,
+        name?: string
+    ): Promise<Response<ReposCreateReleaseResponse>>
+
+    uploadArtifact(
+        assetUrl: string,
+        contentLength: number,
+        contentType: string,
+        file: string,
+        name: string
+    ): Promise<Response<AnyResponse>>
+}
+
+export class GithubReleases implements Releases{
     context: Context
     git: GitHub
 

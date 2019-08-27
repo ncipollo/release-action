@@ -2,20 +2,20 @@ const mockGetInput = jest.fn();
 const mockReadFileSync = jest.fn();
 const mockStatSync = jest.fn();
 
-import { Inputs } from "../src/Inputs";
+import { Inputs, CoreInputs } from "../src/Inputs";
 import { Context } from "@actions/github/lib/context";
 
 
 jest.mock('@actions/core', () => {
     return { getInput: mockGetInput };
-});
+})
 
 jest.mock('fs', () => {
     return { 
         readFileSync: mockReadFileSync,
         statSync: mockStatSync
      };
-});
+})
 
 describe('Inputs', () => {
     let context: Context;
@@ -23,7 +23,7 @@ describe('Inputs', () => {
     beforeEach(() => {
         mockGetInput.mockReturnValue(null)
         context = new Context()
-        inputs = new Inputs(context)
+        inputs = new CoreInputs(context)
     })
 
     it('returns artifact', () => {
@@ -58,21 +58,32 @@ describe('Inputs', () => {
         })
     })
 
-    describe('description', () => {
-        it('returns input description', () => {
-            mockGetInput.mockReturnValue("description")
-            expect(inputs.description).toBe("description")
+    describe('body', () => {
+        it('returns input body', () => {
+            mockGetInput.mockReturnValue("body")
+            expect(inputs.body).toBe("body")
         })
 
-        it('returns description file contents', () => {
+        it('returns body file contents', () => {
             mockGetInput.mockReturnValueOnce("").mockReturnValueOnce("a/path")
             mockReadFileSync.mockReturnValue("file")
 
-            expect(inputs.description).toBe("file")
+            expect(inputs.body).toBe("file")
         })
 
         it('returns empty', () => {
-            expect(inputs.description).toBe("")
+            expect(inputs.body).toBe("")
+        })
+    })
+
+    describe('draft', () => {
+        it('returns false', () => {
+            expect(inputs.draft).toBe(false)
+        })
+        
+        it('returns true', () => {
+            mockGetInput.mockReturnValue("true")
+            expect(inputs.draft).toBe(true)
         })
     })
 
