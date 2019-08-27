@@ -17,7 +17,8 @@ export class Action {
             this.inputs.body,
             this.inputs.commit,
             this.inputs.draft,
-            this.inputs.name)
+            this.inputs.name
+        )
 
         if (this.inputs.artifact) {
             await this.releases.uploadArtifact(
@@ -25,7 +26,8 @@ export class Action {
                 this.inputs.artifactContentLength,
                 this.inputs.artifactContentType,
                 this.inputs.artifact,
-                basename(this.inputs.artifact))
+                basename(this.inputs.artifact)
+            )
         }
     }
 }
