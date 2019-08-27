@@ -1,4 +1,4 @@
-name: 'Release'
+name: 'Create Release'
 description: 'Creates github releases'
 author: 'Nick Cipollo'
 inputs:
@@ -33,3 +33,7 @@ inputs:
 runs:
   using: 'node12'
   main: 'lib/Main.js'
+branding:
+  icon: 'tag'
+  color: 'gray-dark'
+
