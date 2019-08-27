@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: ncipollo/release-action@release/v1
+    - uses: ncipollo/release-action@v1
       with:
         artifact: "release.tar.gz"
         bodyFile: "body.md"
