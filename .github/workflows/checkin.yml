@@ -7,14 +7,14 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: "npm ci"
-      run: npm ci
+    - name: "yarn ci"
+      run: yarn ci
 
-    - name: "npm run build"
-      run: npm run build
+    - name: "yarn build"
+      run: yarn build
 
-    - name: "npm run test"
-      run: npm run test
+    - name: "yarn test"
+      run: yarn test
 
     - name: "check for uncommitted changes"
       # Ensure no changes, but ignore node_modules dir since dev/fresh ci deps installed.
