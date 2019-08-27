@@ -6,6 +6,8 @@ const createMock = jest.fn()
 const uploadMock = jest.fn()
 
 const artifactPath = 'a/path'
+const artifactName = 'path'
+const artifactData = Buffer.from('blob','utf-8')
 const body = 'body'
 const commit = 'commit'
 const contentType = "raw"
@@ -35,14 +37,14 @@ describe("Action", () => {
         const action = createAction(true)
         createMock.mockResolvedValue({
             data: {
-                assets_url: url
+                upload_url: url
             }
         })
 
         await action.perform()
 
         expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
-        expect(uploadMock).toBeCalledWith(url, contentLength, contentType, artifactPath, 'path')
+        expect(uploadMock).toBeCalledWith(url, contentLength, contentType, artifactData, 'path')
     })
 
     it('throws error when create fails', async () => {
@@ -64,7 +66,7 @@ describe("Action", () => {
         const action = createAction(true)
         createMock.mockResolvedValue({
             data: {
-                assets_url: url
+                upload_url: url
             }
         })
         uploadMock.mockRejectedValue("error")
@@ -77,7 +79,7 @@ describe("Action", () => {
         }
 
         expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
-        expect(uploadMock).toBeCalledWith(url, contentLength, contentType, artifactPath, 'path')
+        expect(uploadMock).toBeCalledWith(url, contentLength, contentType, artifactData, 'path')
     })
 
     function createAction(hasArtifact: boolean): Action {
@@ -96,6 +98,7 @@ describe("Action", () => {
         const MockInputs = jest.fn<Inputs, any>(() => {
             return {
                 artifact: artifact,
+                artifactName: artifactName,
                 artifactContentType: contentType,
                 artifactContentLength: contentLength,
                 body: body,
@@ -103,7 +106,8 @@ describe("Action", () => {
                 draft: draft,
                 name: name,
                 tag: tag,
-                token: token
+                token: token,
+                readArtifact: () => artifactData
             }
         })
         const inputs = new MockInputs()

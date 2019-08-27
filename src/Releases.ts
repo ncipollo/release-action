@@ -15,7 +15,7 @@ export interface Releases {
         assetUrl: string,
         contentLength: number,
         contentType: string,
-        file: string,
+        file: string | object,
         name: string
     ): Promise<Response<AnyResponse>>
 }
@@ -51,7 +51,7 @@ export class GithubReleases implements Releases{
         assetUrl: string,
         contentLength: number,
         contentType: string,
-        file: string,
+        file: string | object,
         name: string
     ): Promise<Response<AnyResponse>> {
         return this.git.repos.uploadReleaseAsset({

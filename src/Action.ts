@@ -1,6 +1,7 @@
 import { Inputs } from "./Inputs";
 import { Releases } from "./Releases";
 import { basename } from "path";
+import { readFileSync } from "fs";
 
 export class Action {
     private inputs: Inputs
@@ -21,12 +22,13 @@ export class Action {
         )
 
         if (this.inputs.artifact) {
+            const artifactData = this.inputs.readArtifact()
             await this.releases.uploadArtifact(
-                createResult.data.assets_url,
+                createResult.data.upload_url,
                 this.inputs.artifactContentLength,
                 this.inputs.artifactContentType,
-                this.inputs.artifact,
-                basename(this.inputs.artifact)
+                artifactData,
+                this.inputs.artifactName
             )
         }
     }

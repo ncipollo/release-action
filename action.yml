@@ -15,13 +15,16 @@ inputs:
     description: 'An optional body file for the release. This should be the path to the file'
     default: ''  
   commit:
-    description: 'An optional commit reference. This will be used to create the tag if it doesn't exist.'
+    description: "An optional commit reference. This will be used to create the tag if it does not exist."
+    default: ''
+  draft:
+    description: "Optionally marks this release as a draft release. Set to true to enable."
     default: ''
   name:
     description: 'An optional name for the release. If this is omitted the tag will be used.'
     default: ''
   tag:
-    description: 'An optional tag for the release. If this is omitted the git ref will be used (if it's a tag).'
+    description: 'An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).'
     default: ''
   token:
     description: 'The Github token.'
@@ -29,4 +32,4 @@ inputs:
     default: ''
 runs:
   using: 'node12'
-  main: 'lib/main.js'
+  main: 'lib/Main.js'

@@ -26,6 +26,12 @@ describe('Inputs', () => {
         inputs = new CoreInputs(context)
     })
 
+    it('reads artifact', () => {
+        mockGetInput.mockReturnValue("a/path")
+        mockReadFileSync.mockReturnValue('file')
+        expect(inputs.artifact).toBe("a/path")
+    })
+
     it('returns artifact', () => {
         mockGetInput.mockReturnValue("a/path")
         expect(inputs.artifact).toBe("a/path")
@@ -35,6 +41,11 @@ describe('Inputs', () => {
         mockGetInput.mockReturnValue("a/path")
         mockStatSync.mockReturnValue({size: 100})
         expect(inputs.artifactContentLength).toBe(100)
+    })
+
+    it('returns artifactName', () => {
+        mockGetInput.mockReturnValue("a/path")
+        expect(inputs.artifactName).toBe("path")
     })
 
     it('returns targetCommit', () => {

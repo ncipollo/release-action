@@ -1,9 +1,11 @@
 import * as core from '@actions/core';
 import { Context } from "@actions/github/lib/context";
 import { readFileSync, statSync } from 'fs';
+import { basename } from 'path';
 
 export interface Inputs {
     readonly artifact: string
+    readonly artifactName: string
     readonly artifactContentType: string
     readonly artifactContentLength: number
     readonly body: string
@@ -12,6 +14,8 @@ export interface Inputs {
     readonly name: string
     readonly tag: string
     readonly token: string
+
+    readArtifact(): Buffer
 }
 
 export class CoreInputs implements Inputs {
@@ -23,6 +27,10 @@ export class CoreInputs implements Inputs {
 
     get artifact(): string {
         return core.getInput('artifact')
+    }
+
+    get artifactName(): string {
+        return basename(this.artifact)
     }
 
     get artifactContentType(): string {
@@ -87,6 +95,10 @@ export class CoreInputs implements Inputs {
 
     get token(): string {
         return core.getInput('token', { required: true })
+    }
+
+    readArtifact(): Buffer {
+        return readFileSync(this.artifact)
     }
 
     stringFromFile(path: string): string {
