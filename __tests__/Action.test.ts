@@ -1,13 +1,17 @@
 import { Action } from "../src/Action";
+import { Artifact } from "../src/Artifact";
 import { Inputs } from "../src/Inputs";
 import { Releases } from "../src/Releases";
+import { ArtifactUploader } from "../src/ArtifactUploader";
 
 const createMock = jest.fn()
 const uploadMock = jest.fn()
 
-const artifactPath = 'a/path'
-const artifactName = 'path'
-const artifactData = Buffer.from('blob','utf-8')
+const artifacts = [
+    new Artifact('a/art1'),
+    new Artifact('b/art2')
+]
+const artifactData = Buffer.from('blob', 'utf-8')
 const body = 'body'
 const commit = 'commit'
 const contentType = "raw"
@@ -44,7 +48,7 @@ describe("Action", () => {
         await action.perform()
 
         expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
-        expect(uploadMock).toBeCalledWith(url, contentLength, contentType, artifactData, 'path')
+        expect(uploadMock).toBeCalledWith(artifacts, url)
     })
 
     it('throws error when create fails', async () => {
@@ -79,28 +83,25 @@ describe("Action", () => {
         }
 
         expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
-        expect(uploadMock).toBeCalledWith(url, contentLength, contentType, artifactData, 'path')
+        expect(uploadMock).toBeCalledWith(artifacts, url)
     })
 
     function createAction(hasArtifact: boolean): Action {
-        let artifact: string
+        let inputArtifact: Artifact[]
         if (hasArtifact) {
-            artifact = artifactPath
+            inputArtifact = artifacts
         } else {
-            artifact = ''
+            inputArtifact = []
         }
         const MockReleases = jest.fn<Releases, any>(() => {
             return {
                 create: createMock,
-                uploadArtifact: uploadMock
+                uploadArtifact: jest.fn()
             }
         })
         const MockInputs = jest.fn<Inputs, any>(() => {
             return {
-                artifact: artifact,
-                artifactName: artifactName,
-                artifactContentType: contentType,
-                artifactContentLength: contentLength,
+                artifacts: inputArtifact,
                 body: body,
                 commit: commit,
                 draft: draft,
@@ -110,9 +111,16 @@ describe("Action", () => {
                 readArtifact: () => artifactData
             }
         })
+        const MockUploader = jest.fn<ArtifactUploader, any>(() => {
+            return {
+                uploadArtifacts: uploadMock
+            }
+        })
+
         const inputs = new MockInputs()
         const releases = new MockReleases()
+        const uploader = new MockUploader()
 
-        return new Action(inputs, releases)
+        return new Action(inputs, releases, uploader)
     }
 })

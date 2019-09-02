@@ -1,15 +1,16 @@
 import { Inputs } from "./Inputs";
 import { Releases } from "./Releases";
-import { basename } from "path";
-import { readFileSync } from "fs";
+import { ArtifactUploader } from "./ArtifactUploader";
 
 export class Action {
     private inputs: Inputs
     private releases: Releases
+    private uploader: ArtifactUploader
 
-    constructor(inputs: Inputs, releases: Releases) {
+    constructor(inputs: Inputs, releases: Releases, uploader: ArtifactUploader) {
         this.inputs = inputs
         this.releases = releases
+        this.uploader = uploader
     }
 
     async perform() {
@@ -21,14 +22,11 @@ export class Action {
             this.inputs.name
         )
 
-        if (this.inputs.artifact) {
-            const artifactData = this.inputs.readArtifact()
-            await this.releases.uploadArtifact(
-                createResult.data.upload_url,
-                this.inputs.artifactContentLength,
-                this.inputs.artifactContentType,
-                artifactData,
-                this.inputs.artifactName
+        const artifacts = this.inputs.artifacts
+        if (artifacts.length > 0) {
+            await this.uploader.uploadArtifacts(
+                artifacts,
+                createResult.data.upload_url
             )
         }
     }

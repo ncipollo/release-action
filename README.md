@@ -3,7 +3,8 @@
 This action will create a github release and optionally upload an artifact to it.
 
 ## Action Inputs
-- **artifact**: A path to an optional artifact to upload to the release.
+- **artifact**: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
+- **artifacts**: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
 - **artifactContentType**: The content type of the artifact. Defaults to raw.
 - **body**: An optional body for the release.
 - **bodyFile**: An optional body file for the release. This should be the path to the file.
@@ -32,7 +33,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: ncipollo/release-action@v1
       with:
-        artifact: "release.tar.gz"
+        artifacts: "release.tar.gz,foo/*.txt"
         bodyFile: "body.md"
         token: ${{ secrets.GITHUB_TOKEN }}
 

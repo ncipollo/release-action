@@ -3,8 +3,11 @@ description: 'Creates github releases'
 author: 'Nick Cipollo'
 inputs:
   artifact:
-    description: 'A path to an optional artifact to upload to the release.'
+    description: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)'
     default: ''
+  artifacts:
+    description: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)'
+    default: ''  
   artifactContentType:
     description: 'The content type of the artifact. Defaults to raw'
     default: ''

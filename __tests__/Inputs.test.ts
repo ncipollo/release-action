@@ -1,89 +1,100 @@
 const mockGetInput = jest.fn();
+const mockGlob = jest.fn()
 const mockReadFileSync = jest.fn();
 const mockStatSync = jest.fn();
 
-import { Inputs, CoreInputs } from "../src/Inputs";
+import { Artifact } from "../src/Artifact";
+import { ArtifactGlobber } from "../src/ArtifactGlobber";
 import { Context } from "@actions/github/lib/context";
+import { Inputs, CoreInputs } from "../src/Inputs";
 
+const artifacts = [
+    new Artifact('a/art1'),
+    new Artifact('b/art2')
+]
 
 jest.mock('@actions/core', () => {
     return { getInput: mockGetInput };
 })
 
 jest.mock('fs', () => {
-    return { 
+    return {
         readFileSync: mockReadFileSync,
         statSync: mockStatSync
-     };
+    };
 })
 
 describe('Inputs', () => {
     let context: Context;
     let inputs: Inputs;
     beforeEach(() => {
-        mockGetInput.mockReturnValue(null)
+        mockGetInput.mockReset()
         context = new Context()
-        inputs = new CoreInputs(context)
-    })
-
-    it('reads artifact', () => {
-        mockGetInput.mockReturnValue("a/path")
-        mockReadFileSync.mockReturnValue('file')
-        expect(inputs.artifact).toBe("a/path")
-    })
-
-    it('returns artifact', () => {
-        mockGetInput.mockReturnValue("a/path")
-        expect(inputs.artifact).toBe("a/path")
-    })
-
-    it('returns artifactContentLength', () => {
-        mockGetInput.mockReturnValue("a/path")
-        mockStatSync.mockReturnValue({size: 100})
-        expect(inputs.artifactContentLength).toBe(100)
-    })
-
-    it('returns artifactName', () => {
-        mockGetInput.mockReturnValue("a/path")
-        expect(inputs.artifactName).toBe("path")
+        inputs = new CoreInputs(createGlobber(), context)
     })
 
     it('returns targetCommit', () => {
-        mockGetInput.mockReturnValue("42")
-        expect(inputs.commit).toBe("42")
+        mockGetInput.mockReturnValue('42')
+        expect(inputs.commit).toBe('42')
     })
 
     it('returns token', () => {
-        mockGetInput.mockReturnValue("42")
-        expect(inputs.token).toBe("42")
+        mockGetInput.mockReturnValue('42')
+        expect(inputs.token).toBe('42')
     })
 
-    describe('artifactContentType', () => {
-        it('returns input content-type', () => {
-            mockGetInput.mockReturnValue("type")
-            expect(inputs.artifactContentType).toBe("type")
+    describe('artifacts', () => {
+        it('returns empty artifacts', () => {
+            mockGetInput.mockReturnValueOnce('')
+            .mockReturnValueOnce('')
+            
+            expect(inputs.artifacts).toEqual([])
+            expect(mockGlob).toBeCalledTimes(0)
         })
 
-        it('returns raw as default', () => {
-            expect(inputs.artifactContentType).toBe("raw")
+        it('returns input.artifacts', () => {
+            mockGetInput.mockReturnValueOnce('art1')
+            .mockReturnValueOnce('contentType')
+            
+            expect(inputs.artifacts).toEqual(artifacts)
+            expect(mockGlob).toBeCalledTimes(1)
+            expect(mockGlob).toBeCalledWith('art1', 'contentType')
+        })
+
+        it('returns input.artifacts with default contentType', () => {
+            mockGetInput.mockReturnValueOnce('art1')
+            
+            expect(inputs.artifacts).toEqual(artifacts)
+            expect(mockGlob).toBeCalledTimes(1)
+            expect(mockGlob).toBeCalledWith('art1', 'raw')
+        })
+        
+        it('returns input.artifact', () => {
+            mockGetInput.mockReturnValueOnce('')
+            .mockReturnValueOnce('art2')
+            .mockReturnValueOnce('contentType')
+            
+            expect(inputs.artifacts).toEqual(artifacts)
+            expect(mockGlob).toBeCalledTimes(1)
+            expect(mockGlob).toBeCalledWith('art2', 'contentType')
         })
     })
 
     describe('body', () => {
         it('returns input body', () => {
-            mockGetInput.mockReturnValue("body")
-            expect(inputs.body).toBe("body")
+            mockGetInput.mockReturnValue('body')
+            expect(inputs.body).toBe('body')
         })
 
         it('returns body file contents', () => {
-            mockGetInput.mockReturnValueOnce("").mockReturnValueOnce("a/path")
-            mockReadFileSync.mockReturnValue("file")
+            mockGetInput.mockReturnValueOnce('').mockReturnValueOnce('a/path')
+            mockReadFileSync.mockReturnValue('file')
 
-            expect(inputs.body).toBe("file")
+            expect(inputs.body).toBe('file')
         })
 
         it('returns empty', () => {
-            expect(inputs.body).toBe("")
+            expect(inputs.body).toBe('')
         })
     })
 
@@ -91,43 +102,53 @@ describe('Inputs', () => {
         it('returns false', () => {
             expect(inputs.draft).toBe(false)
         })
-        
+
         it('returns true', () => {
-            mockGetInput.mockReturnValue("true")
+            mockGetInput.mockReturnValue('true')
             expect(inputs.draft).toBe(true)
         })
     })
 
     describe('name', () => {
         it('returns input name', () => {
-            mockGetInput.mockReturnValue("name")
-            expect(inputs.name).toBe("name")
+            mockGetInput.mockReturnValue('name')
+            expect(inputs.name).toBe('name')
         })
 
         it('returns tag', () => {
-            mockGetInput.mockReturnValue("")
-            context.ref = "refs/tags/sha-tag"
-            expect(inputs.name).toBe("sha-tag")
+            mockGetInput.mockReturnValue('')
+            context.ref = 'refs/tags/sha-tag'
+            expect(inputs.name).toBe('sha-tag')
         })
     })
 
     describe('tag', () => {
         it('returns input tag', () => {
-            mockGetInput.mockReturnValue("tag")
-            expect(inputs.tag).toBe("tag")
+            mockGetInput.mockReturnValue('tag')
+            expect(inputs.tag).toBe('tag')
         })
         it('returns context sha when input is empty', () => {
-            mockGetInput.mockReturnValue("")
-            context.ref = "refs/tags/sha-tag"
-            expect(inputs.tag).toBe("sha-tag")
+            mockGetInput.mockReturnValue('')
+            context.ref = 'refs/tags/sha-tag'
+            expect(inputs.tag).toBe('sha-tag')
         })
         it('returns context sha when input is null', () => {
             mockGetInput.mockReturnValue(null)
-            context.ref = "refs/tags/sha-tag"
-            expect(inputs.tag).toBe("sha-tag")
+            context.ref = 'refs/tags/sha-tag'
+            expect(inputs.tag).toBe('sha-tag')
         })
         it('throws if no tag', () => {
             expect(() => inputs.tag).toThrow()
         })
     })
+
+    function createGlobber(): ArtifactGlobber {
+        const MockGlobber = jest.fn<ArtifactGlobber, any>(() => {
+            return {
+                globArtifactString: mockGlob
+            }
+        })
+        mockGlob.mockImplementation(() => artifacts)
+        return new MockGlobber()
+    }
 })

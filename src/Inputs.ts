@@ -1,49 +1,42 @@
 import * as core from '@actions/core';
 import { Context } from "@actions/github/lib/context";
-import { readFileSync, statSync } from 'fs';
-import { basename } from 'path';
+import { readFileSync } from 'fs';
+import { ArtifactGlobber } from './ArtifactGlobber';
+import { Artifact } from './Artifact';
 
 export interface Inputs {
-    readonly artifact: string
-    readonly artifactName: string
-    readonly artifactContentType: string
-    readonly artifactContentLength: number
+    readonly artifacts: Artifact[]
     readonly body: string
     readonly commit: string
     readonly draft: boolean
     readonly name: string
     readonly tag: string
     readonly token: string
-
-    readArtifact(): Buffer
 }
 
 export class CoreInputs implements Inputs {
+    private artifactGlobber: ArtifactGlobber
     private context: Context
 
-    constructor(context: Context) {
+    constructor(artifactGlobber: ArtifactGlobber, context: Context) {
+        this.artifactGlobber = artifactGlobber
         this.context = context
     }
 
-    get artifact(): string {
-        return core.getInput('artifact')
-    }
-
-    get artifactName(): string {
-        return basename(this.artifact)
-    }
-
-    get artifactContentType(): string {
-        const type = core.getInput('artifactContentType')
-        if(type) {
-            return type;
+    get artifacts(): Artifact[] {
+        let artifacts = core.getInput('artifacts')
+        if (!artifacts) {
+            artifacts = core.getInput('artifacts')
         }
-
-        return 'raw'
-    }
-
-    get artifactContentLength(): number {
-        return statSync(this.artifact).size
+        if (artifacts) {
+            let contentType = core.getInput('artifactContentType')
+            if (!contentType) {
+                contentType = 'raw'
+            }
+            return this.artifactGlobber
+                .globArtifactString(artifacts, contentType)
+        }
+        return []
     }
 
     get body(): string {
@@ -95,10 +88,6 @@ export class CoreInputs implements Inputs {
 
     get token(): string {
         return core.getInput('token', { required: true })
-    }
-
-    readArtifact(): Buffer {
-        return readFileSync(this.artifact)
     }
 
     stringFromFile(path: string): string {
