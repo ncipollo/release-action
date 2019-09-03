@@ -3,8 +3,8 @@
 This action will create a github release and optionally upload an artifact to it.
 
 ## Action Inputs
-- **artifact**: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
-- **artifacts**: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
+- **artifact**: An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
+- **artifacts**: An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
 - **artifactContentType**: The content type of the artifact. Defaults to raw.
 - **body**: An optional body for the release.
 - **bodyFile**: An optional body file for the release. This should be the path to the file.
