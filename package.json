@@ -1,8 +1,8 @@
 {
-  "name": "node12-template-action",
-  "version": "0.0.0",
+  "name": "release-action",
+  "version": "1.1.0",
   "private": true,
-  "description": "Node 12 template action",
+  "description": "An action which manages a github release",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/node12-template.git"
+    "url": "git+https://github.com/ncipollo/release-action.git"
   },
   "keywords": [
     "actions",
