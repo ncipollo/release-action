@@ -26,7 +26,7 @@ export class CoreInputs implements Inputs {
     get artifacts(): Artifact[] {
         let artifacts = core.getInput('artifacts')
         if (!artifacts) {
-            artifacts = core.getInput('artifacts')
+            artifacts = core.getInput('artifact')
         }
         if (artifacts) {
             let contentType = core.getInput('artifactContentType')
