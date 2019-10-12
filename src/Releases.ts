@@ -6,7 +6,6 @@ export interface Releases {
     create(
         tag: string,
         body?: string,
-        commitHash?: string,
         draft?: boolean,
         name?: string
     ): Promise<Response<ReposCreateReleaseResponse>>
@@ -42,7 +41,6 @@ export class GithubReleases implements Releases{
             draft: draft,
             owner: this.context.repo.owner,
             repo: this.context.repo.repo,
-            target_commitish: commitHash,
             tag_name: tag
         })
     }
