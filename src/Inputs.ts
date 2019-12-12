@@ -5,6 +5,7 @@ import { ArtifactGlobber } from './ArtifactGlobber';
 import { Artifact } from './Artifact';
 
 export interface Inputs {
+    readonly allowUpdates: boolean
     readonly artifacts: Artifact[]
     readonly body: string
     readonly commit: string
@@ -21,6 +22,11 @@ export class CoreInputs implements Inputs {
     constructor(artifactGlobber: ArtifactGlobber, context: Context) {
         this.artifactGlobber = artifactGlobber
         this.context = context
+    }
+
+    get allowUpdates(): boolean {
+        const allow = core.getInput('allowUpdates')
+        return allow == 'true'
     }
 
     get artifacts(): Artifact[] {

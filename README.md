@@ -3,6 +3,7 @@
 This action will create a github release and optionally upload an artifact to it.
 
 ## Action Inputs
+- **allowUpdates**: An optional flag which indicates if we should update a release if it already exists. Defaults to false.
 - **artifact**: An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
 - **artifacts**: An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
 - **artifactContentType**: The content type of the artifact. Defaults to raw.

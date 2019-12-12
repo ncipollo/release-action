@@ -1,6 +1,33 @@
 import { ErrorMessage } from "../src/ErrorMessage"
 
 describe('ErrorMessage', () => {
+
+    describe('has error with code', () => {
+        const error = {
+            message: 'something bad happened',
+            errors: [
+                {
+                    code: 'missing',
+                    resource: 'release'
+                },
+                {
+                    code: 'already_exists',
+                    resource: 'release'
+                }
+            ]
+        }
+
+        it('does not have error', ()=> {
+            const errorMessage = new ErrorMessage(error)
+            expect(errorMessage.hasErrorWithCode('missing_field')).toBeFalsy()
+        })
+
+        it('has error', ()=> {
+            const errorMessage = new ErrorMessage(error)
+            expect(errorMessage.hasErrorWithCode('missing')).toBeTruthy()
+        })
+    })
+
     it('generates message with errors', () => {
         const resource = "release"
         const error = {

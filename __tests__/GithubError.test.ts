@@ -1,6 +1,17 @@
 import { GithubError } from "../src/GithubError"
 
 describe('GithubError', () => {
+
+    it('provides error code', () => {
+        const error = {
+            code: "missing"
+        }
+
+        const githubError = new GithubError(error)
+
+        expect(githubError.code).toBe('missing')
+    })
+
     it('generates missing resource error message', () => {
         const resource = "release"
         const error = {
@@ -66,10 +77,10 @@ describe('GithubError', () => {
                 message: "foo",
                 documentation_url: url
             }
-    
+
             const githubError = new GithubError(error)
             const message = githubError.toString()
-    
+
             expect(message).toBe(`foo\nPlease see ${url}.`)
         })
 
@@ -78,10 +89,10 @@ describe('GithubError', () => {
                 code: "custom",
                 message: "foo"
             }
-    
+
             const githubError = new GithubError(error)
             const message = githubError.toString()
-    
+
             expect(message).toBe('foo')
         })
     })

@@ -1,9 +1,20 @@
 import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github";
-import { AnyResponse, Response, ReposCreateReleaseResponse } from "@octokit/rest";
+import { AnyResponse, Response, ReposCreateReleaseResponse, ReposGetReleaseByTagResponse } from "@octokit/rest";
 
 export interface Releases {
     create(
+        tag: string,
+        body?: string,
+        commitHash?: string,
+        draft?: boolean,
+        name?: string
+    ): Promise<Response<ReposCreateReleaseResponse>>
+
+    getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>>
+
+    update(
+        id: number,
         tag: string,
         body?: string,
         commitHash?: string,
@@ -20,7 +31,7 @@ export interface Releases {
     ): Promise<Response<AnyResponse>>
 }
 
-export class GithubReleases implements Releases{
+export class GithubReleases implements Releases {
     context: Context
     git: GitHub
 
@@ -37,6 +48,34 @@ export class GithubReleases implements Releases{
         name?: string
     ): Promise<Response<ReposCreateReleaseResponse>> {
         return this.git.repos.createRelease({
+            body: body,
+            name: name,
+            draft: draft,
+            owner: this.context.repo.owner,
+            repo: this.context.repo.repo,
+            target_commitish: commitHash,
+            tag_name: tag
+        })
+    }
+
+    async getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>> {
+        return this.git.repos.getReleaseByTag({
+            owner: this.context.repo.owner,
+            repo: this.context.repo.repo,
+            tag: tag
+        })
+    }
+
+    async update(
+        id: number,
+        tag: string,
+        body?: string,
+        commitHash?: string,
+        draft?: boolean,
+        name?: string
+    ): Promise<Response<ReposCreateReleaseResponse>> {
+        return this.git.repos.updateRelease({
+            release_id: id,
             body: body,
             name: name,
             draft: draft,

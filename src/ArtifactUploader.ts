@@ -2,7 +2,7 @@ import { Artifact } from "./Artifact";
 import { Releases } from "./Releases";
 
 export interface ArtifactUploader {
-    uploadArtifacts(artifacts: Artifact[], uploadUrl: string): void
+    uploadArtifacts(artifacts: Artifact[], uploadUrl: string): Promise<void>
 }
 
 export class GithubArtifactUploader implements ArtifactUploader {

@@ -43,6 +43,17 @@ describe('Inputs', () => {
         expect(inputs.token).toBe('42')
     })
 
+    describe('allowsUpdates', () => {
+        it('returns false', () => {
+            expect(inputs.allowUpdates).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValue('true')
+            expect(inputs.allowUpdates).toBe(true)
+        })
+    })
+
     describe('artifacts', () => {
         it('returns empty artifacts', () => {
             mockGetInput.mockReturnValueOnce('')

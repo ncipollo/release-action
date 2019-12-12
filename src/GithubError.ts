@@ -1,13 +1,17 @@
 export class GithubError {
-    error: any;
+    private error: any;
 
     constructor(error: any) {
         this.error = error
     }
 
+    get code(): string {
+        return this.error.code
+    }
+
     toString(): string {
-        const code = this.error.code 
-        switch(code) {
+        const code = this.error.code
+        switch (code) {
             case 'missing':
                 return this.missingResourceMessage()
             case 'missing_field':
@@ -26,7 +30,7 @@ export class GithubError {
         const documentation = this.error.documentation_url
 
         let documentationMessage: string
-        if(documentation) {
+        if (documentation) {
             documentationMessage = `\nPlease see ${documentation}.`
         } else {
             documentationMessage = ""
@@ -41,7 +45,7 @@ export class GithubError {
 
         return `The ${field} field on ${resource} is an invalid format.`
     }
-    
+
     private missingResourceMessage(): string {
         const resource = this.error.resource
         return `${resource} does not exist.`
