@@ -43,16 +43,12 @@ describe("Action", () => {
     it('creates release if no release exists to update', async () => {
         const action = createAction(true, true)
         const error = {
-            errors: [
-                {
-                    code: 'missing'
-                }
-            ]
+            status: 404
         }
         getMock.mockRejectedValue(error)
 
         await action.perform()
-        
+
         expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
         expect(uploadMock).toBeCalledWith(artifacts, url)
     })
