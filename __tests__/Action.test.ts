@@ -40,6 +40,23 @@ describe("Action", () => {
         expect(uploadMock).not.toBeCalled()
     })
 
+    it('creates release if no release exists to update', async () => {
+        const action = createAction(true, true)
+        const error = {
+            errors: [
+                {
+                    code: 'missing'
+                }
+            ]
+        }
+        getMock.mockRejectedValue(error)
+
+        await action.perform()
+        
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+        expect(uploadMock).toBeCalledWith(artifacts, url)
+    })
+
     it('creates release then uploads artifact', async () => {
         const action = createAction(false, true)
 
@@ -65,7 +82,7 @@ describe("Action", () => {
     })
 
     it('throws error when get fails', async () => {
-        const action = createAction(true, false)
+        const action = createAction(true, true)
         const error = {
             errors: [
                 {
@@ -73,7 +90,7 @@ describe("Action", () => {
                 }
             ]
         }
-        
+
         createMock.mockRejectedValue(error)
         getMock.mockRejectedValue("error")
         expect.hasAssertions()
@@ -82,34 +99,27 @@ describe("Action", () => {
         } catch (error) {
             expect(error).toEqual("error")
         }
-        
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+
+        expect(getMock).toBeCalledWith(tag)
+        expect(updateMock).not.toBeCalled()
         expect(uploadMock).not.toBeCalled()
-        
+
     })
 
     it('throws error when update fails', async () => {
-        const action = createAction(true, false)
-        const error = {
-            errors: [
-                {
-                    code: 'already_exists'
-                }
-            ]
-        }
-        
-        createMock.mockRejectedValue(error)
+        const action = createAction(true, true)
+
         updateMock.mockRejectedValue("error")
+
         expect.hasAssertions()
         try {
             await action.perform()
         } catch (error) {
             expect(error).toEqual("error")
         }
-        
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name)
         expect(uploadMock).not.toBeCalled()
-        
     })
 
     it('throws error when upload fails', async () => {
@@ -129,40 +139,22 @@ describe("Action", () => {
 
     it('updates release but does not upload if no artifact', async () => {
         const action = createAction(true, false)
-        const error = {
-            errors: [
-                {
-                    code: 'already_exists'
-                }
-            ]
-        }
-        
-        createMock.mockRejectedValue(error)
 
         await action.perform()
-        
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name)
         expect(uploadMock).not.toBeCalled()
-        
+
     })
 
     it('updates release then uploads artifact', async () => {
         const action = createAction(true, true)
-        const error = {
-            errors: [
-                {
-                    code: 'already_exists'
-                }
-            ]
-        }
-        
-        createMock.mockRejectedValue(error)
 
         await action.perform()
-        
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name)
         expect(uploadMock).toBeCalledWith(artifacts, url)
-        
+
     })
 
     function createAction(allowUpdates: boolean, hasArtifact: boolean): Action {

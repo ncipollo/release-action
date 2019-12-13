@@ -24,14 +24,19 @@ export class Action {
     }
 
     private async createOrUpdateRelease(): Promise<string> {
-        try {
-            return await this.createRelease()
-        } catch (error) {
-            if (this.releaseAlreadyExisted(error) && this.inputs.allowUpdates) {
-                return this.updateRelease()
-            } else {
-                throw error
+        if(this.inputs.allowUpdates) {
+            try {
+                const getResponse = await this.releases.getByTag(this.inputs.tag)
+                return this.updateRelease(getResponse.data.id)
+            } catch (error) {
+                if (this.noRelease(error)) {
+                    return await this.createRelease()
+                } else {
+                    throw error
+                }
             }
+        } else {
+            return await this.createRelease()
         }
     }
 
@@ -47,15 +52,12 @@ export class Action {
         return response.data.upload_url
     }
 
-    private releaseAlreadyExisted(error: any): boolean {
+    private noRelease(error:any): boolean {
         const errorMessage = new ErrorMessage(error)
-        return errorMessage.hasErrorWithCode('already_exists')
+        return errorMessage.hasErrorWithCode('missing')
     }
 
-    private async updateRelease(): Promise<string> {
-        const getResponse = await this.releases.getByTag(this.inputs.tag)
-        const id = getResponse.data.id
-
+    private async updateRelease(id: number): Promise<string> {
         const response = await this.releases.update(
             id,
             this.inputs.tag,
