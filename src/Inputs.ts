@@ -11,6 +11,7 @@ export interface Inputs {
     readonly commit: string
     readonly draft: boolean
     readonly name: string
+    readonly prerelease: boolean
     readonly tag: string
     readonly token: string
 }
@@ -75,6 +76,11 @@ export class CoreInputs implements Inputs {
         }
 
         return this.tag
+    }
+
+    get prerelease(): boolean {
+        const draft = core.getInput('prerelease')
+        return draft == 'true'
     }
 
     get tag(): string {

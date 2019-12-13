@@ -29,6 +29,9 @@ inputs:
   name:
     description: 'An optional name for the release. If this is omitted the tag will be used.'
     default: ''
+  prerelease:
+    description: "Optionally marks this release as prerelease. Set to true to enable."
+    default: ''  
   tag:
     description: 'An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).'
     default: ''

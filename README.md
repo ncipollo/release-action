@@ -12,6 +12,7 @@ This action will create a github release and optionally upload an artifact to it
 - **commit**: An optional commit reference. This will be used to create the tag if it does not exist.
 - **draft**: Optionally marks this release as a draft release. Set to `true` to enable.
 - **name**: An optional name for the release. If this is omitted the tag will be used.
+- **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).
 - **token**: (**Required**) The Github token. Typically this will be `${{ secrets.GITHUB_TOKEN }}`.
 

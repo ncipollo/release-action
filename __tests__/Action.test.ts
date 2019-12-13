@@ -19,6 +19,7 @@ const commit = 'commit'
 const draft = true
 const id = 100
 const name = 'name'
+const prerelease = true
 const tag = 'tag'
 const token = 'token'
 const url = 'http://api.example.com'
@@ -36,7 +37,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -49,7 +50,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, url)
     })
 
@@ -58,7 +59,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, url)
     })
 
@@ -73,7 +74,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -114,7 +115,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name)
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -129,7 +130,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name)
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, url)
     })
 
@@ -138,7 +139,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name)
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
         expect(uploadMock).not.toBeCalled()
 
     })
@@ -148,7 +149,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name)
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, url)
 
     })
@@ -194,6 +195,7 @@ describe("Action", () => {
                 commit: commit,
                 draft: draft,
                 name: name,
+                prerelease: prerelease,
                 tag: tag,
                 token: token,
                 readArtifact: () => artifactData

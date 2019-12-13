@@ -133,6 +133,17 @@ describe('Inputs', () => {
         })
     })
 
+    describe('prerelase', () => {
+        it('returns false', () => {
+            expect(inputs.prerelease).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValue('true')
+            expect(inputs.prerelease).toBe(true)
+        })
+    })
+
     describe('tag', () => {
         it('returns input tag', () => {
             mockGetInput.mockReturnValue('tag')

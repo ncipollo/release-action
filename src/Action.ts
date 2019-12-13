@@ -24,7 +24,7 @@ export class Action {
     }
 
     private async createOrUpdateRelease(): Promise<string> {
-        if(this.inputs.allowUpdates) {
+        if (this.inputs.allowUpdates) {
             try {
                 const getResponse = await this.releases.getByTag(this.inputs.tag)
                 return await this.updateRelease(getResponse.data.id)
@@ -46,13 +46,14 @@ export class Action {
             this.inputs.body,
             this.inputs.commit,
             this.inputs.draft,
-            this.inputs.name
+            this.inputs.name,
+            this.inputs.prerelease
         )
 
         return response.data.upload_url
     }
 
-    private noRelease(error:any): boolean {
+    private noRelease(error: any): boolean {
         const errorMessage = new ErrorMessage(error)
         return errorMessage.status == 404
     }
@@ -64,7 +65,8 @@ export class Action {
             this.inputs.body,
             this.inputs.commit,
             this.inputs.draft,
-            this.inputs.name
+            this.inputs.name,
+            this.inputs.prerelease
         )
 
         return response.data.upload_url

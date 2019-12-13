@@ -8,7 +8,8 @@ export interface Releases {
         body?: string,
         commitHash?: string,
         draft?: boolean,
-        name?: string
+        name?: string,
+        prerelease?: boolean
     ): Promise<Response<ReposCreateReleaseResponse>>
 
     getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>>
@@ -19,7 +20,8 @@ export interface Releases {
         body?: string,
         commitHash?: string,
         draft?: boolean,
-        name?: string
+        name?: string,
+        prerelease?: boolean
     ): Promise<Response<ReposCreateReleaseResponse>>
 
     uploadArtifact(
@@ -45,13 +47,15 @@ export class GithubReleases implements Releases {
         body?: string,
         commitHash?: string,
         draft?: boolean,
-        name?: string
+        name?: string,
+        prerelease?: boolean
     ): Promise<Response<ReposCreateReleaseResponse>> {
         return this.git.repos.createRelease({
             body: body,
             name: name,
             draft: draft,
             owner: this.context.repo.owner,
+            prerelease: prerelease,
             repo: this.context.repo.repo,
             target_commitish: commitHash,
             tag_name: tag
@@ -72,7 +76,8 @@ export class GithubReleases implements Releases {
         body?: string,
         commitHash?: string,
         draft?: boolean,
-        name?: string
+        name?: string,
+        prerelease?: boolean
     ): Promise<Response<ReposCreateReleaseResponse>> {
         return this.git.repos.updateRelease({
             release_id: id,
@@ -80,6 +85,7 @@ export class GithubReleases implements Releases {
             name: name,
             draft: draft,
             owner: this.context.repo.owner,
+            prerelease: prerelease,
             repo: this.context.repo.repo,
             target_commitish: commitHash,
             tag_name: tag
