@@ -18,6 +18,10 @@ export class ErrorMessage {
         }
     }
 
+    get status():number {
+        return this.error.status
+    }
+
     hasErrorWithCode(code: String): boolean {
         return this.githubErrors.some((err) => err.code == code)
     }
@@ -25,10 +29,11 @@ export class ErrorMessage {
     toString(): string {
         const message = this.error.message
         const errors = this.githubErrors
+        const status = this.status
         if (errors.length > 0) {
-            return `${message}\nErrors:\n${this.errorBulletedList(errors)}`
+            return `Error ${status}: ${message}\nErrors:\n${this.errorBulletedList(errors)}`
         } else {
-            return message
+            return `Error ${status}: ${message}`
         }
     }
 

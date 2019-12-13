@@ -27,7 +27,7 @@ export class Action {
         if(this.inputs.allowUpdates) {
             try {
                 const getResponse = await this.releases.getByTag(this.inputs.tag)
-                return this.updateRelease(getResponse.data.id)
+                return await this.updateRelease(getResponse.data.id)
             } catch (error) {
                 if (this.noRelease(error)) {
                     return await this.createRelease()
@@ -54,7 +54,7 @@ export class Action {
 
     private noRelease(error:any): boolean {
         const errorMessage = new ErrorMessage(error)
-        return errorMessage.hasErrorWithCode('missing')
+        return errorMessage.status == 404
     }
 
     private async updateRelease(id: number): Promise<string> {
