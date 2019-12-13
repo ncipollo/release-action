@@ -2,7 +2,6 @@ import { Inputs } from "./Inputs";
 import { Releases } from "./Releases";
 import { ArtifactUploader } from "./ArtifactUploader";
 import { ErrorMessage } from "./ErrorMessage";
-import { Response, ReposCreateReleaseResponse } from "@octokit/rest";
 
 export class Action {
     private inputs: Inputs

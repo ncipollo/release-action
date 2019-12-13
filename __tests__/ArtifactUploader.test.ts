@@ -34,7 +34,9 @@ describe('ArtifactUploader', () => {
     function createUploader(): GithubArtifactUploader {
         const MockReleases = jest.fn<Releases, any>(() => {
             return {
+                getByTag: jest.fn(),
                 create: jest.fn(),
+                update: jest.fn(),
                 uploadArtifact: uploadMock
             }
         })
