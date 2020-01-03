@@ -1,3 +1,4 @@
+import * as core from '@actions/core';
 import { Artifact } from "./Artifact";
 import { Releases } from "./Releases";
 
@@ -14,11 +15,16 @@ export class GithubArtifactUploader implements ArtifactUploader {
 
     async uploadArtifacts(artifacts: Artifact[], uploadUrl: string) {
         artifacts.forEach(async artifact => {
-            await this.releases.uploadArtifact(uploadUrl,
-                artifact.contentLength,
-                artifact.contentType,
-                artifact.readFile(),
-                artifact.name)
+            try {
+                await this.releases.uploadArtifact(uploadUrl,
+                    artifact.contentLength,
+                    artifact.contentType,
+                    artifact.readFile(),
+                    artifact.name)
+            } catch(error) {
+                const message = `Failed to upload artifact ${artifact.name}. Does it already exist?`
+                core.warning(message)
+            }
         });
     }
 }
