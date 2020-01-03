@@ -36,6 +36,7 @@ describe('ArtifactUploader', () => {
             return {
                 getByTag: jest.fn(),
                 create: jest.fn(),
+                listReleases: jest.fn(),
                 update: jest.fn(),
                 uploadArtifact: uploadMock
             }
