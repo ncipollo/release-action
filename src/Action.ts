@@ -29,8 +29,8 @@ export class Action {
                 const getResponse = await this.releases.getByTag(this.inputs.tag)
                 return await this.updateRelease(getResponse.data.id)
             } catch (error) {
-                if (this.noRelease(error)) {
-                    return await this.createRelease()
+                if (this.noPublishedRelease(error)) {
+                    return await this.updateDraftOrCreateRelease()
                 } else {
                     throw error
                 }
@@ -40,8 +40,9 @@ export class Action {
         }
     }
 
-    private async createRelease(): Promise<string> {
-        const response = await this.releases.create(
+    private async updateRelease(id: number): Promise<string> {
+        const response = await this.releases.update(
+            id,
             this.inputs.tag,
             this.inputs.body,
             this.inputs.commit,
@@ -53,14 +54,31 @@ export class Action {
         return response.data.upload_url
     }
 
-    private noRelease(error: any): boolean {
+    private noPublishedRelease(error: any): boolean {
         const errorMessage = new ErrorMessage(error)
         return errorMessage.status == 404
     }
 
-    private async updateRelease(id: number): Promise<string> {
-        const response = await this.releases.update(
-            id,
+    private async updateDraftOrCreateRelease(): Promise<string> {
+        const draftReleaseId = await this.findMatchingDraftReleaseId()
+        if (draftReleaseId) {
+            return await this.updateRelease(draftReleaseId)
+        } else {
+            return await this.createRelease()
+        }
+    }
+
+    private async findMatchingDraftReleaseId(): Promise<number | undefined> {
+        const tag = this.inputs.tag
+        const response = await this.releases.listReleases()
+        const releases = response.data
+        const draftRelease = releases.find(release => release.draft && release.tag_name == tag)
+
+        return draftRelease?.id
+    }
+
+    private async createRelease(): Promise<string> {
+        const response = await this.releases.create(
             this.inputs.tag,
             this.inputs.body,
             this.inputs.commit,

@@ -6,6 +6,7 @@ import { ArtifactUploader } from "../src/ArtifactUploader";
 
 const createMock = jest.fn()
 const getMock = jest.fn()
+const listMock = jest.fn()
 const updateMock = jest.fn()
 const uploadMock = jest.fn()
 
@@ -28,6 +29,7 @@ describe("Action", () => {
     beforeEach(() => {
         createMock.mockClear()
         getMock.mockClear()
+        listMock.mockClear()
         updateMock.mockClear()
         uploadMock.mockClear()
     })
@@ -43,15 +45,30 @@ describe("Action", () => {
 
     it('creates release if no release exists to update', async () => {
         const action = createAction(true, true)
-        const error = {
-            status: 404
-        }
+        const error = { status: 404 }
         getMock.mockRejectedValue(error)
 
         await action.perform()
 
         expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, url)
+    })
+
+    it('creates release if no draft releases', async () => {
+        const action = createAction(true, true)
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({
+            data: [
+                { id: id, draft: false, tag_name: tag }
+            ]
+        })
+
+        await action.perform()
+
+        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(uploadMock).toBeCalledWith(artifacts, url)
+
     })
 
     it('creates release then uploads artifact', async () => {
@@ -134,6 +151,24 @@ describe("Action", () => {
         expect(uploadMock).toBeCalledWith(artifacts, url)
     })
 
+    it('updates draft release', async () => {
+        const action = createAction(true, true)
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({
+            data: [
+                { id: 123, draft: false, tag_name: tag },
+                { id: id, draft: true, tag_name: tag }
+            ]
+        })
+
+        await action.perform()
+
+        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
+        expect(uploadMock).toBeCalledWith(artifacts, url)
+
+    })
+
     it('updates release but does not upload if no artifact', async () => {
         const action = createAction(true, false)
 
@@ -165,6 +200,7 @@ describe("Action", () => {
             return {
                 create: createMock,
                 getByTag: getMock,
+                listReleases: listMock,
                 update: updateMock,
                 uploadArtifact: uploadMock
             }
@@ -179,6 +215,9 @@ describe("Action", () => {
             data: {
                 id: id
             }
+        })
+        listMock.mockResolvedValue({
+            data: []
         })
         updateMock.mockResolvedValue({
             data: {

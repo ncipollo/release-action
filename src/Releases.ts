@@ -1,6 +1,6 @@
 import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github";
-import { AnyResponse, Response, ReposCreateReleaseResponse, ReposGetReleaseByTagResponse } from "@octokit/rest";
+import { AnyResponse, Response, ReposCreateReleaseResponse, ReposGetReleaseByTagResponse, ReposListReleasesResponse } from "@octokit/rest";
 
 export interface Releases {
     create(
@@ -13,6 +13,8 @@ export interface Releases {
     ): Promise<Response<ReposCreateReleaseResponse>>
 
     getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>>
+
+    listReleases(): Promise<Response<ReposListReleasesResponse>>
 
     update(
         id: number,
@@ -59,6 +61,13 @@ export class GithubReleases implements Releases {
             repo: this.context.repo.repo,
             target_commitish: commitHash,
             tag_name: tag
+        })
+    }
+
+    async listReleases(): Promise<Response<ReposListReleasesResponse>> {
+        return this.git.repos.listReleases({
+            owner: this.context.repo.owner,
+            repo: this.context.repo.repo
         })
     }
 
