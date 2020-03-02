@@ -1,5 +1,6 @@
 import { Inputs } from "./Inputs";
 import { Releases } from "./Releases";
+import { ReposCreateReleaseResponse } from "@octokit/rest";
 import { ArtifactUploader } from "./ArtifactUploader";
 import { ErrorMessage } from "./ErrorMessage";
 
@@ -15,15 +16,17 @@ export class Action {
     }
 
     async perform() {
-        const uploadUrl = await this.createOrUpdateRelease()
+        const releaseResponse = await this.createOrUpdateRelease();
+        const releaseId = releaseResponse.id
+        const uploadUrl = releaseResponse.upload_url
 
         const artifacts = this.inputs.artifacts
         if (artifacts.length > 0) {
-            await this.uploader.uploadArtifacts(artifacts, uploadUrl)
+            await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
         }
     }
 
-    private async createOrUpdateRelease(): Promise<string> {
+    private async createOrUpdateRelease(): Promise<ReposCreateReleaseResponse> {
         if (this.inputs.allowUpdates) {
             try {
                 const getResponse = await this.releases.getByTag(this.inputs.tag)
@@ -40,7 +43,7 @@ export class Action {
         }
     }
 
-    private async updateRelease(id: number): Promise<string> {
+    private async updateRelease(id: number): Promise<ReposCreateReleaseResponse> {
         const response = await this.releases.update(
             id,
             this.inputs.tag,
@@ -51,7 +54,7 @@ export class Action {
             this.inputs.prerelease
         )
 
-        return response.data.upload_url
+        return response.data
     }
 
     private noPublishedRelease(error: any): boolean {
@@ -59,7 +62,7 @@ export class Action {
         return errorMessage.status == 404
     }
 
-    private async updateDraftOrCreateRelease(): Promise<string> {
+    private async updateDraftOrCreateRelease(): Promise<ReposCreateReleaseResponse> {
         const draftReleaseId = await this.findMatchingDraftReleaseId()
         if (draftReleaseId) {
             return await this.updateRelease(draftReleaseId)
@@ -77,7 +80,7 @@ export class Action {
         return draftRelease?.id
     }
 
-    private async createRelease(): Promise<string> {
+    private async createRelease(): Promise<ReposCreateReleaseResponse> {
         const response = await this.releases.create(
             this.inputs.tag,
             this.inputs.body,
@@ -87,6 +90,6 @@ export class Action {
             this.inputs.prerelease
         )
 
-        return response.data.upload_url
+        return response.data
     }
 }

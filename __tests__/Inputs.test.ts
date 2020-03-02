@@ -144,6 +144,17 @@ describe('Inputs', () => {
         })
     })
 
+    describe('replacesArtifacts', () => {
+        it('returns false', () => {
+            expect(inputs.replacesArtifacts).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValue('true')
+            expect(inputs.replacesArtifacts).toBe(true)
+        })
+    })
+
     describe('tag', () => {
         it('returns input tag', () => {
             mockGetInput.mockReturnValue('tag')

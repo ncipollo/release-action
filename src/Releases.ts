@@ -1,6 +1,6 @@
 import { Context } from "@actions/github/lib/context";
 import { GitHub } from "@actions/github";
-import { AnyResponse, Response, ReposCreateReleaseResponse, ReposGetReleaseByTagResponse, ReposListReleasesResponse } from "@octokit/rest";
+import { AnyResponse, Response, ReposDeleteReleaseAssetResponse, ReposListAssetsForReleaseResponse, ReposCreateReleaseResponse, ReposGetReleaseByTagResponse, ReposListReleasesResponse } from "@octokit/rest";
 
 export interface Releases {
     create(
@@ -12,7 +12,11 @@ export interface Releases {
         prerelease?: boolean
     ): Promise<Response<ReposCreateReleaseResponse>>
 
+    deleteArtifact(assetId: number): Promise<Response<ReposDeleteReleaseAssetResponse>>
+
     getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>>
+
+    listArtifactsForRelease(releaseId: number): Promise<Response<ReposListAssetsForReleaseResponse>>
 
     listReleases(): Promise<Response<ReposListReleasesResponse>>
 
@@ -61,6 +65,26 @@ export class GithubReleases implements Releases {
             repo: this.context.repo.repo,
             target_commitish: commitHash,
             tag_name: tag
+        })
+    }
+
+    async deleteArtifact(
+        assetId: number
+    ): Promise<Response<ReposDeleteReleaseAssetResponse>> {
+        return this.git.repos.deleteReleaseAsset({
+            asset_id: assetId,
+            owner: this.context.repo.owner,
+            repo: this.context.repo.repo
+        })
+    }
+
+    async listArtifactsForRelease(
+        releaseId: number
+    ): Promise<Response<ReposListAssetsForReleaseResponse>> {
+        return this.git.repos.listAssetsForRelease({
+            owner: this.context.repo.owner,
+            release_id: releaseId,
+            repo: this.context.repo.repo
         })
     }
 

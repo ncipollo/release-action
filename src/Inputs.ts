@@ -12,6 +12,7 @@ export interface Inputs {
     readonly draft: boolean
     readonly name: string
     readonly prerelease: boolean
+    readonly replacesArtifacts: boolean
     readonly tag: string
     readonly token: string
 }
@@ -79,8 +80,13 @@ export class CoreInputs implements Inputs {
     }
 
     get prerelease(): boolean {
-        const draft = core.getInput('prerelease')
-        return draft == 'true'
+        const preRelease = core.getInput('prerelease')
+        return preRelease == 'true'
+    }
+
+    get replacesArtifacts(): boolean {
+        const replaces = core.getInput('replacesArtifacts')
+        return replaces == 'true'
     }
 
     get tag(): string {
