@@ -6,6 +6,7 @@ inputs:
     description: 'An optional flag which indicates if we should update a release if it already exists. Defaults to false.'
     default: ''
   artifact:
+    deprecationMessage: Use 'artifacts' instead.
     description: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)'
     default: ''
   artifacts:
