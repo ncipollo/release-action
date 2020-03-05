@@ -53,7 +53,7 @@ export class GithubArtifactUploader implements ArtifactUploader {
         for (const artifact of artifacts) {
             const asset = assetByName[artifact.name]
             if (asset) {
-                core.debug(`Deleting exist artifact ${artifact.name}...`)
+                core.debug(`Deleting existing artifact ${artifact.name}...`)
                 await this.releases.deleteArtifact(asset.id)
             }
         }
