@@ -2,22 +2,30 @@ import * as core from '@actions/core';
 import { Artifact } from "./Artifact";
 import { Releases } from "./Releases";
 import { ReposListAssetsForReleaseResponseItem } from "@octokit/rest";
-import { ErrorMessage } from './ErrorMessage';
 
 export interface ArtifactUploader {
     uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<void>
 }
 
 export class GithubArtifactUploader implements ArtifactUploader {
-    private releases: Releases
-    private replacesExistingArtifacts: boolean = true
-
-    constructor(releases: Releases, replacesExistingArtifacts: boolean) {
-        this.releases = releases
-        this.replacesExistingArtifacts = replacesExistingArtifacts
+    constructor(
+        private releases: Releases,
+        private replacesExistingArtifacts: boolean = true,
+    ) {
     }
 
-    async uploadArtifact(artifact: Artifact, uploadUrl: string, retry = 3) {
+    async uploadArtifacts(artifacts: Artifact[],
+        releaseId: number,
+        uploadUrl: string): Promise<void> {
+        if (this.replacesExistingArtifacts) {
+            await this.deleteUpdatedArtifacts(artifacts, releaseId)
+        }
+        for (const artifact of artifacts) {
+            await this.uploadArtifact(artifact, uploadUrl)
+        }
+    }
+
+    private async uploadArtifact(artifact: Artifact, uploadUrl: string, retry = 3) {
         try {
             core.debug(`Uploading artifact ${artifact.name}...`)
             await this.releases.uploadArtifact(uploadUrl,
@@ -35,18 +43,7 @@ export class GithubArtifactUploader implements ArtifactUploader {
         }
     }
 
-    async uploadArtifacts(artifacts: Artifact[],
-        releaseId: number,
-        uploadUrl: string): Promise<void> {
-        if (this.replacesExistingArtifacts) {
-            await this.deleteUpdatedArtifacts(artifacts, releaseId)
-        }
-        for (const artifact of artifacts) {
-            await this.uploadArtifact(artifact, uploadUrl)
-        }
-    }
-
-    async deleteUpdatedArtifacts(artifacts: Artifact[], releaseId: number): Promise<void> {
+    private async deleteUpdatedArtifacts(artifacts: Artifact[], releaseId: number): Promise<void> {
         const response =  await this.releases.listArtifactsForRelease(releaseId)
         const releaseAssets = response.data
         const assetByName: Record<string, ReposListAssetsForReleaseResponseItem> = {}

@@ -198,13 +198,10 @@ describe('ArtifactUploader', () => {
     }
 
     function mockUploadArtifact(status: number = 200, failures: number = 0) {
-        uploadMock.mockImplementation(() => new Promise((resolve, reject) => {
-            if (failures > 0) {
-                failures--
-                reject(new RequestError(`HTTP ${status}`, status, { headers: {}, request: { method: 'GET', url: '', headers: {}}}))
-            } else {
-                resolve({})
-            }
-        }))
+        const error = new RequestError(`HTTP ${status}`, status, { headers: {}, request: { method: 'GET', url: '', headers: {} } })
+        for (let index = 0; index < failures; index++) {
+            uploadMock.mockRejectedValueOnce(error)
+        }
+        uploadMock.mockResolvedValue({})
     }
 });
