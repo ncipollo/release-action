@@ -32,10 +32,10 @@
     "global": "^4.4.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.25",
-    "jest": "^24.9.0",
-    "jest-circus": "^24.7.1",
-    "ts-jest": "^24.2.0",
+    "@types/jest": "^25.1.4",
+    "jest": "^25.1.0",
+    "jest-circus": "^25.1.0",
+    "ts-jest": "^25.2.1",
     "typescript": "^3.7.3"
   }
 }
