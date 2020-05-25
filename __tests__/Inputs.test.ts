@@ -58,7 +58,7 @@ describe('Inputs', () => {
         it('returns empty artifacts', () => {
             mockGetInput.mockReturnValueOnce('')
             .mockReturnValueOnce('')
-            
+
             expect(inputs.artifacts).toEqual([])
             expect(mockGlob).toBeCalledTimes(0)
         })
@@ -66,7 +66,7 @@ describe('Inputs', () => {
         it('returns input.artifacts', () => {
             mockGetInput.mockReturnValueOnce('art1')
             .mockReturnValueOnce('contentType')
-            
+
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
             expect(mockGlob).toBeCalledWith('art1', 'contentType')
@@ -74,17 +74,17 @@ describe('Inputs', () => {
 
         it('returns input.artifacts with default contentType', () => {
             mockGetInput.mockReturnValueOnce('art1')
-            
+
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
             expect(mockGlob).toBeCalledWith('art1', 'raw')
         })
-        
+
         it('returns input.artifact', () => {
             mockGetInput.mockReturnValueOnce('')
             .mockReturnValueOnce('art2')
             .mockReturnValueOnce('contentType')
-            
+
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
             expect(mockGlob).toBeCalledWith('art2', 'contentType')
@@ -93,19 +93,35 @@ describe('Inputs', () => {
 
     describe('body', () => {
         it('returns input body', () => {
-            mockGetInput.mockReturnValue('body')
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('body')
             expect(inputs.body).toBe('body')
         })
 
         it('returns body file contents', () => {
-            mockGetInput.mockReturnValueOnce('').mockReturnValueOnce('a/path')
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('')
+                .mockReturnValueOnce('a/path')
             mockReadFileSync.mockReturnValue('file')
 
             expect(inputs.body).toBe('file')
         })
 
         it('returns empty', () => {
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('')
+                .mockReturnValueOnce('')
             expect(inputs.body).toBe('')
+        })
+
+        it('returns null when omitted', () => {
+            mockGetInput
+                .mockReturnValueOnce('true')
+                .mockReturnValueOnce('body')
+            expect(inputs.body).toBeUndefined()
         })
     })
 
@@ -122,12 +138,23 @@ describe('Inputs', () => {
 
     describe('name', () => {
         it('returns input name', () => {
-            mockGetInput.mockReturnValue('name')
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('name')
             expect(inputs.name).toBe('name')
         })
 
+        it('returns null when omitted', () => {
+            mockGetInput
+                .mockReturnValueOnce('true')
+                .mockReturnValueOnce('name')
+            expect(inputs.body).toBeUndefined()
+        })
+
         it('returns tag', () => {
-            mockGetInput.mockReturnValue('')
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('')
             context.ref = 'refs/tags/sha-tag'
             expect(inputs.name).toBe('sha-tag')
         })

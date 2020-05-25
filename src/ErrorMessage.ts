@@ -1,4 +1,4 @@
-import { GithubError } from "./GithubError"
+import {GithubError} from "./GithubError"
 
 export class ErrorMessage {
     private error: any
@@ -18,7 +18,7 @@ export class ErrorMessage {
         }
     }
 
-    get status():number {
+    get status(): number {
         return this.error.status
     }
 

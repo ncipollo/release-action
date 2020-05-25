@@ -12,6 +12,8 @@ This action will create a github release and optionally upload an artifact to it
 - **commit**: An optional commit reference. This will be used to create the tag if it does not exist.
 - **draft**: Optionally marks this release as a draft release. Set to `true` to enable.
 - **name**: An optional name for the release. If this is omitted the tag will be used.
+- **omitBody**: Indicates if the release body should be omitted. This is primarily useful for preserving the release body during updates.
+- **omitName**: Indicates if the release name should be omitted. This is primarily useful for preserving the release name during updates.
 - **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
 - **replacesArtifacts**: Indicates if existing release artifacts should be replaced. Defaults to true.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).

@@ -2,42 +2,62 @@ name: 'Create Release'
 description: 'Creates github releases'
 author: 'Nick Cipollo'
 inputs:
-  allowUpdates: 
+  allowUpdates:
     description: 'An optional flag which indicates if we should update a release if it already exists. Defaults to false.'
+    required: false
     default: ''
   artifact:
     deprecationMessage: Use 'artifacts' instead.
     description: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)'
+    required: false
     default: ''
   artifacts:
     description: 'An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)'
-    default: ''  
+    required: false
+    default: ''
   artifactContentType:
     description: 'The content type of the artifact. Defaults to raw'
+    required: false
     default: ''
   body:
     description: 'An optional body for the release.'
+    required: false
     default: ''
   bodyFile:
     description: 'An optional body file for the release. This should be the path to the file'
-    default: ''  
+    required: false
+    default: ''
   commit:
     description: "An optional commit reference. This will be used to create the tag if it does not exist."
+    required: false
     default: ''
   draft:
     description: "Optionally marks this release as a draft release. Set to true to enable."
+    required: false
     default: ''
   name:
     description: 'An optional name for the release. If this is omitted the tag will be used.'
+    required: false
     default: ''
+  omitBody:
+    description: 'Indicates if the release body should be omitted. This is primarily useful for preserving the release body during updates.'
+    required: false
+    default: 'false'
+  omitName:
+    description: 'Indicates if the release name should be omitted. This is primarily useful for preserving the release name during updates.'
+    required: false
+    default: 'false'
   prerelease:
     description: "Optionally marks this release as prerelease. Set to true to enable."
+    required: false
     default: ''
   replacesArtifacts:
     description: "Indicates if existing release artifacts should be replaced. Defaults to true."
-    default: 'true'  
+    required: false
+    default: 'true'
   tag:
     description: 'An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).'
+    required: false
     default: ''
   token:
     description: 'The Github token.'

@@ -1,16 +1,16 @@
 import * as core from '@actions/core';
-import { Context } from "@actions/github/lib/context";
-import { readFileSync } from 'fs';
-import { ArtifactGlobber } from './ArtifactGlobber';
-import { Artifact } from './Artifact';
+import {Context} from "@actions/github/lib/context";
+import {readFileSync} from 'fs';
+import {ArtifactGlobber} from './ArtifactGlobber';
+import {Artifact} from './Artifact';
 
 export interface Inputs {
     readonly allowUpdates: boolean
     readonly artifacts: Artifact[]
-    readonly body: string
+    readonly body?: string
     readonly commit: string
     readonly draft: boolean
-    readonly name: string
+    readonly name?: string
     readonly prerelease: boolean
     readonly replacesArtifacts: boolean
     readonly tag: string
@@ -47,7 +47,9 @@ export class CoreInputs implements Inputs {
         return []
     }
 
-    get body(): string {
+    get body(): string | undefined {
+        if (CoreInputs.omitBody()) return undefined
+
         const body = core.getInput('body')
         if (body) {
             return body
@@ -61,6 +63,10 @@ export class CoreInputs implements Inputs {
         return ''
     }
 
+    private static omitBody(): boolean {
+        return core.getInput('omitBody') == 'true'
+    }
+
     get commit(): string {
         return core.getInput('commit')
     }
@@ -70,13 +76,19 @@ export class CoreInputs implements Inputs {
         return draft == 'true'
     }
 
-    get name(): string {
+    get name(): string | undefined {
+        if (CoreInputs.omitName()) return undefined
+
         const name = core.getInput('name')
         if (name) {
             return name
         }
 
         return this.tag
+    }
+
+    private static omitName(): boolean {
+        return core.getInput('omitName') == 'true'
     }
 
     get prerelease(): boolean {
@@ -105,7 +117,7 @@ export class CoreInputs implements Inputs {
     }
 
     get token(): string {
-        return core.getInput('token', { required: true })
+        return core.getInput('token', {required: true})
     }
 
     stringFromFile(path: string): string {
