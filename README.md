@@ -13,13 +13,13 @@ This action will create a github release and optionally upload an artifact to it
 - **draft**: Optionally marks this release as a draft release. Set to `true` to enable.
 - **name**: An optional name for the release. If this is omitted the tag will be used.
 - **omitBody**: Indicates if the release body should be omitted. This is primarily useful for preserving the release body during updates.
+- **omitBodyDuringUpdate**: Indicates if the release body should be omitted during updates. The body will still be applied for newly created releases. This will preserve the existing body during updates.
 - **omitName**: Indicates if the release name should be omitted. This is primarily useful for preserving the release name during updates.
+- **omitNameDuringUpdate**: Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.
 - **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
 - **replacesArtifacts**: Indicates if existing release artifacts should be replaced. Defaults to true.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).
 - **token**: (**Required**) The Github token. Typically this will be `${{ secrets.GITHUB_TOKEN }}`.
-- **omitBodyDuringUpdate**: Indicates if the release body should be omitted during updates. The body will still be applied for newly created releases. This will preserve the existing body during updates.
-- **omitNameDuringUpdate**: Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.
 
 ## Example
 This example will create a release when tag is pushed:
