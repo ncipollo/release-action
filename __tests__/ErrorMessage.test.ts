@@ -30,7 +30,6 @@ describe('ErrorMessage', () => {
     })
 
     it('generates message with errors', () => {
-        const resource = "release"
         const error = {
             message: 'something bad happened',
             errors: [

@@ -47,10 +47,10 @@ export class Action {
         const response = await this.releases.update(
             id,
             this.inputs.tag,
-            this.inputs.body,
+            this.inputs.updatedReleaseBody,
             this.inputs.commit,
             this.inputs.draft,
-            this.inputs.name,
+            this.inputs.updatedReleaseName,
             this.inputs.prerelease
         )
 
@@ -83,10 +83,10 @@ export class Action {
     private async createRelease(): Promise<ReposCreateReleaseResponse> {
         const response = await this.releases.create(
             this.inputs.tag,
-            this.inputs.body,
+            this.inputs.createdReleaseBody,
             this.inputs.commit,
             this.inputs.draft,
-            this.inputs.name,
+            this.inputs.createdReleaseName,
             this.inputs.prerelease
         )
 

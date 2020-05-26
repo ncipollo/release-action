@@ -16,17 +16,19 @@ const artifacts = [
     new Artifact('a/art1'),
     new Artifact('b/art2')
 ]
-const artifactData = Buffer.from('blob', 'utf-8')
-const body = 'body'
+
+const createBody = 'createBody'
+const createName = 'createName'
 const commit = 'commit'
 const draft = true
 const id = 100
-const name = 'name'
 const prerelease = true
 const releaseId = 101
 const replacesArtifacts = true
 const tag = 'tag'
 const token = 'token'
+const updateBody = 'updateBody'
+const updateName = 'updateName'
 const url = 'http://api.example.com'
 
 describe("Action", () => {
@@ -43,7 +45,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(createMock).toBeCalledWith(tag, createBody, commit, draft, createName, prerelease)
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -54,7 +56,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(createMock).toBeCalledWith(tag, createBody, commit, draft, createName, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
     })
 
@@ -70,7 +72,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(createMock).toBeCalledWith(tag, createBody, commit, draft, createName, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
 
     })
@@ -80,7 +82,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(createMock).toBeCalledWith(tag, createBody, commit, draft, createName, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
     })
 
@@ -95,7 +97,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(createMock).toBeCalledWith(tag, createBody, commit, draft, createName, prerelease)
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -136,7 +138,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
+        expect(updateMock).toBeCalledWith(id, tag, updateBody, commit, draft, updateName, prerelease)
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -151,7 +153,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(tag, body, commit, draft, name, prerelease)
+        expect(createMock).toBeCalledWith(tag, createBody, commit, draft, createName, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
     })
 
@@ -168,7 +170,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
+        expect(updateMock).toBeCalledWith(id, tag, updateBody, commit, draft, updateName, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
 
     })
@@ -178,7 +180,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
+        expect(updateMock).toBeCalledWith(id, tag, updateBody, commit, draft, updateName, prerelease)
         expect(uploadMock).not.toBeCalled()
 
     })
@@ -188,7 +190,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(id, tag, body, commit, draft, name, prerelease)
+        expect(updateMock).toBeCalledWith(id, tag, updateBody, commit, draft, updateName, prerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
 
     })
@@ -238,15 +240,16 @@ describe("Action", () => {
             return {
                 allowUpdates: allowUpdates,
                 artifacts: inputArtifact,
-                body: body,
+                createdReleaseBody: createBody,
+                createdReleaseName: createName,
                 commit: commit,
                 draft: draft,
-                name: name,
                 prerelease: prerelease,
                 replacesArtifacts: replacesArtifacts,
                 tag: tag,
                 token: token,
-                readArtifact: () => artifactData
+                updatedReleaseBody: updateBody,
+                updatedReleaseName: updateName
             }
         })
         const MockUploader = jest.fn<ArtifactUploader, any>(() => {

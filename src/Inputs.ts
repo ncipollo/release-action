@@ -7,14 +7,16 @@ import {Artifact} from './Artifact';
 export interface Inputs {
     readonly allowUpdates: boolean
     readonly artifacts: Artifact[]
-    readonly body?: string
     readonly commit: string
+    readonly createdReleaseBody?: string
+    readonly createdReleaseName?: string
     readonly draft: boolean
-    readonly name?: string
     readonly prerelease: boolean
     readonly replacesArtifacts: boolean
     readonly tag: string
     readonly token: string
+    readonly updatedReleaseBody?: string
+    readonly updatedReleaseName?: string
 }
 
 export class CoreInputs implements Inputs {
@@ -47,9 +49,16 @@ export class CoreInputs implements Inputs {
         return []
     }
 
-    get body(): string | undefined {
-        if (CoreInputs.omitBody()) return undefined
+    get createdReleaseBody(): string | undefined {
+        if (CoreInputs.omitBody) return undefined
+        return this.body
+    }
 
+    private static get omitBody(): boolean {
+        return core.getInput('omitBody') == 'true'
+    }
+
+    private get body() : string | undefined {
         const body = core.getInput('body')
         if (body) {
             return body
@@ -63,22 +72,20 @@ export class CoreInputs implements Inputs {
         return ''
     }
 
-    private static omitBody(): boolean {
-        return core.getInput('omitBody') == 'true'
-    }
-
     get commit(): string {
         return core.getInput('commit')
     }
 
-    get draft(): boolean {
-        const draft = core.getInput('draft')
-        return draft == 'true'
+    get createdReleaseName(): string | undefined {
+        if (CoreInputs.omitName) return undefined
+        return this.name
     }
 
-    get name(): string | undefined {
-        if (CoreInputs.omitName()) return undefined
+    private static get omitName(): boolean {
+        return core.getInput('omitName') == 'true'
+    }
 
+    private get name(): string | undefined {
         const name = core.getInput('name')
         if (name) {
             return name
@@ -87,8 +94,9 @@ export class CoreInputs implements Inputs {
         return this.tag
     }
 
-    private static omitName(): boolean {
-        return core.getInput('omitName') == 'true'
+    get draft(): boolean {
+        const draft = core.getInput('draft')
+        return draft == 'true'
     }
 
     get prerelease(): boolean {
@@ -118,6 +126,24 @@ export class CoreInputs implements Inputs {
 
     get token(): string {
         return core.getInput('token', {required: true})
+    }
+
+    get updatedReleaseBody(): string | undefined {
+        if (CoreInputs.omitBody || CoreInputs.omitBodyDuringUpdate) return undefined
+        return this.body
+    }
+
+    private static get omitBodyDuringUpdate(): boolean {
+        return core.getInput('omitBodyDuringUpdate') == 'true'
+    }
+
+    get updatedReleaseName(): string | undefined {
+        if (CoreInputs.omitName ||  CoreInputs.omitNameDuringUpdate) return undefined
+        return this.name
+    }
+
+    private static get omitNameDuringUpdate(): boolean {
+        return core.getInput('omitNameDuringUpdate') == 'true'
     }
 
     stringFromFile(path: string): string {

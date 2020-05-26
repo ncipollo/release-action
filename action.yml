@@ -40,11 +40,19 @@ inputs:
     required: false
     default: ''
   omitBody:
-    description: 'Indicates if the release body should be omitted. This is primarily useful for preserving the release body during updates.'
+    description: 'Indicates if the release body should be omitted.'
+    required: false
+    default: 'false'
+  omitBodyDuringUpdate:
+    description: 'Indicates if the release body should be omitted during updates. The body will still be applied for newly created releases. This will preserve the existing body during updates.'
     required: false
     default: 'false'
   omitName:
-    description: 'Indicates if the release name should be omitted. This is primarily useful for preserving the release name during updates.'
+    description: 'Indicates if the release name should be omitted.'
+    required: false
+    default: 'false'
+  omitNameDuringUpdate:
+    description: 'Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.'
     required: false
     default: 'false'
   prerelease:
