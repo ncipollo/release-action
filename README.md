@@ -48,4 +48,4 @@ jobs:
 
 ## Notes
 - You must provide a tag either via the action input or the git ref (i.e push / create a tag). If you do not the action will fail.
-- If the tag of the release you are creating does not exist yet, you should set both the `tag` and `commit` action inputs. `commit` can point to a commit hash or a branch name (ex - `master`).
+- If the tag of the release you are creating does not exist yet, you should set both the `tag` and `commit` action inputs. `commit` can point to a commit hash or a branch name (ex - `main`).
