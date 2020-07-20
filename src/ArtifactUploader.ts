@@ -1,7 +1,6 @@
 import * as core from '@actions/core';
-import { Artifact } from "./Artifact";
-import { Releases } from "./Releases";
-import { ReposListAssetsForReleaseResponseItem } from "@octokit/rest";
+import {Artifact} from "./Artifact";
+import {Releases} from "./Releases";
 
 export interface ArtifactUploader {
     uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<void>
@@ -15,28 +14,32 @@ export class GithubArtifactUploader implements ArtifactUploader {
     }
 
     async uploadArtifacts(artifacts: Artifact[],
-        releaseId: number,
-        uploadUrl: string): Promise<void> {
+                          releaseId: number,
+                          uploadUrl: string): Promise<void> {
         if (this.replacesExistingArtifacts) {
             await this.deleteUpdatedArtifacts(artifacts, releaseId)
         }
         for (const artifact of artifacts) {
-            await this.uploadArtifact(artifact, uploadUrl)
+            await this.uploadArtifact(artifact, releaseId, uploadUrl)
         }
     }
 
-    private async uploadArtifact(artifact: Artifact, uploadUrl: string, retry = 3) {
+    private async uploadArtifact(artifact: Artifact,
+                                 releaseId: number,
+                                 uploadUrl: string,
+                                 retry = 3) {
         try {
             core.debug(`Uploading artifact ${artifact.name}...`)
             await this.releases.uploadArtifact(uploadUrl,
                 artifact.contentLength,
                 artifact.contentType,
                 artifact.readFile(),
-                artifact.name)
+                artifact.name,
+                releaseId)
         } catch (error) {
             if (error.status >= 500 && retry > 0) {
                 core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}. Retrying...`)
-                await this.uploadArtifact(artifact, uploadUrl, retry - 1)
+                await this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1)
             } else {
                 core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}.`)
             }
@@ -44,9 +47,9 @@ export class GithubArtifactUploader implements ArtifactUploader {
     }
 
     private async deleteUpdatedArtifacts(artifacts: Artifact[], releaseId: number): Promise<void> {
-        const response =  await this.releases.listArtifactsForRelease(releaseId)
+        const response = await this.releases.listArtifactsForRelease(releaseId)
         const releaseAssets = response.data
-        const assetByName: Record<string, ReposListAssetsForReleaseResponseItem> = {}
+        const assetByName: Record<string, { id: number; name: string }> = {}
         releaseAssets.forEach(asset => {
             assetByName[asset.name] = asset
         });

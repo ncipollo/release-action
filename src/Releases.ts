@@ -1,6 +1,13 @@
-import { Context } from "@actions/github/lib/context";
-import { GitHub } from "@actions/github";
-import { AnyResponse, Response, ReposDeleteReleaseAssetResponse, ReposListAssetsForReleaseResponse, ReposCreateReleaseResponse, ReposGetReleaseByTagResponse, ReposListReleasesResponse } from "@octokit/rest";
+import {Context} from "@actions/github/lib/context";
+import { GitHub } from '@actions/github/lib/utils'
+import {
+    OctokitResponse,
+    ReposListReleaseAssetsResponseData,
+    ReposCreateReleaseResponseData,
+    ReposGetReleaseByTagResponseData,
+    ReposListReleasesResponseData,
+    ReposUploadReleaseAssetResponseData
+} from "@octokit/types";
 
 export interface Releases {
     create(
@@ -10,15 +17,15 @@ export interface Releases {
         draft?: boolean,
         name?: string,
         prerelease?: boolean
-    ): Promise<Response<ReposCreateReleaseResponse>>
+    ): Promise<OctokitResponse<ReposCreateReleaseResponseData>>
 
-    deleteArtifact(assetId: number): Promise<Response<ReposDeleteReleaseAssetResponse>>
+    deleteArtifact(assetId: number): Promise<OctokitResponse<any>>
 
-    getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>>
+    getByTag(tag: string): Promise<OctokitResponse<ReposGetReleaseByTagResponseData>>
 
-    listArtifactsForRelease(releaseId: number): Promise<Response<ReposListAssetsForReleaseResponse>>
+    listArtifactsForRelease(releaseId: number): Promise<OctokitResponse<ReposListReleaseAssetsResponseData>>
 
-    listReleases(): Promise<Response<ReposListReleasesResponse>>
+    listReleases(): Promise<OctokitResponse<ReposListReleasesResponseData>>
 
     update(
         id: number,
@@ -28,22 +35,23 @@ export interface Releases {
         draft?: boolean,
         name?: string,
         prerelease?: boolean
-    ): Promise<Response<ReposCreateReleaseResponse>>
+    ): Promise<OctokitResponse<ReposCreateReleaseResponseData>>
 
     uploadArtifact(
         assetUrl: string,
         contentLength: number,
         contentType: string,
         file: string | object,
-        name: string
-    ): Promise<Response<AnyResponse>>
+        name: string,
+        releaseId: number,
+    ): Promise<OctokitResponse<ReposUploadReleaseAssetResponseData>>
 }
 
 export class GithubReleases implements Releases {
     context: Context
-    git: GitHub
+    git: InstanceType<typeof GitHub>
 
-    constructor(context: Context, git: GitHub) {
+    constructor(context: Context, git: InstanceType<typeof GitHub>) {
         this.context = context
         this.git = git
     }
@@ -55,7 +63,8 @@ export class GithubReleases implements Releases {
         draft?: boolean,
         name?: string,
         prerelease?: boolean
-    ): Promise<Response<ReposCreateReleaseResponse>> {
+    ): Promise<OctokitResponse<ReposCreateReleaseResponseData>> {
+        // noinspection TypeScriptValidateJSTypes
         return this.git.repos.createRelease({
             body: body,
             name: name,
@@ -70,7 +79,7 @@ export class GithubReleases implements Releases {
 
     async deleteArtifact(
         assetId: number
-    ): Promise<Response<ReposDeleteReleaseAssetResponse>> {
+    ): Promise<OctokitResponse<any>> {
         return this.git.repos.deleteReleaseAsset({
             asset_id: assetId,
             owner: this.context.repo.owner,
@@ -80,22 +89,22 @@ export class GithubReleases implements Releases {
 
     async listArtifactsForRelease(
         releaseId: number
-    ): Promise<Response<ReposListAssetsForReleaseResponse>> {
-        return this.git.repos.listAssetsForRelease({
+    ): Promise<OctokitResponse<ReposListReleaseAssetsResponseData>> {
+        return this.git.repos.listReleaseAssets({
             owner: this.context.repo.owner,
             release_id: releaseId,
             repo: this.context.repo.repo
         })
     }
 
-    async listReleases(): Promise<Response<ReposListReleasesResponse>> {
+    async listReleases(): Promise<OctokitResponse<ReposListReleasesResponseData>> {
         return this.git.repos.listReleases({
             owner: this.context.repo.owner,
             repo: this.context.repo.repo
         })
     }
 
-    async getByTag(tag: string): Promise<Response<ReposGetReleaseByTagResponse>> {
+    async getByTag(tag: string): Promise<OctokitResponse<ReposGetReleaseByTagResponseData>> {
         return this.git.repos.getReleaseByTag({
             owner: this.context.repo.owner,
             repo: this.context.repo.repo,
@@ -111,7 +120,8 @@ export class GithubReleases implements Releases {
         draft?: boolean,
         name?: string,
         prerelease?: boolean
-    ): Promise<Response<ReposCreateReleaseResponse>> {
+    ): Promise<OctokitResponse<ReposCreateReleaseResponseData>> {
+        // noinspection TypeScriptValidateJSTypes
         return this.git.repos.updateRelease({
             release_id: id,
             body: body,
@@ -130,16 +140,20 @@ export class GithubReleases implements Releases {
         contentLength: number,
         contentType: string,
         file: string | object,
-        name: string
-    ): Promise<Response<AnyResponse>> {
+        name: string,
+        releaseId: number,
+    ): Promise<OctokitResponse<ReposUploadReleaseAssetResponseData>> {
         return this.git.repos.uploadReleaseAsset({
             url: assetUrl,
             headers: {
                 "content-length": contentLength,
                 "content-type": contentType
             },
-            file: file,
-            name: name
+            data: file as any,
+            name: name,
+            owner: this.context.repo.owner,
+            release_id: releaseId,
+            repo: this.context.repo.repo
         })
     }
 }

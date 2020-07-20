@@ -1,6 +1,6 @@
 import { Inputs } from "./Inputs";
 import { Releases } from "./Releases";
-import { ReposCreateReleaseResponse } from "@octokit/rest";
+import { ReposCreateReleaseResponseData } from "@octokit/types";
 import { ArtifactUploader } from "./ArtifactUploader";
 import { ErrorMessage } from "./ErrorMessage";
 
@@ -26,13 +26,13 @@ export class Action {
         }
     }
 
-    private async createOrUpdateRelease(): Promise<ReposCreateReleaseResponse> {
+    private async createOrUpdateRelease(): Promise<ReposCreateReleaseResponseData> {
         if (this.inputs.allowUpdates) {
             try {
                 const getResponse = await this.releases.getByTag(this.inputs.tag)
                 return await this.updateRelease(getResponse.data.id)
             } catch (error) {
-                if (this.noPublishedRelease(error)) {
+                if (Action.noPublishedRelease(error)) {
                     return await this.updateDraftOrCreateRelease()
                 } else {
                     throw error
@@ -43,7 +43,7 @@ export class Action {
         }
     }
 
-    private async updateRelease(id: number): Promise<ReposCreateReleaseResponse> {
+    private async updateRelease(id: number): Promise<ReposCreateReleaseResponseData> {
         const response = await this.releases.update(
             id,
             this.inputs.tag,
@@ -57,12 +57,12 @@ export class Action {
         return response.data
     }
 
-    private noPublishedRelease(error: any): boolean {
+    private static noPublishedRelease(error: any): boolean {
         const errorMessage = new ErrorMessage(error)
         return errorMessage.status == 404
     }
 
-    private async updateDraftOrCreateRelease(): Promise<ReposCreateReleaseResponse> {
+    private async updateDraftOrCreateRelease(): Promise<ReposCreateReleaseResponseData> {
         const draftReleaseId = await this.findMatchingDraftReleaseId()
         if (draftReleaseId) {
             return await this.updateRelease(draftReleaseId)
@@ -80,7 +80,7 @@ export class Action {
         return draftRelease?.id
     }
 
-    private async createRelease(): Promise<ReposCreateReleaseResponse> {
+    private async createRelease(): Promise<ReposCreateReleaseResponseData> {
         const response = await this.releases.create(
             this.inputs.tag,
             this.inputs.createdReleaseBody,

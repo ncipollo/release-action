@@ -30,6 +30,44 @@ describe('ArtifactUploader', () => {
         uploadMock.mockClear()
     })
 
+    it('abort when upload failed with non-5xx response', async () => {
+        mockListWithoutAssets()
+        mockUploadArtifact(401, 2)
+        const uploader = createUploader(true)
+
+        await uploader.uploadArtifacts(artifacts, releaseId, url)
+
+        expect(uploadMock).toBeCalledTimes(2)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+
+        expect(deleteMock).toBeCalledTimes(0)
+    })
+
+    it('abort when upload failed with 5xx response after 3 attempts', async () => {
+        mockListWithoutAssets()
+        mockUploadArtifact(500, 4)
+        const uploader = createUploader(true)
+
+        await uploader.uploadArtifacts(artifacts, releaseId, url)
+
+        expect(uploadMock).toBeCalledTimes(5)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+
+        expect(deleteMock).toBeCalledTimes(0)
+    })
+
     it('replaces all artifacts', async () => {
         mockDeleteSuccess()
         mockListWithAssets()
@@ -40,9 +78,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(2)
         expect(deleteMock).toBeCalledWith(1)
@@ -59,9 +97,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
@@ -75,51 +113,13 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(4)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
-
-        expect(deleteMock).toBeCalledTimes(0)
-    })
-
-    it('abort when upload failed with 5xx response after 3 attemps', async () => {
-        mockListWithoutAssets()
-        mockUploadArtifact(500, 4)
-        const uploader = createUploader(true)
-
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
-
-        expect(uploadMock).toBeCalledTimes(5)
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
-
-        expect(deleteMock).toBeCalledTimes(0)
-    })
-
-    it('abort when upload failed with non-5xx response', async () => {
-        mockListWithoutAssets()
-        mockUploadArtifact(401, 2)
-        const uploader = createUploader(true)
-
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
-
-        expect(uploadMock).toBeCalledTimes(2)
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
-        expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
@@ -148,9 +148,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2')
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })

@@ -20,7 +20,7 @@ async function run() {
 function createAction(): Action {
   const token = core.getInput('token')
   const context = github.context
-  const git = new github.GitHub(token)
+  const git = github.getOctokit(token)
   const globber = new FileArtifactGlobber()
 
   const inputs = new CoreInputs(globber, context)
