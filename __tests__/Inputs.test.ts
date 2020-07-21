@@ -3,10 +3,10 @@ const mockGlob = jest.fn()
 const mockReadFileSync = jest.fn();
 const mockStatSync = jest.fn();
 
-import { Artifact } from "../src/Artifact";
-import { ArtifactGlobber } from "../src/ArtifactGlobber";
-import { Context } from "@actions/github/lib/context";
-import { Inputs, CoreInputs } from "../src/Inputs";
+import {Artifact} from "../src/Artifact";
+import {ArtifactGlobber} from "../src/ArtifactGlobber";
+import {Context} from "@actions/github/lib/context";
+import {Inputs, CoreInputs} from "../src/Inputs";
 
 const artifacts = [
     new Artifact('a/art1'),
@@ -14,11 +14,14 @@ const artifacts = [
 ]
 
 jest.mock('@actions/core', () => {
-    return { getInput: mockGetInput };
+    return {getInput: mockGetInput};
 })
 
 jest.mock('fs', () => {
     return {
+        existsSync: () => {
+            return false
+        },
         readFileSync: mockReadFileSync,
         statSync: mockStatSync
     };
@@ -57,7 +60,7 @@ describe('Inputs', () => {
     describe('artifacts', () => {
         it('returns empty artifacts', () => {
             mockGetInput.mockReturnValueOnce('')
-            .mockReturnValueOnce('')
+                .mockReturnValueOnce('')
 
             expect(inputs.artifacts).toEqual([])
             expect(mockGlob).toBeCalledTimes(0)
@@ -65,7 +68,7 @@ describe('Inputs', () => {
 
         it('returns input.artifacts', () => {
             mockGetInput.mockReturnValueOnce('art1')
-            .mockReturnValueOnce('contentType')
+                .mockReturnValueOnce('contentType')
 
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
@@ -82,8 +85,8 @@ describe('Inputs', () => {
 
         it('returns input.artifact', () => {
             mockGetInput.mockReturnValueOnce('')
-            .mockReturnValueOnce('art2')
-            .mockReturnValueOnce('contentType')
+                .mockReturnValueOnce('art2')
+                .mockReturnValueOnce('contentType')
 
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
