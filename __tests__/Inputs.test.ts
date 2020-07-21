@@ -18,6 +18,8 @@ jest.mock('@actions/core', () => {
 })
 
 jest.mock('fs', () => {
+    // existsSync is used by Context's constructor
+    // noinspection JSUnusedGlobalSymbols
     return {
         existsSync: () => {
             return false
