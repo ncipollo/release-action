@@ -23,7 +23,7 @@
   "author": "GitHub",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "add": "^2.0.6",
     "glob": "^7.1.4",
