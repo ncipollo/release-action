@@ -11,8 +11,10 @@ export interface Inputs {
     readonly createdReleaseBody?: string
     readonly createdReleaseName?: string
     readonly draft: boolean
+    readonly owner: string
     readonly prerelease: boolean
     readonly replacesArtifacts: boolean
+    readonly repo: string
     readonly tag: string
     readonly token: string
     readonly updatedReleaseBody?: string
@@ -99,6 +101,14 @@ export class CoreInputs implements Inputs {
         return draft == 'true'
     }
 
+    get owner(): string {
+        let owner = core.getInput('owner')
+        if (owner) {
+            return owner
+        }
+        return this.context.repo.owner
+    }
+
     get prerelease(): boolean {
         const preRelease = core.getInput('prerelease')
         return preRelease == 'true'
@@ -107,6 +117,14 @@ export class CoreInputs implements Inputs {
     get replacesArtifacts(): boolean {
         const replaces = core.getInput('replacesArtifacts')
         return replaces == 'true'
+    }
+
+    get repo(): string {
+        let repo = core.getInput('repo')
+        if (repo) {
+            return repo
+        }
+        return this.context.repo.repo
     }
 
     get tag(): string {

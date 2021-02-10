@@ -1,8 +1,8 @@
-import { Action } from "../src/Action";
-import { Artifact } from "../src/Artifact";
-import { Inputs } from "../src/Inputs";
-import { Releases } from "../src/Releases";
-import { ArtifactUploader } from "../src/ArtifactUploader";
+import {Action} from "../src/Action";
+import {Artifact} from "../src/Artifact";
+import {Inputs} from "../src/Inputs";
+import {Releases} from "../src/Releases";
+import {ArtifactUploader} from "../src/ArtifactUploader";
 
 const createMock = jest.fn()
 const deleteMock = jest.fn()
@@ -51,7 +51,7 @@ describe("Action", () => {
 
     it('creates release if no release exists to update', async () => {
         const action = createAction(true, true)
-        const error = { status: 404 }
+        const error = {status: 404}
         getMock.mockRejectedValue(error)
 
         await action.perform()
@@ -62,11 +62,11 @@ describe("Action", () => {
 
     it('creates release if no draft releases', async () => {
         const action = createAction(true, true)
-        const error = { status: 404 }
+        const error = {status: 404}
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({
             data: [
-                { id: id, draft: false, tag_name: tag }
+                {id: id, draft: false, tag_name: tag}
             ]
         })
 
@@ -159,12 +159,12 @@ describe("Action", () => {
 
     it('updates draft release', async () => {
         const action = createAction(true, true)
-        const error = { status: 404 }
+        const error = {status: 404}
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({
             data: [
-                { id: 123, draft: false, tag_name: tag },
-                { id: id, draft: true, tag_name: tag }
+                {id: 123, draft: false, tag_name: tag},
+                {id: id, draft: true, tag_name: tag}
             ]
         })
 
@@ -244,8 +244,10 @@ describe("Action", () => {
                 createdReleaseName: createName,
                 commit: commit,
                 draft: draft,
+                owner: "owner",
                 prerelease: prerelease,
                 replacesArtifacts: replacesArtifacts,
+                repo: "repo",
                 tag: tag,
                 token: token,
                 updatedReleaseBody: updateBody,

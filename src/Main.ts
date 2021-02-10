@@ -24,7 +24,7 @@ function createAction(): Action {
   const globber = new FileArtifactGlobber()
 
   const inputs = new CoreInputs(globber, context)
-  const releases = new GithubReleases(context, git)
+  const releases = new GithubReleases(inputs, git)
   const uploader = new GithubArtifactUploader(releases, inputs.replacesArtifacts)
   return new Action(inputs, releases, uploader)
 }

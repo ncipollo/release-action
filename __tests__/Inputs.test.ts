@@ -164,6 +164,18 @@ describe('Inputs', () => {
             expect(inputs.draft).toBe(true)
         })
     })
+    
+    describe('owner', () => {
+        it('returns owner from context', function () {
+            process.env.GITHUB_REPOSITORY = "owner/repo"
+            mockGetInput.mockReturnValue("")
+            expect(inputs.owner).toBe("owner")
+        });
+        it('returns owner from inputs', function () {
+            mockGetInput.mockReturnValue("owner")
+            expect(inputs.owner).toBe("owner")
+        });
+    })    
 
     describe('prerelase', () => {
         it('returns false', () => {
@@ -185,6 +197,18 @@ describe('Inputs', () => {
             mockGetInput.mockReturnValue('true')
             expect(inputs.replacesArtifacts).toBe(true)
         })
+    })
+
+    describe('repo', () => {
+        it('returns repo from context', function () {
+            process.env.GITHUB_REPOSITORY = "owner/repo"
+            mockGetInput.mockReturnValue("")
+            expect(inputs.repo).toBe("repo")
+        });
+        it('returns repo from inputs', function () {
+            mockGetInput.mockReturnValue("repo")
+            expect(inputs.repo).toBe("repo")
+        });
     })
 
     describe('tag', () => {
