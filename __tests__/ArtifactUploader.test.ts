@@ -1,7 +1,7 @@
-import { Artifact } from "../src/Artifact"
-import { GithubArtifactUploader } from "../src/ArtifactUploader"
-import { Releases } from "../src/Releases";
-import { RequestError } from '@octokit/request-error'
+import {Artifact} from "../src/Artifact"
+import {GithubArtifactUploader} from "../src/ArtifactUploader"
+import {Releases} from "../src/Releases";
+import {RequestError} from '@octokit/request-error'
 
 const artifacts = [
     new Artifact('a/art1'),
@@ -19,7 +19,9 @@ const uploadMock = jest.fn()
 jest.mock('fs', () => {
     return {
         readFileSync: () => fileContents,
-        statSync: () => { return { size: contentLength } }
+        statSync: () => {
+            return {size: contentLength}
+        }
     };
 })
 
@@ -124,6 +126,19 @@ describe('ArtifactUploader', () => {
         expect(deleteMock).toBeCalledTimes(0)
     })
 
+    it('throws upload error when replacesExistingArtifacts is true', async () => {
+        mockListWithoutAssets()
+        mockUploadError()
+        const uploader = createUploader(true, true)
+
+        expect.hasAssertions()
+        try {
+            await uploader.uploadArtifacts(artifacts, releaseId, url)
+        } catch (error) {
+            expect(error).toEqual(Error("Failed to upload artifact art1. error."))
+        }
+    })
+
     it('throws error from replace', async () => {
         mockDeleteError()
         mockListWithAssets()
@@ -155,7 +170,7 @@ describe('ArtifactUploader', () => {
         expect(deleteMock).toBeCalledTimes(0)
     })
 
-    function createUploader(replaces: boolean): GithubArtifactUploader {
+    function createUploader(replaces: boolean, throws: boolean = false): GithubArtifactUploader {
         const MockReleases = jest.fn<Releases, any>(() => {
             return {
                 create: jest.fn(),
@@ -167,7 +182,7 @@ describe('ArtifactUploader', () => {
                 uploadArtifact: uploadMock
             }
         })
-        return new GithubArtifactUploader(new MockReleases(), replaces)
+        return new GithubArtifactUploader(new MockReleases(), replaces, throws)
     }
 
     function mockDeleteError(): any {
@@ -194,14 +209,24 @@ describe('ArtifactUploader', () => {
     }
 
     function mockListWithoutAssets() {
-        listArtifactsMock.mockResolvedValue({ data: [] })
+        listArtifactsMock.mockResolvedValue({data: []})
     }
 
     function mockUploadArtifact(status: number = 200, failures: number = 0) {
-        const error = new RequestError(`HTTP ${status}`, status, { headers: {}, request: { method: 'GET', url: '', headers: {} } })
+        const error = new RequestError(`HTTP ${status}`, status, {
+            headers: {},
+            request: {method: 'GET', url: '', headers: {}}
+        })
         for (let index = 0; index < failures; index++) {
             uploadMock.mockRejectedValueOnce(error)
         }
         uploadMock.mockResolvedValue({})
+    }
+
+    function mockUploadError() {
+        uploadMock.mockRejectedValue({
+            message: "error",
+            status: 502
+        })
     }
 });

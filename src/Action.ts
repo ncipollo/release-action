@@ -78,7 +78,7 @@ export class Action {
     }
 
     private async createRelease(): Promise<CreateReleaseResponse> {
-        const response = await this.releases.create(
+        return await this.releases.create(
             this.inputs.tag,
             this.inputs.createdReleaseBody,
             this.inputs.commit,
@@ -86,7 +86,5 @@ export class Action {
             this.inputs.createdReleaseName,
             this.inputs.prerelease
         )
-
-        return response
     }
 }

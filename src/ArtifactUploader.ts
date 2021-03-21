@@ -10,6 +10,7 @@ export class GithubArtifactUploader implements ArtifactUploader {
     constructor(
         private releases: Releases,
         private replacesExistingArtifacts: boolean = true,
+        private throwsUploadErrors: boolean = false,
     ) {
     }
 
@@ -41,7 +42,11 @@ export class GithubArtifactUploader implements ArtifactUploader {
                 core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}. Retrying...`)
                 await this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1)
             } else {
-                core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}.`)
+                if (this.throwsUploadErrors) {
+                    throw Error(`Failed to upload artifact ${artifact.name}. ${error.message}.`)
+                } else {
+                    core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}.`)
+                }
             }
         }
     }

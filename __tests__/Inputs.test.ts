@@ -59,7 +59,28 @@ describe('Inputs', () => {
         })
     })
 
+    describe('artifactErrorsFailBuild', () => {
+        it('returns false', () => {
+            expect(inputs.artifactErrorsFailBuild).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValue('true')
+            expect(inputs.artifactErrorsFailBuild).toBe(true)
+        })
+    })
+
     describe('artifacts', () => {
+        it('globber told to throw errors', () => {
+            mockGetInput.mockReturnValueOnce('art1')
+                .mockReturnValueOnce('contentType')
+                .mockReturnValueOnce('true')
+
+            expect(inputs.artifacts).toEqual(artifacts)
+            expect(mockGlob).toBeCalledTimes(1)
+            expect(mockGlob).toBeCalledWith('art1', 'contentType', true)
+        })
+        
         it('returns empty artifacts', () => {
             mockGetInput.mockReturnValueOnce('')
                 .mockReturnValueOnce('')
@@ -71,28 +92,32 @@ describe('Inputs', () => {
         it('returns input.artifacts', () => {
             mockGetInput.mockReturnValueOnce('art1')
                 .mockReturnValueOnce('contentType')
+                .mockReturnValueOnce('false')
 
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith('art1', 'contentType')
+            expect(mockGlob).toBeCalledWith('art1', 'contentType', false)
         })
 
         it('returns input.artifacts with default contentType', () => {
             mockGetInput.mockReturnValueOnce('art1')
+                .mockReturnValueOnce('raw')
+                .mockReturnValueOnce('false')
 
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith('art1', 'raw')
+            expect(mockGlob).toBeCalledWith('art1', 'raw', false)
         })
 
         it('returns input.artifact', () => {
             mockGetInput.mockReturnValueOnce('')
                 .mockReturnValueOnce('art2')
                 .mockReturnValueOnce('contentType')
+                .mockReturnValueOnce('false')
 
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith('art2', 'contentType')
+            expect(mockGlob).toBeCalledWith('art2', 'contentType', false)
         })
     })
 
@@ -164,7 +189,7 @@ describe('Inputs', () => {
             expect(inputs.draft).toBe(true)
         })
     })
-    
+
     describe('owner', () => {
         it('returns owner from context', function () {
             process.env.GITHUB_REPOSITORY = "owner/repo"
@@ -175,7 +200,7 @@ describe('Inputs', () => {
             mockGetInput.mockReturnValue("owner")
             expect(inputs.owner).toBe("owner")
         });
-    })    
+    })
 
     describe('prerelase', () => {
         it('returns false', () => {

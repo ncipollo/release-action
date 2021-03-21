@@ -6,6 +6,7 @@ import {Artifact} from './Artifact';
 
 export interface Inputs {
     readonly allowUpdates: boolean
+    readonly artifactErrorsFailBuild: boolean
     readonly artifacts: Artifact[]
     readonly commit: string
     readonly createdReleaseBody?: string
@@ -46,9 +47,14 @@ export class CoreInputs implements Inputs {
                 contentType = 'raw'
             }
             return this.artifactGlobber
-                .globArtifactString(artifacts, contentType)
+                .globArtifactString(artifacts, contentType, this.artifactErrorsFailBuild)
         }
         return []
+    }
+
+    get artifactErrorsFailBuild(): boolean {
+        const allow = core.getInput('artifactErrorsFailBuild')
+        return allow == 'true'
     }
 
     get createdReleaseBody(): string | undefined {

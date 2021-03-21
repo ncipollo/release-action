@@ -17,6 +17,7 @@ const artifacts = [
     new Artifact('b/art2')
 ]
 
+const artifactErrorsFailBuild = false
 const createBody = 'createBody'
 const createName = 'createName'
 const commit = 'commit'
@@ -239,6 +240,7 @@ describe("Action", () => {
         const MockInputs = jest.fn<Inputs, any>(() => {
             return {
                 allowUpdates: allowUpdates,
+                artifactErrorsFailBuild: true,
                 artifacts: inputArtifact,
                 createdReleaseBody: createBody,
                 createdReleaseName: createName,
