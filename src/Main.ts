@@ -25,7 +25,7 @@ function createAction(): Action {
 
   const inputs = new CoreInputs(globber, context)
   const releases = new GithubReleases(inputs, git)
-  const uploader = new GithubArtifactUploader(releases, inputs.replacesArtifacts)
+  const uploader = new GithubArtifactUploader(releases, inputs.replacesArtifacts, inputs.artifactErrorsFailBuild)
   return new Action(inputs, releases, uploader)
 }
 
