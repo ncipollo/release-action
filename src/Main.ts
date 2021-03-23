@@ -5,15 +5,15 @@ import { GithubReleases } from './Releases';
 import { Action } from './Action';
 import { GithubArtifactUploader } from './ArtifactUploader';
 import { FileArtifactGlobber } from './ArtifactGlobber';
-import { ErrorMessage } from './ErrorMessage';
+import { GithubError } from './GithubError';
 
 async function run() {
   try {
     const action = createAction()
     await action.perform()
   } catch (error) {
-    const errorMessage = new ErrorMessage(error)
-    core.setFailed(errorMessage.toString());
+    const githubError = new GithubError(error)
+    core.setFailed(githubError.toString());
   }
 }
 

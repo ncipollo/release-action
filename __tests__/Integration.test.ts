@@ -20,8 +20,8 @@ describe.skip('Integration Test', () => {
         const releases = new GithubReleases(inputs, git)
         const uploader = new GithubArtifactUploader(
             releases,
+            inputs.replacesArtifacts,
             inputs.artifactErrorsFailBuild,
-            inputs.replacesArtifacts
         )
         action = new Action(inputs, releases, uploader)
     })

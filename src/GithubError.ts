@@ -1,65 +1,44 @@
+import {GithubErrorDetail} from "./GithubErrorDetail"
+
 export class GithubError {
-    private error: any;
+    private error: any
+    private readonly githubErrors: GithubErrorDetail[]
 
     constructor(error: any) {
         this.error = error
+        this.githubErrors = this.generateGithubErrors()
     }
 
-    get code(): string {
-        return this.error.code
+    private generateGithubErrors(): GithubErrorDetail[] {
+        const errors = this.error.errors
+        if (errors instanceof Array) {
+            return errors.map((err) => new GithubErrorDetail(err))
+        } else {
+            return []
+        }
+    }
+
+    get status(): number {
+        return this.error.status
+    }
+
+    hasErrorWithCode(code: String): boolean {
+        return this.githubErrors.some((err) => err.code == code)
     }
 
     toString(): string {
-        const code = this.error.code
-        switch (code) {
-            case 'missing':
-                return this.missingResourceMessage()
-            case 'missing_field':
-                return this.missingFieldMessage()
-            case 'invalid':
-                return this.invalidFieldMessage()
-            case 'already_exists':
-                return this.resourceAlreadyExists()
-            default:
-                return this.customErrorMessage()
-        }
-    }
-
-    private customErrorMessage(): string {
-        const message = this.error.message;
-        const documentation = this.error.documentation_url
-
-        let documentationMessage: string
-        if (documentation) {
-            documentationMessage = `\nPlease see ${documentation}.`
+        const message = this.error.message
+        const errors = this.githubErrors
+        const status = this.status
+        if (errors.length > 0) {
+            return `Error ${status}: ${message}\nErrors:\n${this.errorBulletedList(errors)}`
         } else {
-            documentationMessage = ""
+            return `Error ${status}: ${message}`
         }
-
-        return `${message}${documentationMessage}`
     }
 
-    private invalidFieldMessage(): string {
-        const resource = this.error.resource
-        const field = this.error.field
-
-        return `The ${field} field on ${resource} is an invalid format.`
-    }
-
-    private missingResourceMessage(): string {
-        const resource = this.error.resource
-        return `${resource} does not exist.`
-    }
-
-    private missingFieldMessage(): string {
-        const resource = this.error.resource
-        const field = this.error.field
-
-        return `The ${field} field on ${resource} is missing.`
-    }
-
-    private resourceAlreadyExists(): string {
-        const resource = this.error.resource
-        return `${resource} already exists.`
+    private errorBulletedList(errors: GithubErrorDetail[]): string {
+        return errors.map((err) => `- ${err}`).join("\n")
     }
 }
+

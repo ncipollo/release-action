@@ -1,7 +1,7 @@
 import {Inputs} from "./Inputs";
 import {CreateReleaseResponse, Releases, UpdateReleaseResponse} from "./Releases";
 import {ArtifactUploader} from "./ArtifactUploader";
-import {ErrorMessage} from "./ErrorMessage";
+import {GithubError} from "./GithubError";
 
 export class Action {
     private inputs: Inputs
@@ -55,8 +55,8 @@ export class Action {
     }
 
     private static noPublishedRelease(error: any): boolean {
-        const errorMessage = new ErrorMessage(error)
-        return errorMessage.status == 404
+        const githubError = new GithubError(error)
+        return githubError.status == 404
     }
 
     private async updateDraftOrCreateRelease(): Promise<CreateReleaseResponse | UpdateReleaseResponse> {
