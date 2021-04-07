@@ -11,6 +11,7 @@ export interface Inputs {
     readonly commit: string
     readonly createdReleaseBody?: string
     readonly createdReleaseName?: string
+    readonly discussionCategory?: string
     readonly draft: boolean
     readonly owner: string
     readonly prerelease: boolean
@@ -66,7 +67,7 @@ export class CoreInputs implements Inputs {
         return core.getInput('omitBody') == 'true'
     }
 
-    private get body() : string | undefined {
+    private get body(): string | undefined {
         const body = core.getInput('body')
         if (body) {
             return body
@@ -87,6 +88,14 @@ export class CoreInputs implements Inputs {
     get createdReleaseName(): string | undefined {
         if (CoreInputs.omitName) return undefined
         return this.name
+    }
+
+    get discussionCategory(): string | undefined {
+        const category = core.getInput('discussionCategory')
+        if (category) {
+            return category
+        }
+        return undefined
     }
 
     private static get omitName(): boolean {
@@ -162,7 +171,7 @@ export class CoreInputs implements Inputs {
     }
 
     get updatedReleaseName(): string | undefined {
-        if (CoreInputs.omitName ||  CoreInputs.omitNameDuringUpdate) return undefined
+        if (CoreInputs.omitName || CoreInputs.omitNameDuringUpdate) return undefined
         return this.name
     }
 

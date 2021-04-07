@@ -1,5 +1,5 @@
 import {Inputs} from "./Inputs";
-import {CreateReleaseResponse, Releases, UpdateReleaseResponse} from "./Releases";
+import {CreateReleaseResponse, ReleaseByTagResponse, Releases, UpdateReleaseResponse} from "./Releases";
 import {ArtifactUploader} from "./ArtifactUploader";
 import {GithubError} from "./GithubError";
 
@@ -27,18 +27,24 @@ export class Action {
 
     private async createOrUpdateRelease(): Promise<CreateReleaseResponse | UpdateReleaseResponse> {
         if (this.inputs.allowUpdates) {
+            let getResponse: ReleaseByTagResponse
             try {
-                const getResponse = await this.releases.getByTag(this.inputs.tag)
-                return await this.updateRelease(getResponse.data.id)
+                getResponse = await this.releases.getByTag(this.inputs.tag)
             } catch (error) {
-                if (Action.noPublishedRelease(error)) {
-                    return await this.updateDraftOrCreateRelease()
-                } else {
-                    throw error
-                }
+                return await this.checkForMissingReleaseError(error)
             }
+
+            return await this.updateRelease(getResponse.data.id)
         } else {
             return await this.createRelease()
+        }
+    }
+    
+    private async checkForMissingReleaseError(error: Error) : Promise<CreateReleaseResponse | UpdateReleaseResponse> {
+        if (Action.noPublishedRelease(error)) {
+            return await this.updateDraftOrCreateRelease()
+        } else {
+            throw error
         }
     }
 
@@ -48,6 +54,7 @@ export class Action {
             this.inputs.tag,
             this.inputs.updatedReleaseBody,
             this.inputs.commit,
+            this.inputs.discussionCategory,
             this.inputs.draft,
             this.inputs.updatedReleaseName,
             this.inputs.prerelease
@@ -82,6 +89,7 @@ export class Action {
             this.inputs.tag,
             this.inputs.createdReleaseBody,
             this.inputs.commit,
+            this.inputs.discussionCategory,
             this.inputs.draft,
             this.inputs.createdReleaseName,
             this.inputs.prerelease

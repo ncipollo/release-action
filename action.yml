@@ -34,6 +34,10 @@ inputs:
   commit:
     description: "An optional commit reference. This will be used to create the tag if it does not exist."
     required: false
+    default: ''  
+  discussionCategory:
+    description: "When provided this will generate a discussion of the specified category. The category must exist otherwise this will cause the action to fail. This isn't used with draft releases"
+    required: false
     default: ''
   draft:
     description: "Optionally marks this release as a draft release. Set to true to enable."

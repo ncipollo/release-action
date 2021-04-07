@@ -11,6 +11,7 @@ This action will create a github release and optionally upload an artifact to it
 - **body**: An optional body for the release.
 - **bodyFile**: An optional body file for the release. This should be the path to the file.
 - **commit**: An optional commit reference. This will be used to create the tag if it does not exist.
+- **discussionCategory**: When provided this will generate a discussion of the specified category. The category must exist otherwise this will cause the action to fail. This isn't used with draft releases.
 - **draft**: Optionally marks this release as a draft release. Set to `true` to enable.
 - **name**: An optional name for the release. If this is omitted the tag will be used.
 - **omitBody**: Indicates if the release body should be omitted.

@@ -15,6 +15,7 @@ export interface Releases {
         tag: string,
         body?: string,
         commitHash?: string,
+        discussionCategory?: string,
         draft?: boolean,
         name?: string,
         prerelease?: boolean
@@ -33,6 +34,7 @@ export interface Releases {
         tag: string,
         body?: string,
         commitHash?: string,
+        discussionCategory?: string,
         draft?: boolean,
         name?: string,
         prerelease?: boolean
@@ -61,6 +63,7 @@ export class GithubReleases implements Releases {
         tag: string,
         body?: string,
         commitHash?: string,
+        discussionCategory?: string,
         draft?: boolean,
         name?: string,
         prerelease?: boolean
@@ -69,6 +72,7 @@ export class GithubReleases implements Releases {
         return this.git.repos.createRelease({
             body: body,
             name: name,
+            discussion_category_name: discussionCategory,
             draft: draft,
             owner: this.inputs.owner,
             prerelease: prerelease,
@@ -118,6 +122,7 @@ export class GithubReleases implements Releases {
         tag: string,
         body?: string,
         commitHash?: string,
+        discussionCategory?: string,
         draft?: boolean,
         name?: string,
         prerelease?: boolean
@@ -127,6 +132,7 @@ export class GithubReleases implements Releases {
             release_id: id,
             body: body,
             name: name,
+            discussion_category_name: discussionCategory,
             draft: draft,
             owner: this.inputs.owner,
             prerelease: prerelease,

@@ -179,6 +179,18 @@ describe('Inputs', () => {
         })
     })
 
+    describe('discussionCategory', () => {
+        it('returns category', () => {
+            mockGetInput.mockReturnValue('Release')
+            expect(inputs.discussionCategory).toBe('Release')
+        })
+        
+        it('returns undefined', () => {
+            mockGetInput.mockReturnValue('')
+            expect(inputs.discussionCategory).toBe(undefined)
+        })
+    })
+
     describe('draft', () => {
         it('returns false', () => {
             expect(inputs.draft).toBe(false)
