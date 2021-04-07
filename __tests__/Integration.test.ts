@@ -9,7 +9,7 @@ import {FileArtifactGlobber} from "../src/ArtifactGlobber";
 // This test is currently intended to be manually run during development. To run:
 // - Make sure you have an environment variable named GITHUB_TOKEN assigned to your token
 // - Remove skip from the test below
-describe('Integration Test', () => {
+describe.skip('Integration Test', () => {
     let action: Action
 
     beforeEach(() => {
