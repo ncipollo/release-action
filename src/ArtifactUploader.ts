@@ -52,8 +52,7 @@ export class GithubArtifactUploader implements ArtifactUploader {
     }
 
     private async deleteUpdatedArtifacts(artifacts: Artifact[], releaseId: number): Promise<void> {
-        const response = await this.releases.listArtifactsForRelease(releaseId)
-        const releaseAssets = response.data
+        const releaseAssets = await this.releases.listArtifactsForRelease(releaseId)
         const assetByName: Record<string, { id: number; name: string }> = {}
         releaseAssets.forEach(asset => {
             assetByName[asset.name] = asset

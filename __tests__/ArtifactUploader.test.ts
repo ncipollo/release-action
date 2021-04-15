@@ -194,22 +194,20 @@ describe('ArtifactUploader', () => {
     }
 
     function mockListWithAssets() {
-        listArtifactsMock.mockResolvedValue({
-            data: [
-                {
-                    name: "art1",
-                    id: 1
-                },
-                {
-                    name: "art2",
-                    id: 2
-                }
-            ]
-        })
+        listArtifactsMock.mockResolvedValue([
+            {
+                name: "art1",
+                id: 1
+            },
+            {
+                name: "art2",
+                id: 2
+            }
+        ])
     }
 
     function mockListWithoutAssets() {
-        listArtifactsMock.mockResolvedValue({data: []})
+        listArtifactsMock.mockResolvedValue([])
     }
 
     function mockUploadArtifact(status: number = 200, failures: number = 0) {
