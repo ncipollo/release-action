@@ -6,7 +6,7 @@ import {Inputs} from "./Inputs";
 export type CreateReleaseResponse = RestEndpointMethodTypes["repos"]["createRelease"]["response"]
 export type ReleaseByTagResponse = RestEndpointMethodTypes["repos"]["getReleaseByTag"]["response"]
 export type ListReleasesResponse = RestEndpointMethodTypes["repos"]["listReleases"]["response"]
-export type ListReleaseAssetsResponse = RestEndpointMethodTypes["repos"]["listReleaseAssets"]["response"]
+export type ListReleaseAssetsResponseData = RestEndpointMethodTypes["repos"]["listReleaseAssets"]["response"]["data"]
 export type UpdateReleaseResponse = RestEndpointMethodTypes["repos"]["updateRelease"]["response"]
 export type UploadArtifactResponse = RestEndpointMethodTypes["repos"]["uploadReleaseAsset"]["response"]
 
@@ -25,7 +25,7 @@ export interface Releases {
 
     getByTag(tag: string): Promise<ReleaseByTagResponse>
 
-    listArtifactsForRelease(releaseId: number): Promise<ListReleaseAssetsResponse>
+    listArtifactsForRelease(releaseId: number): Promise<ListReleaseAssetsResponseData>
 
     listReleases(): Promise<ListReleasesResponse>
 
@@ -102,8 +102,8 @@ export class GithubReleases implements Releases {
 
     async listArtifactsForRelease(
         releaseId: number
-    ): Promise<ListReleaseAssetsResponse> {
-        return this.git.repos.listReleaseAssets({
+    ): Promise<ListReleaseAssetsResponseData> {
+        return this.git.paginate(this.git.repos.listReleaseAssets, {
             owner: this.inputs.owner,
             release_id: releaseId,
             repo: this.inputs.repo
