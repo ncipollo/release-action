@@ -87,6 +87,13 @@ inputs:
     description: 'The Github token.'
     required: true
     default: ''
+outputs:
+  id:
+    description: 'The identifier of the created release.'
+  html_url:
+    description: 'The HTML URL of the release.'
+  upload_url:
+    description: 'The URL for uploading assets to the release.'
 runs:
   using: 'node12'
   main: 'lib/Main.js'

@@ -1,10 +1,11 @@
 import {Action} from "../src/Action";
 import * as github from "@actions/github";
 import {Inputs} from "../src/Inputs";
-import {GithubReleases} from "../src/Releases";
+import {GithubReleases, ReleaseData} from "../src/Releases";
 import {GithubArtifactUploader} from "../src/ArtifactUploader";
 import * as path from "path";
 import {FileArtifactGlobber} from "../src/ArtifactGlobber";
+import {Outputs} from "../src/Outputs";
 
 // This test is currently intended to be manually run during development. To run:
 // - Make sure you have an environment variable named GITHUB_TOKEN assigned to your token
@@ -17,13 +18,14 @@ describe.skip('Integration Test', () => {
         const git = github.getOctokit(token)
 
         const inputs = getInputs()
+        const outputs = getOutputs()
         const releases = new GithubReleases(inputs, git)
         const uploader = new GithubArtifactUploader(
             releases,
             inputs.replacesArtifacts,
             inputs.artifactErrorsFailBuild,
         )
-        action = new Action(inputs, releases, uploader)
+        action = new Action(inputs, outputs, releases, uploader)
     })
 
     it('Performs action', async () => {
@@ -52,6 +54,17 @@ describe.skip('Integration Test', () => {
             }
         })
         return new MockInputs();
+    }
+
+    function getOutputs(): Outputs {
+        const MockOutputs = jest.fn<Outputs, any>(() => {
+            return {
+                applyReleaseData(releaseData: ReleaseData) {
+                    console.log(`Release Data: ${releaseData}`)
+                }
+            }
+        })
+        return new MockOutputs()
     }
 
     function artifacts() {

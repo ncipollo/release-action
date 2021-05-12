@@ -9,6 +9,13 @@ export type ListReleasesResponse = RestEndpointMethodTypes["repos"]["listRelease
 export type ListReleaseAssetsResponseData = RestEndpointMethodTypes["repos"]["listReleaseAssets"]["response"]["data"]
 export type UpdateReleaseResponse = RestEndpointMethodTypes["repos"]["updateRelease"]["response"]
 export type UploadArtifactResponse = RestEndpointMethodTypes["repos"]["uploadReleaseAsset"]["response"]
+export type CreateOrUpdateReleaseResponse = CreateReleaseResponse | UpdateReleaseResponse
+
+export type ReleaseData = {
+    id: number
+    html_url: string
+    upload_url: string
+}
 
 export interface Releases {
     create(

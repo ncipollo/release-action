@@ -1,31 +1,43 @@
 import {Inputs} from "./Inputs";
-import {CreateReleaseResponse, ReleaseByTagResponse, Releases, UpdateReleaseResponse} from "./Releases";
+import {
+    CreateOrUpdateReleaseResponse,
+    CreateReleaseResponse,
+    ReleaseByTagResponse,
+    Releases,
+    UpdateReleaseResponse
+} from "./Releases";
 import {ArtifactUploader} from "./ArtifactUploader";
 import {GithubError} from "./GithubError";
+import {Outputs} from "./Outputs";
 
 export class Action {
     private inputs: Inputs
+    private outputs: Outputs
     private releases: Releases
     private uploader: ArtifactUploader
 
-    constructor(inputs: Inputs, releases: Releases, uploader: ArtifactUploader) {
+    constructor(inputs: Inputs, outputs: Outputs, releases: Releases, uploader: ArtifactUploader) {
         this.inputs = inputs
+        this.outputs = outputs
         this.releases = releases
         this.uploader = uploader
     }
 
     async perform() {
         const releaseResponse = await this.createOrUpdateRelease();
-        const releaseId = releaseResponse.data.id
-        const uploadUrl = releaseResponse.data.upload_url
+        const releaseData = releaseResponse.data
+        const releaseId = releaseData.id
+        const uploadUrl = releaseData.upload_url
 
         const artifacts = this.inputs.artifacts
         if (artifacts.length > 0) {
             await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
         }
+        
+        this.outputs.applyReleaseData(releaseData)
     }
 
-    private async createOrUpdateRelease(): Promise<CreateReleaseResponse | UpdateReleaseResponse> {
+    private async createOrUpdateRelease(): Promise<CreateOrUpdateReleaseResponse> {
         if (this.inputs.allowUpdates) {
             let getResponse: ReleaseByTagResponse
             try {
@@ -39,8 +51,8 @@ export class Action {
             return await this.createRelease()
         }
     }
-    
-    private async checkForMissingReleaseError(error: Error) : Promise<CreateReleaseResponse | UpdateReleaseResponse> {
+
+    private async checkForMissingReleaseError(error: Error): Promise<CreateOrUpdateReleaseResponse> {
         if (Action.noPublishedRelease(error)) {
             return await this.updateDraftOrCreateRelease()
         } else {
