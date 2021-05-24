@@ -13,6 +13,18 @@ jest.mock('@actions/core', () => {
     return {warning: warnMock};
 })
 
+jest.mock('fs', () => {
+    return {
+        statSync: () => {
+            return {
+                isDirectory(): boolean {
+                    return false
+                }
+            }
+        }
+    };
+})
+
 describe("ArtifactGlobber", () => {
     beforeEach(() => {
         globMock.mockClear()

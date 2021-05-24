@@ -70,7 +70,7 @@ describe.skip('Integration Test', () => {
     function artifacts() {
         const globber = new FileArtifactGlobber()
         const artifactPath = path.join(__dirname, 'Integration.test.ts')
-        const artifactString = `~/Desktop/test.txt,blarg.tx, ${artifactPath}`
+        const artifactString = `~/Desktop,~/Desktop/test.txt,blarg.tx, ${artifactPath}`
         return globber.globArtifactString(artifactString, "raw", false)
     }
 
