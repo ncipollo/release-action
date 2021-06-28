@@ -31,7 +31,7 @@ This action will create a GitHub release and optionally upload an artifact to it
 - **upload_url**: The URL for uploading assets to the release.
 
 ## Example
-This example will create a release when a new tag is pushed:
+This example will create a release when a tag is pushed:
 
 ```yml
 name: Releases
