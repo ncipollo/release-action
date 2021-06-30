@@ -76,7 +76,7 @@ export class GithubReleases implements Releases {
         prerelease?: boolean
     ): Promise<CreateReleaseResponse> {
         // noinspection TypeScriptValidateJSTypes
-        return this.git.repos.createRelease({
+        return this.git.rest.repos.createRelease({
             body: body,
             name: name,
             discussion_category_name: discussionCategory,
@@ -92,7 +92,7 @@ export class GithubReleases implements Releases {
     async deleteArtifact(
         assetId: number
     ): Promise<OctokitResponse<any>> {
-        return this.git.repos.deleteReleaseAsset({
+        return this.git.rest.repos.deleteReleaseAsset({
             asset_id: assetId,
             owner: this.inputs.owner,
             repo: this.inputs.repo
@@ -100,7 +100,7 @@ export class GithubReleases implements Releases {
     }
 
     async getByTag(tag: string): Promise<ReleaseByTagResponse> {
-        return this.git.repos.getReleaseByTag({
+        return this.git.rest.repos.getReleaseByTag({
             owner: this.inputs.owner,
             repo: this.inputs.repo,
             tag: tag
@@ -110,7 +110,7 @@ export class GithubReleases implements Releases {
     async listArtifactsForRelease(
         releaseId: number
     ): Promise<ListReleaseAssetsResponseData> {
-        return this.git.paginate(this.git.repos.listReleaseAssets, {
+        return this.git.paginate(this.git.rest.repos.listReleaseAssets, {
             owner: this.inputs.owner,
             release_id: releaseId,
             repo: this.inputs.repo
@@ -118,7 +118,7 @@ export class GithubReleases implements Releases {
     }
 
     async listReleases(): Promise<ListReleasesResponse> {
-        return this.git.repos.listReleases({
+        return this.git.rest.repos.listReleases({
             owner: this.inputs.owner,
             repo: this.inputs.repo
         })
@@ -135,7 +135,7 @@ export class GithubReleases implements Releases {
         prerelease?: boolean
     ): Promise<UpdateReleaseResponse> {
         // noinspection TypeScriptValidateJSTypes
-        return this.git.repos.updateRelease({
+        return this.git.rest.repos.updateRelease({
             release_id: id,
             body: body,
             name: name,
@@ -157,7 +157,7 @@ export class GithubReleases implements Releases {
         name: string,
         releaseId: number,
     ): Promise<UploadArtifactResponse> {
-        return this.git.repos.uploadReleaseAsset({
+        return this.git.rest.repos.uploadReleaseAsset({
             url: assetUrl,
             headers: {
                 "content-length": contentLength,
