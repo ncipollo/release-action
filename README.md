@@ -5,7 +5,7 @@ This action will create a GitHub release and optionally upload an artifact to it
 ## Action Inputs
 - **allowUpdates**: An optional flag which indicates if we should update a release if it already exists. Defaults to `false`.
 - **artifactErrorsFailBuild**: An optional flag which indicates if artifact read or upload errors should fail the build.  
-- **artifact**: An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
+- **artifact** (deprecated): An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
 - **artifacts**: An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs).
 - **artifactContentType**: The content type of the artifact. Defaults to `raw`.
 - **body**: An optional body for the release.
