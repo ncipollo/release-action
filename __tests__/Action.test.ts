@@ -26,6 +26,7 @@ const discussionCategory = 'discussionCategory'
 const draft = true
 const id = 100
 const prerelease = true
+const updatePrerelease = false
 const releaseId = 101
 const replacesArtifacts = true
 const tag = 'tag'
@@ -153,7 +154,7 @@ describe("Action", () => {
             discussionCategory,
             draft,
             updateName,
-            prerelease
+            updatePrerelease
         )
         expect(uploadMock).not.toBeCalled()
     })
@@ -195,7 +196,7 @@ describe("Action", () => {
             discussionCategory,
             draft,
             updateName,
-            prerelease
+            updatePrerelease
         )
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
@@ -214,7 +215,7 @@ describe("Action", () => {
             discussionCategory,
             draft,
             updateName,
-            prerelease
+            updatePrerelease
         )
         expect(uploadMock).not.toBeCalled()
         assertOutputApplied()
@@ -233,7 +234,7 @@ describe("Action", () => {
             discussionCategory,
             draft,
             updateName,
-            prerelease
+            updatePrerelease
         )
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
@@ -301,7 +302,8 @@ describe("Action", () => {
                 tag: tag,
                 token: token,
                 updatedReleaseBody: updateBody,
-                updatedReleaseName: updateName
+                updatedReleaseName: updateName,
+                updatedPrerelease: updatePrerelease
             }
         })
         const MockOutputs = jest.fn<Outputs, any>(() => {

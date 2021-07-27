@@ -21,6 +21,7 @@ export interface Inputs {
     readonly token: string
     readonly updatedReleaseBody?: string
     readonly updatedReleaseName?: string
+    readonly updatedPrerelease?: boolean
 }
 
 export class CoreInputs implements Inputs {
@@ -129,6 +130,14 @@ export class CoreInputs implements Inputs {
         return preRelease == 'true'
     }
 
+    private static get omitPrereleaseDuringUpdate(): boolean {
+        return core.getInput('omitPrereleaseDuringUpdate') == 'true'
+    }
+
+    get updatedPrerelease(): boolean | undefined {
+        if (CoreInputs.omitPrereleaseDuringUpdate) return undefined
+        return this.prerelease
+    }
     get replacesArtifacts(): boolean {
         const replaces = core.getInput('replacesArtifacts')
         return replaces == 'true'

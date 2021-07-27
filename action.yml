@@ -71,6 +71,10 @@ inputs:
     description: "Optionally marks this release as prerelease. Set to true to enable."
     required: false
     default: ''
+  omitPrereleaseDuringUpdate:
+    description: 'Indicates if the prerelease flag should be omitted during updates. The prerelease flag will still be applied for newly created releases. This will preserve the existing prerelease state during updates.'
+    required: false
+    default: 'false'
   replacesArtifacts:
     description: "Indicates if existing release artifacts should be replaced. Defaults to true."
     required: false

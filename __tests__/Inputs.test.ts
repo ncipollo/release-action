@@ -349,6 +349,29 @@ describe('Inputs', () => {
         })
     })
 
+    describe('updatedPrerelease', () => {
+        it('returns false', () => {
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('false')
+            expect(inputs.updatedPrerelease).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('true')
+            expect(inputs.updatedPrerelease).toBe(true)
+        })
+
+        it('returns undefined when omitted for update', () => {
+            mockGetInput
+                .mockReturnValueOnce('true')
+                .mockReturnValueOnce('false')
+            expect(inputs.updatedPrerelease).toBeUndefined()
+        })
+    })
+
     function createGlobber(): ArtifactGlobber {
         const MockGlobber = jest.fn<ArtifactGlobber, any>(() => {
             return {
