@@ -104,7 +104,7 @@ export class Action {
             this.inputs.discussionCategory,
             this.inputs.draft,
             this.inputs.createdReleaseName,
-            this.inputs.prerelease
+            this.inputs.createdPrerelease
         )
     }
 }

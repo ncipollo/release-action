@@ -214,14 +214,14 @@ describe('Inputs', () => {
         });
     })
 
-    describe('prerelase', () => {
+    describe('createdPrerelase', () => {
         it('returns false', () => {
-            expect(inputs.prerelease).toBe(false)
+            expect(inputs.createdPrerelease).toBe(false)
         })
 
         it('returns true', () => {
             mockGetInput.mockReturnValue('true')
-            expect(inputs.prerelease).toBe(true)
+            expect(inputs.createdPrerelease).toBe(true)
         })
     })
 
