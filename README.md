@@ -18,10 +18,10 @@ This action will create a GitHub release and optionally upload an artifact to it
 - **omitBodyDuringUpdate**: Indicates if the release body should be omitted during updates. The body will still be applied for newly created releases. This will preserve the existing body during updates.
 - **omitName**: Indicates if the release name should be omitted.
 - **omitNameDuringUpdate**: Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.
-- **owner**: Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner.
-- **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
 - **omitPrereleaseDuringUpdate**: Indicates if the prerelease flag should be omitted during updates. The prerelease flag will still be applied for newly created releases.
   This will preserve the existing prerelease state during updates.
+- **owner**: Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner.
+- **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
 - **replacesArtifacts**: Indicates if existing release artifacts should be replaced. Defaults to `true`.
 - **repo**: Optionally specify the repo where the release should be generated. Defaults to current repo.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).
