@@ -63,6 +63,10 @@ inputs:
     description: 'Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.'
     required: false
     default: 'false'
+  omitPrereleaseDuringUpdate:
+    description: 'Indicates if the prerelease flag should be omitted during updates. The prerelease flag will still be applied for newly created releases. This will preserve the existing prerelease state during updates.'
+    required: false
+    default: 'false'
   owner:
     description: "Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner."
     required: false

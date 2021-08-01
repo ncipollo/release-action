@@ -214,14 +214,14 @@ describe('Inputs', () => {
         });
     })
 
-    describe('prerelase', () => {
+    describe('createdPrerelase', () => {
         it('returns false', () => {
-            expect(inputs.prerelease).toBe(false)
+            expect(inputs.createdPrerelease).toBe(false)
         })
 
         it('returns true', () => {
             mockGetInput.mockReturnValue('true')
-            expect(inputs.prerelease).toBe(true)
+            expect(inputs.createdPrerelease).toBe(true)
         })
     })
 
@@ -346,6 +346,29 @@ describe('Inputs', () => {
                 .mockReturnValueOnce('')
             context.ref = 'refs/tags/sha-tag'
             expect(inputs.updatedReleaseName).toBe('sha-tag')
+        })
+    })
+
+    describe('updatedPrerelease', () => {
+        it('returns false', () => {
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('false')
+            expect(inputs.updatedPrerelease).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValueOnce('true')
+            expect(inputs.updatedPrerelease).toBe(true)
+        })
+
+        it('returns undefined when omitted for update', () => {
+            mockGetInput
+                .mockReturnValueOnce('true')
+                .mockReturnValueOnce('false')
+            expect(inputs.updatedPrerelease).toBeUndefined()
         })
     })
 

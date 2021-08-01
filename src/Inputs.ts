@@ -14,13 +14,14 @@ export interface Inputs {
     readonly discussionCategory?: string
     readonly draft: boolean
     readonly owner: string
-    readonly prerelease: boolean
+    readonly createdPrerelease: boolean
     readonly replacesArtifacts: boolean
     readonly repo: string
     readonly tag: string
     readonly token: string
     readonly updatedReleaseBody?: string
     readonly updatedReleaseName?: string
+    readonly updatedPrerelease?: boolean
 }
 
 export class CoreInputs implements Inputs {
@@ -124,11 +125,19 @@ export class CoreInputs implements Inputs {
         return this.context.repo.owner
     }
 
-    get prerelease(): boolean {
+    get createdPrerelease(): boolean {
         const preRelease = core.getInput('prerelease')
         return preRelease == 'true'
     }
 
+    private static get omitPrereleaseDuringUpdate(): boolean {
+        return core.getInput('omitPrereleaseDuringUpdate') == 'true'
+    }
+
+    get updatedPrerelease(): boolean | undefined {
+        if (CoreInputs.omitPrereleaseDuringUpdate) return undefined
+        return this.createdPrerelease
+    }
     get replacesArtifacts(): boolean {
         const replaces = core.getInput('replacesArtifacts')
         return replaces == 'true'
