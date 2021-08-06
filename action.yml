@@ -90,7 +90,7 @@ inputs:
   token:
     description: 'The Github token.'
     required: true
-    default: ''
+    default: ${{ github.token }}
 outputs:
   id:
     description: 'The identifier of the created release.'
