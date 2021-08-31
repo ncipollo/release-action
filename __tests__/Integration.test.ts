@@ -23,6 +23,7 @@ describe.skip('Integration Test', () => {
         const uploader = new GithubArtifactUploader(
             releases,
             inputs.replacesArtifacts,
+            inputs.removeArtifacts,
             inputs.artifactErrorsFailBuild,
         )
         action = new Action(inputs, outputs, releases, uploader)
@@ -46,6 +47,7 @@ describe.skip('Integration Test', () => {
                 owner: "ncipollo",
                 createdPrerelease: false,
                 replacesArtifacts: true,
+                removeArtifacts: false,
                 repo: "actions-playground",
                 tag: "release-action-test",
                 token: getToken(),

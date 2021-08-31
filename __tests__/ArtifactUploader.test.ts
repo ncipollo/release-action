@@ -89,6 +89,25 @@ describe('ArtifactUploader', () => {
         expect(deleteMock).toBeCalledWith(2)
     })
 
+    it('removes all artifacts', async () => {
+        mockDeleteSuccess()
+        mockListWithAssets()
+        mockUploadArtifact()
+        const uploader = createUploader(false, true)
+
+        await uploader.uploadArtifacts(artifacts, releaseId, url)
+
+        expect(uploadMock).toBeCalledTimes(2)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+        expect(uploadMock)
+            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+
+        expect(deleteMock).toBeCalledTimes(2)
+        expect(deleteMock).toBeCalledWith(1)
+        expect(deleteMock).toBeCalledWith(2)
+    })
+
     it('replaces no artifacts when previous asset list empty', async () => {
         mockDeleteSuccess()
         mockListWithoutAssets()
@@ -129,7 +148,7 @@ describe('ArtifactUploader', () => {
     it('throws upload error when replacesExistingArtifacts is true', async () => {
         mockListWithoutAssets()
         mockUploadError()
-        const uploader = createUploader(true, true)
+        const uploader = createUploader(true, false, true)
 
         expect.hasAssertions()
         try {
@@ -170,7 +189,7 @@ describe('ArtifactUploader', () => {
         expect(deleteMock).toBeCalledTimes(0)
     })
 
-    function createUploader(replaces: boolean, throws: boolean = false): GithubArtifactUploader {
+    function createUploader(replaces: boolean, removes: boolean = false, throws: boolean = false): GithubArtifactUploader {
         const MockReleases = jest.fn<Releases, any>(() => {
             return {
                 create: jest.fn(),
@@ -182,7 +201,7 @@ describe('ArtifactUploader', () => {
                 uploadArtifact: uploadMock
             }
         })
-        return new GithubArtifactUploader(new MockReleases(), replaces, throws)
+        return new GithubArtifactUploader(new MockReleases(), replaces, removes, throws)
     }
 
     function mockDeleteError(): any {

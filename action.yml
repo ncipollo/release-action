@@ -75,6 +75,10 @@ inputs:
     description: "Optionally marks this release as prerelease. Set to true to enable."
     required: false
     default: ''
+  removeArtifacts:
+    description: 'Indicates if existing release artifacts should be removed, Defaults to false.'
+    required: false
+    default: 'false'
   replacesArtifacts:
     description: "Indicates if existing release artifacts should be replaced. Defaults to true."
     required: false
