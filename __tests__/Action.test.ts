@@ -29,6 +29,7 @@ const createPrerelease = true
 const updatePrerelease = false
 const releaseId = 101
 const replacesArtifacts = true
+const removeArtifacts = false
 const tag = 'tag'
 const token = 'token'
 const updateBody = 'updateBody'
@@ -298,6 +299,7 @@ describe("Action", () => {
                 owner: "owner",
                 createdPrerelease: createPrerelease,
                 replacesArtifacts: replacesArtifacts,
+                removeArtifacts: removeArtifacts,
                 repo: "repo",
                 tag: tag,
                 token: token,

@@ -22,6 +22,7 @@ This action will create a GitHub release and optionally upload an artifact to it
   This will preserve the existing prerelease state during updates.
 - **owner**: Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner.
 - **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
+- **removeArtifacts**: Indicates if existing release artifacts should be removed. Defaults to `false`.
 - **replacesArtifacts**: Indicates if existing release artifacts should be replaced. Defaults to `true`.
 - **repo**: Optionally specify the repo where the release should be generated. Defaults to current repo.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).

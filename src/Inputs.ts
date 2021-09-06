@@ -15,6 +15,7 @@ export interface Inputs {
     readonly draft: boolean
     readonly owner: string
     readonly createdPrerelease: boolean
+    readonly removeArtifacts: boolean
     readonly replacesArtifacts: boolean
     readonly repo: string
     readonly tag: string
@@ -137,6 +138,10 @@ export class CoreInputs implements Inputs {
     get updatedPrerelease(): boolean | undefined {
         if (CoreInputs.omitPrereleaseDuringUpdate) return undefined
         return this.createdPrerelease
+    }
+    get removeArtifacts(): boolean {
+        const removes = core.getInput('removeArtifacts')
+        return removes == 'true'
     }
     get replacesArtifacts(): boolean {
         const replaces = core.getInput('replacesArtifacts')

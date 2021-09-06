@@ -236,6 +236,17 @@ describe('Inputs', () => {
         })
     })
 
+    describe('removeArtifacts', () => {
+        it('returns false', () => {
+            expect(inputs.removeArtifacts).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValue('true')
+            expect(inputs.removeArtifacts).toBe(true)
+        })
+    })
+
     describe('repo', () => {
         it('returns repo from context', function () {
             process.env.GITHUB_REPOSITORY = "owner/repo"
