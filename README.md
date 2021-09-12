@@ -26,7 +26,7 @@ This action will create a GitHub release and optionally upload an artifact to it
 - **replacesArtifacts**: Indicates if existing release artifacts should be replaced. Defaults to `true`.
 - **repo**: Optionally specify the repo where the release should be generated. Defaults to current repo.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).
-- **token**: (**Required**) The GitHub token. Typically this will be `${{ secrets.GITHUB_TOKEN }}`.
+- **token**: The GitHub token. Typically, this will be `${{ secrets.GITHUB_TOKEN }}`. If you are using a personal access token it should have access to the `repo` scope.
 
 ## Action Outputs
 - **id**: The identifier of the created release.

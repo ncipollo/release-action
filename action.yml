@@ -93,7 +93,7 @@ inputs:
     default: ''
   token:
     description: 'The Github token.'
-    required: true
+    required: false
     default: ${{ github.token }}
 outputs:
   id:
