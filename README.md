@@ -20,11 +20,11 @@ This action will create a GitHub release and optionally upload an artifact to it
 - **omitNameDuringUpdate**: Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.
 - **omitPrereleaseDuringUpdate**: Indicates if the prerelease flag should be omitted during updates. The prerelease flag will still be applied for newly created releases.
   This will preserve the existing prerelease state during updates.
-- **owner**: Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner.
+- **owner**: Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner. Example - `ncipollo`.
 - **prerelease**: Optionally marks this release as prerelease. Set to true to enable.
 - **removeArtifacts**: Indicates if existing release artifacts should be removed. Defaults to `false`.
 - **replacesArtifacts**: Indicates if existing release artifacts should be replaced. Defaults to `true`.
-- **repo**: Optionally specify the repo where the release should be generated. Defaults to current repo.
+- **repo**: Optionally specify the repo where the release should be generated. Defaults to current repo. Example - `release-action`.
 - **tag**: An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).
 - **token**: The GitHub token. Typically, this will be `${{ secrets.GITHUB_TOKEN }}`. If you are using a personal access token it should have access to the `repo` scope.
 
