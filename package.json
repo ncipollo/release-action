@@ -26,7 +26,7 @@
     "@actions/core": "^1.5.0",
     "@actions/github": "^5.0.0",
     "@types/glob": "^7.1.4",
-    "glob": "^7.1.7",
+    "glob": "^7.2.0",
     "untildify": "^4.0.0"
   },
   "devDependencies": {
