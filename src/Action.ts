@@ -42,7 +42,7 @@ export class Action {
             let getResponse: ReleaseByTagResponse
             try {
                 getResponse = await this.releases.getByTag(this.inputs.tag)
-            } catch (error) {
+            } catch (error: any) {
                 return await this.checkForMissingReleaseError(error)
             }
 
