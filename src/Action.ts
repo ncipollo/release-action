@@ -9,18 +9,25 @@ import {
 import {ArtifactUploader} from "./ArtifactUploader";
 import {GithubError} from "./GithubError";
 import {Outputs} from "./Outputs";
+import {ArtifactDestroyer} from "./ArtifactDestroyer";
 
 export class Action {
     private inputs: Inputs
     private outputs: Outputs
     private releases: Releases
+    private artifactDestroyer: ArtifactDestroyer
     private uploader: ArtifactUploader
 
-    constructor(inputs: Inputs, outputs: Outputs, releases: Releases, uploader: ArtifactUploader) {
+    constructor(inputs: Inputs,
+                outputs: Outputs,
+                releases: Releases,
+                uploader: ArtifactUploader,
+                artifactDestroyer: ArtifactDestroyer) {
         this.inputs = inputs
         this.outputs = outputs
         this.releases = releases
         this.uploader = uploader
+        this.artifactDestroyer = artifactDestroyer
     }
 
     async perform() {
@@ -28,12 +35,16 @@ export class Action {
         const releaseData = releaseResponse.data
         const releaseId = releaseData.id
         const uploadUrl = releaseData.upload_url
-
+        
+        if (this.inputs.removeArtifacts) {
+            await this.artifactDestroyer.destroyArtifacts(releaseId)
+        }
+        
         const artifacts = this.inputs.artifacts
         if (artifacts.length > 0) {
             await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
         }
-        
+
         this.outputs.applyReleaseData(releaseData)
     }
 

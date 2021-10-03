@@ -4,6 +4,7 @@ import {Inputs} from "../src/Inputs";
 import {Releases} from "../src/Releases";
 import {ArtifactUploader} from "../src/ArtifactUploader";
 import {Outputs} from "../src/Outputs";
+import {ArtifactDestroyer} from "../src/ArtifactDestroyer";
 
 const applyReleaseDataMock = jest.fn()
 const createMock = jest.fn()
@@ -13,6 +14,7 @@ const listArtifactsMock = jest.fn()
 const listMock = jest.fn()
 const updateMock = jest.fn()
 const uploadMock = jest.fn()
+const artifactDestroyMock = jest.fn()
 
 const artifacts = [
     new Artifact('a/art1'),
@@ -29,7 +31,6 @@ const createPrerelease = true
 const updatePrerelease = false
 const releaseId = 101
 const replacesArtifacts = true
-const removeArtifacts = false
 const tag = 'tag'
 const token = 'token'
 const updateBody = 'updateBody'
@@ -92,6 +93,24 @@ describe("Action", () => {
 
         expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        assertOutputApplied()
+    })
+
+    it('removes all artifacts when artifact destroyer is enabled', async () => {
+        const action = createAction(false, true, true)
+
+        await action.perform()
+
+        expect(artifactDestroyMock).toBeCalledWith(releaseId)
+        assertOutputApplied()
+    })
+
+    it('removes no artifacts when artifact destroyer is disabled', async () => {
+        const action = createAction(false, true)
+
+        await action.perform()
+
+        expect(artifactDestroyMock).not.toBeCalled()
         assertOutputApplied()
     })
 
@@ -245,7 +264,7 @@ describe("Action", () => {
         expect(applyReleaseDataMock).toBeCalledWith({id: releaseId, upload_url: url})
     }
 
-    function createAction(allowUpdates: boolean, hasArtifact: boolean): Action {
+    function createAction(allowUpdates: boolean, hasArtifact: boolean, removeArtifacts: boolean = false): Action {
         let inputArtifact: Artifact[]
         if (hasArtifact) {
             inputArtifact = artifacts
@@ -318,12 +337,18 @@ describe("Action", () => {
                 uploadArtifacts: uploadMock
             }
         })
+        const MockArtifactDestroyer = jest.fn<ArtifactDestroyer, any>(() => {
+            return {
+                destroyArtifacts: artifactDestroyMock
+            }
+        })
 
         const inputs = new MockInputs()
         const outputs = new MockOutputs()
         const releases = new MockReleases()
         const uploader = new MockUploader()
+        const artifactDestroyer = new MockArtifactDestroyer()
 
-        return new Action(inputs, outputs, releases, uploader)
+        return new Action(inputs, outputs, releases, uploader, artifactDestroyer)
     }
 })

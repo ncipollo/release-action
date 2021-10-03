@@ -6,6 +6,7 @@ import {GithubArtifactUploader} from "../src/ArtifactUploader";
 import * as path from "path";
 import {FileArtifactGlobber} from "../src/ArtifactGlobber";
 import {Outputs} from "../src/Outputs";
+import {GithubArtifactDestroyer} from "../src/ArtifactDestroyer";
 
 // This test is currently intended to be manually run during development. To run:
 // - Make sure you have an environment variable named GITHUB_TOKEN assigned to your token
@@ -23,10 +24,11 @@ describe.skip('Integration Test', () => {
         const uploader = new GithubArtifactUploader(
             releases,
             inputs.replacesArtifacts,
-            inputs.removeArtifacts,
             inputs.artifactErrorsFailBuild,
         )
-        action = new Action(inputs, outputs, releases, uploader)
+        const artifactDestroyer = new GithubArtifactDestroyer(releases)
+        
+        action = new Action(inputs, outputs, releases, uploader, artifactDestroyer)
     })
 
     it('Performs action', async () => {
