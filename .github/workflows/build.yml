@@ -11,7 +11,7 @@ jobs:
   check_pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
 
       - name: "yarn install"
         run: yarn install
