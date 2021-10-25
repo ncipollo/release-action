@@ -54,7 +54,7 @@ describe("ArtifactGlobber", () => {
         expect(warnMock).not.toBeCalled()
     })
 
-    it("splits multiple paths", () => {
+    it("splits multiple paths with comma separator", () => {
         const globber = createArtifactGlobber()
 
         const expectedArtifacts =
@@ -63,6 +63,21 @@ describe("ArtifactGlobber", () => {
                 .map((path) => new Artifact(path, contentType))
 
         expect(globber.globArtifactString('path1,path2', 'raw', false))
+            .toEqual(expectedArtifacts)
+        expect(globMock).toBeCalledWith('path1')
+        expect(globMock).toBeCalledWith('path2')
+        expect(warnMock).not.toBeCalled()
+    })
+
+    it("splits multiple paths with new line separator and trims start", () => {
+        const globber = createArtifactGlobber()
+
+        const expectedArtifacts =
+            globResults
+                .concat(globResults)
+                .map((path) => new Artifact(path, contentType))
+
+        expect(globber.globArtifactString('path1\n  path2', 'raw', false))
             .toEqual(expectedArtifacts)
         expect(globMock).toBeCalledWith('path1')
         expect(globMock).toBeCalledWith('path2')

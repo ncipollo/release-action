@@ -16,7 +16,9 @@ export class FileArtifactGlobber implements ArtifactGlobber {
     }
 
     globArtifactString(artifact: string, contentType: string, errorsFailBuild: boolean): Artifact[] {
-        return artifact.split(',')
+        const split = /[,\n]/
+        return artifact.split(split)
+            .map(path => path.trimStart())
             .map(path => FileArtifactGlobber.expandPath(path))
             .map(pattern => this.globPattern(pattern, errorsFailBuild))
             .map((globResult) => FileArtifactGlobber.validatePattern(errorsFailBuild, globResult[1], globResult[0]))
