@@ -294,6 +294,7 @@ describe('Inputs', () => {
             expect(inputs.tag).toBe('sha-tag')
         })
         it('throws if no tag', () => {
+            context.ref = ""
             expect(() => inputs.tag).toThrow()
         })
     })
