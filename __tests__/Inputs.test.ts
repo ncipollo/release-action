@@ -38,9 +38,16 @@ describe('Inputs', () => {
         inputs = new CoreInputs(createGlobber(), context)
     })
 
-    it('returns targetCommit', () => {
-        mockGetInput.mockReturnValue('42')
-        expect(inputs.commit).toBe('42')
+    describe('commit', () => {
+        it('returns commit', () => {
+            mockGetInput.mockReturnValueOnce('commit')
+            expect(inputs.commit).toBe('commit')
+        })
+
+        it('returns undefined when omitted', () => {
+            mockGetInput.mockReturnValueOnce('')
+            expect(inputs.commit).toBeUndefined()
+        })
     })
 
     it('returns token', () => {
@@ -202,6 +209,18 @@ describe('Inputs', () => {
         })
     })
 
+    describe('generateReleaseNotes', () => {
+        it('returns returns true', function () {
+            mockGetInput.mockReturnValue("true")
+            expect(inputs.generateReleaseNotes).toBe(true)
+        });
+
+        it('returns false when omitted', function () {
+            mockGetInput.mockReturnValue("")
+            expect(inputs.generateReleaseNotes).toBe(false)
+        });
+    })
+    
     describe('owner', () => {
         it('returns owner from context', function () {
             process.env.GITHUB_REPOSITORY = "owner/repo"

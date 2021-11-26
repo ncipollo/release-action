@@ -26,6 +26,7 @@ const createName = 'createName'
 const commit = 'commit'
 const discussionCategory = 'discussionCategory'
 const draft = true
+const generateReleaseNotes = true
 const id = 100
 const createPrerelease = true
 const updatePrerelease = false
@@ -51,7 +52,14 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
+        expect(createMock).toBeCalledWith(tag,
+            createBody,
+            commit,
+            discussionCategory,
+            draft,
+            generateReleaseNotes,
+            createName,
+            createPrerelease)
         expect(uploadMock).not.toBeCalled()
         assertOutputApplied()
     })
@@ -63,7 +71,15 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
+        expect(createMock).toBeCalledWith(
+            tag,
+            createBody,
+            commit,
+            discussionCategory,
+            draft,
+            generateReleaseNotes,
+            createName,
+            createPrerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
@@ -80,7 +96,16 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
+        expect(createMock).toBeCalledWith(
+            tag,
+            createBody,
+            commit,
+            discussionCategory,
+            draft,
+            generateReleaseNotes,
+            createName,
+            createPrerelease
+        )
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
 
@@ -91,7 +116,16 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
+        expect(createMock).toBeCalledWith(
+            tag,
+            createBody,
+            commit,
+            discussionCategory,
+            draft,
+            generateReleaseNotes,
+            createName,
+            createPrerelease
+        )
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
@@ -125,7 +159,16 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
+        expect(createMock).toBeCalledWith(
+            tag,
+            createBody,
+            commit,
+            discussionCategory,
+            draft,
+            generateReleaseNotes,
+            createName,
+            createPrerelease
+        )
         expect(uploadMock).not.toBeCalled()
     })
 
@@ -191,7 +234,16 @@ describe("Action", () => {
             expect(error).toEqual(expectedError)
         }
 
-        expect(createMock).toBeCalledWith(tag, createBody, commit, discussionCategory, draft, createName, createPrerelease)
+        expect(createMock).toBeCalledWith(
+            tag,
+            createBody,
+            commit,
+            discussionCategory,
+            draft,
+            generateReleaseNotes,
+            createName,
+            createPrerelease
+        )
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
     })
 
@@ -315,6 +367,7 @@ describe("Action", () => {
                 commit: commit,
                 discussionCategory: discussionCategory,
                 draft: draft,
+                generateReleaseNotes: true,
                 owner: "owner",
                 createdPrerelease: createPrerelease,
                 replacesArtifacts: replacesArtifacts,

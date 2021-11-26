@@ -100,7 +100,7 @@ class Action {
     }
     createRelease() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.releases.create(this.inputs.tag, this.inputs.createdReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.draft, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
+            return yield this.releases.create(this.inputs.tag, this.inputs.createdReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.draft, this.inputs.generateReleaseNotes, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
         });
     }
 }
@@ -640,7 +640,11 @@ class CoreInputs {
         return '';
     }
     get commit() {
-        return core.getInput('commit');
+        const commit = core.getInput('commit');
+        if (commit) {
+            return commit;
+        }
+        return undefined;
     }
     get createdReleaseName() {
         if (CoreInputs.omitName)
@@ -667,6 +671,10 @@ class CoreInputs {
     get draft() {
         const draft = core.getInput('draft');
         return draft == 'true';
+    }
+    get generateReleaseNotes() {
+        const generate = core.getInput('generateReleaseNotes');
+        return generate == 'true';
     }
     get owner() {
         let owner = core.getInput('owner');
@@ -802,7 +810,7 @@ class GithubReleases {
         this.inputs = inputs;
         this.git = git;
     }
-    create(tag, body, commitHash, discussionCategory, draft, name, prerelease) {
+    create(tag, body, commitHash, discussionCategory, draft, generateReleaseNotes, name, prerelease) {
         return __awaiter(this, void 0, void 0, function* () {
             // noinspection TypeScriptValidateJSTypes
             return this.git.rest.repos.createRelease({
@@ -810,6 +818,7 @@ class GithubReleases {
                 name: name,
                 discussion_category_name: discussionCategory,
                 draft: draft,
+                generate_release_notes: generateReleaseNotes,
                 owner: this.inputs.owner,
                 prerelease: prerelease,
                 repo: this.inputs.repo,

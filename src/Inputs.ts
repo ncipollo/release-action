@@ -8,11 +8,12 @@ export interface Inputs {
     readonly allowUpdates: boolean
     readonly artifactErrorsFailBuild: boolean
     readonly artifacts: Artifact[]
-    readonly commit: string
+    readonly commit?: string
     readonly createdReleaseBody?: string
     readonly createdReleaseName?: string
     readonly discussionCategory?: string
     readonly draft: boolean
+    readonly generateReleaseNotes: boolean
     readonly owner: string
     readonly createdPrerelease: boolean
     readonly removeArtifacts: boolean
@@ -83,8 +84,12 @@ export class CoreInputs implements Inputs {
         return ''
     }
 
-    get commit(): string {
-        return core.getInput('commit')
+    get commit(): string | undefined {
+        const commit = core.getInput('commit')
+        if (commit) {
+            return commit
+        }
+        return undefined
     }
 
     get createdReleaseName(): string | undefined {
@@ -116,6 +121,11 @@ export class CoreInputs implements Inputs {
     get draft(): boolean {
         const draft = core.getInput('draft')
         return draft == 'true'
+    }
+    
+    get generateReleaseNotes(): boolean {
+        const generate = core.getInput('generateReleaseNotes')
+        return generate == 'true'
     }
 
     get owner(): string {

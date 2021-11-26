@@ -13,6 +13,7 @@ This action will create a GitHub release and optionally upload an artifact to it
 - **commit**: An optional commit reference. This will be used to create the tag if it does not exist.
 - **discussionCategory**: When provided this will generate a discussion of the specified category. The category must exist otherwise this will cause the action to fail. This isn't used with draft releases.
 - **draft**: Optionally marks this release as a draft release. Set to `true` to enable.
+- **generateReleaseNotes**: Indicates if release notes should be automatically generated. Set to `true` to enable.
 - **name**: An optional name for the release. If this is omitted the tag will be used.
 - **omitBody**: Indicates if the release body should be omitted.
 - **omitBodyDuringUpdate**: Indicates if the release body should be omitted during updates. The body will still be applied for newly created releases. This will preserve the existing body during updates.

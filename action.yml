@@ -43,6 +43,10 @@ inputs:
     description: "Optionally marks this release as a draft release. Set to true to enable."
     required: false
     default: ''
+  generateReleaseNotes:
+    description: 'Indicates if release notes should be automatically generated.'
+    required: false
+    default: 'false'
   name:
     description: 'An optional name for the release. If this is omitted the tag will be used.'
     required: false

@@ -24,6 +24,7 @@ export interface Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
+        generateReleaseNotes?: boolean,
         name?: string,
         prerelease?: boolean
     ): Promise<CreateReleaseResponse>
@@ -72,6 +73,7 @@ export class GithubReleases implements Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
+        generateReleaseNotes?: boolean,
         name?: string,
         prerelease?: boolean
     ): Promise<CreateReleaseResponse> {
@@ -81,6 +83,7 @@ export class GithubReleases implements Releases {
             name: name,
             discussion_category_name: discussionCategory,
             draft: draft,
+            generate_release_notes: generateReleaseNotes,
             owner: this.inputs.owner,
             prerelease: prerelease,
             repo: this.inputs.repo,

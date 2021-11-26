@@ -114,6 +114,7 @@ export class Action {
             this.inputs.commit,
             this.inputs.discussionCategory,
             this.inputs.draft,
+            this.inputs.generateReleaseNotes,
             this.inputs.createdReleaseName,
             this.inputs.createdPrerelease
         )

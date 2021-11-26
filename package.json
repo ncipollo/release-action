@@ -3,11 +3,11 @@
   "version": "1.1.0",
   "private": true,
   "description": "An action which manages a github release",
-  "main": "dist/index.js",
+  "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib/*",
-    "debug": "yarn clean && yarn install && yarn build",
+    "debug": "yarn clean && yarn install && yarn build && yarn package",
     "package": "ncc build --source-map --license licenses.txt",
     "release": "yarn clean && yarn install --production && yarn build && yarn package",
     "test": "jest"
