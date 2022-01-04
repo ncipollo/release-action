@@ -49,6 +49,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v2
     - uses: ncipollo/release-action@v1
@@ -62,3 +64,4 @@ jobs:
 ## Notes
 - You must provide a tag either via the action input or the git ref (i.e push / create a tag). If you do not provide a tag the action will fail.
 - If the tag of the release you are creating does not yet exist, you should set both the `tag` and `commit` action inputs. `commit` can point to a commit hash or a branch name (ex - `main`).
+- In the example above only required permissions for the action specified (which is `contents: write`). If you add other actions to the same workflow you should expand `permissions` block accordingly.
