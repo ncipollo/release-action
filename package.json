@@ -31,7 +31,7 @@
     "untildify": "^4.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.4.0",
     "@types/node": "^16.11.12",
     "jest": "^27.4.2",
     "jest-circus": "^27.4.2",
