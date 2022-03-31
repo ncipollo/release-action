@@ -22,20 +22,21 @@ const artifacts = [
 ]
 
 const createBody = 'createBody'
+const createDraft = true
 const createName = 'createName'
 const commit = 'commit'
 const discussionCategory = 'discussionCategory'
-const draft = true
 const generateReleaseNotes = true
 const id = 100
 const createPrerelease = true
-const updatePrerelease = false
 const releaseId = 101
 const replacesArtifacts = true
 const tag = 'tag'
 const token = 'token'
 const updateBody = 'updateBody'
+const updateDraft = false
 const updateName = 'updateName'
+const updatePrerelease = false
 const url = 'http://api.example.com'
 
 describe("Action", () => {
@@ -56,7 +57,7 @@ describe("Action", () => {
             createBody,
             commit,
             discussionCategory,
-            draft,
+            createDraft,
             generateReleaseNotes,
             createName,
             createPrerelease)
@@ -76,7 +77,7 @@ describe("Action", () => {
             createBody,
             commit,
             discussionCategory,
-            draft,
+            createDraft,
             generateReleaseNotes,
             createName,
             createPrerelease)
@@ -101,7 +102,7 @@ describe("Action", () => {
             createBody,
             commit,
             discussionCategory,
-            draft,
+            createDraft,
             generateReleaseNotes,
             createName,
             createPrerelease
@@ -121,7 +122,7 @@ describe("Action", () => {
             createBody,
             commit,
             discussionCategory,
-            draft,
+            createDraft,
             generateReleaseNotes,
             createName,
             createPrerelease
@@ -164,7 +165,7 @@ describe("Action", () => {
             createBody,
             commit,
             discussionCategory,
-            draft,
+            createDraft,
             generateReleaseNotes,
             createName,
             createPrerelease
@@ -215,7 +216,7 @@ describe("Action", () => {
             updateBody,
             commit,
             discussionCategory,
-            draft,
+            updateDraft,
             updateName,
             updatePrerelease
         )
@@ -239,7 +240,7 @@ describe("Action", () => {
             createBody,
             commit,
             discussionCategory,
-            draft,
+            createDraft,
             generateReleaseNotes,
             createName,
             createPrerelease
@@ -266,7 +267,7 @@ describe("Action", () => {
             updateBody,
             commit,
             discussionCategory,
-            draft,
+            updateDraft,
             updateName,
             updatePrerelease
         )
@@ -285,7 +286,7 @@ describe("Action", () => {
             updateBody,
             commit,
             discussionCategory,
-            draft,
+            updateDraft,
             updateName,
             updatePrerelease
         )
@@ -304,7 +305,7 @@ describe("Action", () => {
             updateBody,
             commit,
             discussionCategory,
-            draft,
+            updateDraft,
             updateName,
             updatePrerelease
         )
@@ -362,11 +363,11 @@ describe("Action", () => {
                 allowUpdates: allowUpdates,
                 artifactErrorsFailBuild: true,
                 artifacts: inputArtifact,
+                createdDraft: createDraft,
                 createdReleaseBody: createBody,
                 createdReleaseName: createName,
                 commit: commit,
                 discussionCategory: discussionCategory,
-                draft: draft,
                 generateReleaseNotes: true,
                 owner: "owner",
                 createdPrerelease: createPrerelease,
@@ -375,6 +376,7 @@ describe("Action", () => {
                 repo: "repo",
                 tag: tag,
                 token: token,
+                updatedDraft: updateDraft,
                 updatedReleaseBody: updateBody,
                 updatedReleaseName: updateName,
                 updatedPrerelease: updatePrerelease

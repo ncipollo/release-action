@@ -59,6 +59,10 @@ inputs:
     description: 'Indicates if the release body should be omitted during updates. The body will still be applied for newly created releases. This will preserve the existing body during updates.'
     required: false
     default: 'false'
+  omitDraftDuringUpdate:
+    description: 'Indicates if the draft flag should be omitted during updates. The draft flag will still be applied for newly created releases. This will preserve the existing draft state during updates.'
+    required: false
+    default: 'false'
   omitName:
     description: 'Indicates if the release name should be omitted.'
     required: false
