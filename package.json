@@ -24,6 +24,18 @@
   ],
   "author": "GitHub",
   "license": "MIT",
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "moduleFileExtensions": ["js", "ts"],
+    "testEnvironment": "node",
+    "testMatch": ["**/*.test.ts"],
+    "testRunner": "jest-circus/runner",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "verbose": true
+  },
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
