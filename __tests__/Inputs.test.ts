@@ -41,7 +41,7 @@ describe('Inputs', () => {
     describe('commit', () => {
         it('returns commit', () => {
             mockGetInput.mockReturnValueOnce('commit')
-            expect(inputs.commit).toBe('commitxx')
+            expect(inputs.commit).toBe('commit')
         })
 
         it('returns undefined when omitted', () => {
