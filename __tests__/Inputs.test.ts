@@ -108,7 +108,7 @@ describe('Inputs', () => {
 
         it('returns input.artifacts with default contentType', () => {
             mockGetInput.mockReturnValueOnce('art1')
-                .mockReturnValueOnce('raw')
+                .mockReturnValueOnce('')
                 .mockReturnValueOnce('false')
 
             expect(inputs.artifacts).toEqual(artifacts)
@@ -125,6 +125,17 @@ describe('Inputs', () => {
             expect(inputs.artifacts).toEqual(artifacts)
             expect(mockGlob).toBeCalledTimes(1)
             expect(mockGlob).toBeCalledWith('art2', 'contentType', false)
+        })
+    })
+
+    describe('createdDraft', () => {
+        it('returns false', () => {
+            expect(inputs.createdDraft).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValue('true')
+            expect(inputs.createdDraft).toBe(true)
         })
     })
 
@@ -174,7 +185,7 @@ describe('Inputs', () => {
             mockGetInput
                 .mockReturnValueOnce('true')
                 .mockReturnValueOnce('name')
-            expect(inputs.createdReleaseBody).toBeUndefined()
+            expect(inputs.createdReleaseName).toBeUndefined()
         })
 
         it('returns tag', () => {
@@ -195,17 +206,6 @@ describe('Inputs', () => {
         it('returns undefined', () => {
             mockGetInput.mockReturnValue('')
             expect(inputs.discussionCategory).toBe(undefined)
-        })
-    })
-
-    describe('draft', () => {
-        it('returns false', () => {
-            expect(inputs.draft).toBe(false)
-        })
-
-        it('returns true', () => {
-            mockGetInput.mockReturnValue('true')
-            expect(inputs.draft).toBe(true)
         })
     })
 
@@ -296,6 +296,33 @@ describe('Inputs', () => {
         it('throws if no tag', () => {
             context.ref = ""
             expect(() => inputs.tag).toThrow()
+        })
+    })
+
+    describe('updatedDraft', () => {
+        it('returns false', () => {
+            expect(inputs.updatedDraft).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput
+                .mockReturnValueOnce('false')
+                .mockReturnValue('true')
+            expect(inputs.updatedDraft).toBe(true)
+        })
+
+        it('returns true when omitted is blank', () => {
+            mockGetInput
+                .mockReturnValueOnce('')
+                .mockReturnValue('true')
+            expect(inputs.updatedDraft).toBe(true)
+        })
+
+        it('returns undefined when omitted for update', () => {
+            mockGetInput
+                .mockReturnValueOnce('true')
+                .mockReturnValueOnce('true')
+            expect(inputs.updatedDraft).toBeUndefined()
         })
     })
 

@@ -9,18 +9,19 @@ export interface Inputs {
     readonly artifactErrorsFailBuild: boolean
     readonly artifacts: Artifact[]
     readonly commit?: string
+    readonly createdDraft: boolean
+    readonly createdPrerelease: boolean
     readonly createdReleaseBody?: string
     readonly createdReleaseName?: string
     readonly discussionCategory?: string
-    readonly draft: boolean
     readonly generateReleaseNotes: boolean
     readonly owner: string
-    readonly createdPrerelease: boolean
     readonly removeArtifacts: boolean
     readonly replacesArtifacts: boolean
     readonly repo: string
     readonly tag: string
     readonly token: string
+    readonly updatedDraft?: boolean
     readonly updatedReleaseBody?: string
     readonly updatedReleaseName?: string
     readonly updatedPrerelease?: boolean
@@ -61,15 +62,6 @@ export class CoreInputs implements Inputs {
         return allow == 'true'
     }
 
-    get createdReleaseBody(): string | undefined {
-        if (CoreInputs.omitBody) return undefined
-        return this.body
-    }
-
-    private static get omitBody(): boolean {
-        return core.getInput('omitBody') == 'true'
-    }
-
     private get body(): string | undefined {
         const body = core.getInput('body')
         if (body) {
@@ -84,17 +76,40 @@ export class CoreInputs implements Inputs {
         return ''
     }
 
+    get createdDraft(): boolean {
+        const draft = core.getInput('draft')
+        return draft == 'true'
+    }
+
+    get createdPrerelease(): boolean {
+        const preRelease = core.getInput('prerelease')
+        return preRelease == 'true'
+    }
+
+    get createdReleaseBody(): string | undefined {
+        if (CoreInputs.omitBody) return undefined
+        return this.body
+    }
+
+    private static get omitBody(): boolean {
+        return core.getInput('omitBody') == 'true'
+    }
+
+    get createdReleaseName(): string | undefined {
+        if (CoreInputs.omitName) return undefined
+        return this.name
+    }
+
+    private static get omitName(): boolean {
+        return core.getInput('omitName') == 'true'
+    }
+
     get commit(): string | undefined {
         const commit = core.getInput('commit')
         if (commit) {
             return commit
         }
         return undefined
-    }
-
-    get createdReleaseName(): string | undefined {
-        if (CoreInputs.omitName) return undefined
-        return this.name
     }
 
     get discussionCategory(): string | undefined {
@@ -105,10 +120,6 @@ export class CoreInputs implements Inputs {
         return undefined
     }
 
-    private static get omitName(): boolean {
-        return core.getInput('omitName') == 'true'
-    }
-
     private get name(): string | undefined {
         const name = core.getInput('name')
         if (name) {
@@ -116,11 +127,6 @@ export class CoreInputs implements Inputs {
         }
 
         return this.tag
-    }
-
-    get draft(): boolean {
-        const draft = core.getInput('draft')
-        return draft == 'true'
     }
     
     get generateReleaseNotes(): boolean {
@@ -135,20 +141,7 @@ export class CoreInputs implements Inputs {
         }
         return this.context.repo.owner
     }
-
-    get createdPrerelease(): boolean {
-        const preRelease = core.getInput('prerelease')
-        return preRelease == 'true'
-    }
-
-    private static get omitPrereleaseDuringUpdate(): boolean {
-        return core.getInput('omitPrereleaseDuringUpdate') == 'true'
-    }
-
-    get updatedPrerelease(): boolean | undefined {
-        if (CoreInputs.omitPrereleaseDuringUpdate) return undefined
-        return this.createdPrerelease
-    }
+    
     get removeArtifacts(): boolean {
         const removes = core.getInput('removeArtifacts')
         return removes == 'true'
@@ -183,6 +176,24 @@ export class CoreInputs implements Inputs {
 
     get token(): string {
         return core.getInput('token', {required: true})
+    }
+
+    get updatedDraft(): boolean | undefined {
+        if (CoreInputs.omitDraftDuringUpdate) return undefined
+        return this.createdDraft
+    }
+
+    private static get omitDraftDuringUpdate(): boolean {
+        return core.getInput('omitDraftDuringUpdate') == 'true'
+    }
+    
+    get updatedPrerelease(): boolean | undefined {
+        if (CoreInputs.omitPrereleaseDuringUpdate) return undefined
+        return this.createdPrerelease
+    }
+
+    private static get omitPrereleaseDuringUpdate(): boolean {
+        return core.getInput('omitPrereleaseDuringUpdate') == 'true'
     }
 
     get updatedReleaseBody(): string | undefined {

@@ -78,7 +78,7 @@ export class Action {
             this.inputs.updatedReleaseBody,
             this.inputs.commit,
             this.inputs.discussionCategory,
-            this.inputs.draft,
+            this.inputs.updatedDraft,
             this.inputs.updatedReleaseName,
             this.inputs.updatedPrerelease
         )
@@ -113,7 +113,7 @@ export class Action {
             this.inputs.createdReleaseBody,
             this.inputs.commit,
             this.inputs.discussionCategory,
-            this.inputs.draft,
+            this.inputs.createdDraft,
             this.inputs.generateReleaseNotes,
             this.inputs.createdReleaseName,
             this.inputs.createdPrerelease

@@ -71,7 +71,7 @@ class Action {
     }
     updateRelease(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.releases.update(id, this.inputs.tag, this.inputs.updatedReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.draft, this.inputs.updatedReleaseName, this.inputs.updatedPrerelease);
+            return yield this.releases.update(id, this.inputs.tag, this.inputs.updatedReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.updatedDraft, this.inputs.updatedReleaseName, this.inputs.updatedPrerelease);
         });
     }
     static noPublishedRelease(error) {
@@ -100,7 +100,7 @@ class Action {
     }
     createRelease() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.releases.create(this.inputs.tag, this.inputs.createdReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.draft, this.inputs.generateReleaseNotes, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
+            return yield this.releases.create(this.inputs.tag, this.inputs.createdReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.createdDraft, this.inputs.generateReleaseNotes, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
         });
     }
 }
@@ -640,14 +640,6 @@ class CoreInputs {
         const allow = core.getInput('artifactErrorsFailBuild');
         return allow == 'true';
     }
-    get createdReleaseBody() {
-        if (CoreInputs.omitBody)
-            return undefined;
-        return this.body;
-    }
-    static get omitBody() {
-        return core.getInput('omitBody') == 'true';
-    }
     get body() {
         const body = core.getInput('body');
         if (body) {
@@ -659,17 +651,36 @@ class CoreInputs {
         }
         return '';
     }
+    get createdDraft() {
+        const draft = core.getInput('draft');
+        return draft == 'true';
+    }
+    get createdPrerelease() {
+        const preRelease = core.getInput('prerelease');
+        return preRelease == 'true';
+    }
+    get createdReleaseBody() {
+        if (CoreInputs.omitBody)
+            return undefined;
+        return this.body;
+    }
+    static get omitBody() {
+        return core.getInput('omitBody') == 'true';
+    }
+    get createdReleaseName() {
+        if (CoreInputs.omitName)
+            return undefined;
+        return this.name;
+    }
+    static get omitName() {
+        return core.getInput('omitName') == 'true';
+    }
     get commit() {
         const commit = core.getInput('commit');
         if (commit) {
             return commit;
         }
         return undefined;
-    }
-    get createdReleaseName() {
-        if (CoreInputs.omitName)
-            return undefined;
-        return this.name;
     }
     get discussionCategory() {
         const category = core.getInput('discussionCategory');
@@ -678,19 +689,12 @@ class CoreInputs {
         }
         return undefined;
     }
-    static get omitName() {
-        return core.getInput('omitName') == 'true';
-    }
     get name() {
         const name = core.getInput('name');
         if (name) {
             return name;
         }
         return this.tag;
-    }
-    get draft() {
-        const draft = core.getInput('draft');
-        return draft == 'true';
     }
     get generateReleaseNotes() {
         const generate = core.getInput('generateReleaseNotes');
@@ -702,18 +706,6 @@ class CoreInputs {
             return owner;
         }
         return this.context.repo.owner;
-    }
-    get createdPrerelease() {
-        const preRelease = core.getInput('prerelease');
-        return preRelease == 'true';
-    }
-    static get omitPrereleaseDuringUpdate() {
-        return core.getInput('omitPrereleaseDuringUpdate') == 'true';
-    }
-    get updatedPrerelease() {
-        if (CoreInputs.omitPrereleaseDuringUpdate)
-            return undefined;
-        return this.createdPrerelease;
     }
     get removeArtifacts() {
         const removes = core.getInput('removeArtifacts');
@@ -744,6 +736,22 @@ class CoreInputs {
     }
     get token() {
         return core.getInput('token', { required: true });
+    }
+    get updatedDraft() {
+        if (CoreInputs.omitDraftDuringUpdate)
+            return undefined;
+        return this.createdDraft;
+    }
+    static get omitDraftDuringUpdate() {
+        return core.getInput('omitDraftDuringUpdate') == 'true';
+    }
+    get updatedPrerelease() {
+        if (CoreInputs.omitPrereleaseDuringUpdate)
+            return undefined;
+        return this.createdPrerelease;
+    }
+    static get omitPrereleaseDuringUpdate() {
+        return core.getInput('omitPrereleaseDuringUpdate') == 'true';
     }
     get updatedReleaseBody() {
         if (CoreInputs.omitBody || CoreInputs.omitBodyDuringUpdate)
