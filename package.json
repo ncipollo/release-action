@@ -27,17 +27,26 @@
   "jest": {
     "clearMocks": true,
     "collectCoverage": true,
+    "coveragePathIgnorePatterns": [
+      "src/Globber.ts",
+      "src/Releases.ts"
+    ],
     "coverageThreshold": {
       "global": {
-        "branches": 80,
+        "branches": 95,
         "functions": 100,
         "lines": 100,
         "statements": 100
       }
     },
-    "moduleFileExtensions": ["js", "ts"],
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
     "testEnvironment": "node",
-    "testMatch": ["**/*.test.ts"],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
     "testRunner": "jest-circus/runner",
     "transform": {
       "^.+\\.ts$": "ts-jest"
