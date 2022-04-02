@@ -28,7 +28,7 @@ export class GithubArtifactUploader implements ArtifactUploader {
     private async uploadArtifact(artifact: Artifact,
                                  releaseId: number,
                                  uploadUrl: string,
-                                 retry = 3) {
+                                 retry = 50) {
         try {
             core.debug(`Uploading artifact ${artifact.name}...`)
             await this.releases.uploadArtifact(uploadUrl,
@@ -40,6 +40,7 @@ export class GithubArtifactUploader implements ArtifactUploader {
         } catch (error: any) {
             if (error.status >= 500 && retry > 0) {
                 core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}. Retrying...`)
+                await new Promise(r => setTimeout(r, 60000));
                 await this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1)
             } else {
                 if (this.throwsUploadErrors) {
