@@ -18,6 +18,7 @@ const uploadMock = jest.fn()
 
 jest.mock('fs', () => {
     return {
+        promises: {},
         readFileSync: () => fileContents,
         statSync: () => {
             return {size: contentLength}
