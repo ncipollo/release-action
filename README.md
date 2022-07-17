@@ -60,7 +60,7 @@ jobs:
       with:
         artifacts: "release.tar.gz,foo/*.txt"
         bodyFile: "body.md"
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.YOUR_GITHUB_TOKEN }}
 
 ```
 
