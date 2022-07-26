@@ -22,7 +22,7 @@ This action will create a GitHub release and optionally upload an artifact to it
 | omitName                   | Indicates if the release name should be omitted.                                                                                                                                                                                                    | false      | false                |
 | omitNameDuringUpdate       | Indicates if the release name should be omitted during updates. The name will still be applied for newly created releases. This will preserve the existing name during updates.                                                                     | false      | false                |
 | omitPrereleaseDuringUpdate | Indicates if the prerelease flag should be omitted during updates. The prerelease flag will still be applied for newly created releases. This will preserve the existing prerelease state during updates.                                           | false      | false                |
-| owner                      | Optionally specify the owner of the repo where the release should be generated. Defaults to current repo'sowner.                                                                                                                                    | false      | "current repo owner" |
+| owner                      | Optionally specify the owner of the repo where the release should be generated. Defaults to current repo's owner.                                                                                                                                    | false      | "current repo owner" |
 | prerelease                 | Optionally marks this release as prerelease. Set to true to enable.                                                                                                                                                                                 | false      | ""                   |
 | removeArtifacts            | Indicates if existing release artifacts should be removed.                                                                                                                                                                                          | false      | false                |
 | replacesArtifacts          | Indicates if existing release artifacts should be replaced.                                                                                                                                                                                         | false      | true                 |
@@ -60,7 +60,7 @@ jobs:
       with:
         artifacts: "release.tar.gz,foo/*.txt"
         bodyFile: "body.md"
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.YOUR_GITHUB_TOKEN }}
 
 ```
 
