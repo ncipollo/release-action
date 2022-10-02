@@ -25,6 +25,7 @@ export interface Inputs {
     readonly updatedReleaseBody?: string
     readonly updatedReleaseName?: string
     readonly updatedPrerelease?: boolean
+    readonly updateOnlyUnreleased: boolean
 }
 
 export class CoreInputs implements Inputs {
@@ -208,6 +209,10 @@ export class CoreInputs implements Inputs {
     get updatedReleaseName(): string | undefined {
         if (CoreInputs.omitName || CoreInputs.omitNameDuringUpdate) return undefined
         return this.name
+    }
+    
+    get updateOnlyUnreleased(): boolean {
+        return core.getInput('updateOnlyUnreleased') == 'true'
     }
 
     private static get omitNameDuringUpdate(): boolean {

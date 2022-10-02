@@ -94,7 +94,7 @@ inputs:
   repo:
     description: "Optionally specify the repo where the release should be generated. Defaults to current repo"
     required: false
-    default: ''  
+    default: ''
   tag:
     description: 'An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).'
     required: false
@@ -103,6 +103,10 @@ inputs:
     description: 'The Github token.'
     required: false
     default: ${{ github.token }}
+  updateOnlyUnreleased:
+    description: "When allowUpdates is enabled, this will fail the action if the release it is updating is not a draft or a prerelease."
+    required: false
+    default: 'true'
 outputs:
   id:
     description: 'The identifier of the created release.'

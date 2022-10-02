@@ -37,6 +37,7 @@ const updateBody = 'updateBody'
 const updateDraft = false
 const updateName = 'updateName'
 const updatePrerelease = false
+const updateOnlyUnreleased = false
 const url = 'http://api.example.com'
 
 describe("Action", () => {
@@ -317,7 +318,9 @@ describe("Action", () => {
         expect(applyReleaseDataMock).toBeCalledWith({id: releaseId, upload_url: url})
     }
 
-    function createAction(allowUpdates: boolean, hasArtifact: boolean, removeArtifacts: boolean = false): Action {
+    function createAction(allowUpdates: boolean,
+                          hasArtifact: boolean,
+                          removeArtifacts: boolean = false): Action {
         let inputArtifact: Artifact[]
         if (hasArtifact) {
             inputArtifact = artifacts
@@ -379,7 +382,8 @@ describe("Action", () => {
                 updatedDraft: updateDraft,
                 updatedReleaseBody: updateBody,
                 updatedReleaseName: updateName,
-                updatedPrerelease: updatePrerelease
+                updatedPrerelease: updatePrerelease,
+                updateOnlyUnreleased: updateOnlyUnreleased
             }
         })
         const MockOutputs = jest.fn<Outputs, any>(() => {

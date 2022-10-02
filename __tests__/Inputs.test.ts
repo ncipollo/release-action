@@ -430,6 +430,17 @@ describe('Inputs', () => {
         })
     })
 
+    describe('updateOnlyUnreleased', () => {
+        it('returns false', () => {
+            expect(inputs.updateOnlyUnreleased).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetInput.mockReturnValueOnce('true')
+            expect(inputs.updateOnlyUnreleased).toBe(true)
+        })
+    })
+
     function createGlobber(): ArtifactGlobber {
         const MockGlobber = jest.fn<ArtifactGlobber, any>(() => {
             return {

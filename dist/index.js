@@ -18,6 +18,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Action = void 0;
 const GithubError_1 = __nccwpck_require__(7433);
+const ReleaseValidator_1 = __nccwpck_require__(7579);
 class Action {
     constructor(inputs, outputs, releases, uploader, artifactDestroyer) {
         this.inputs = inputs;
@@ -25,6 +26,7 @@ class Action {
         this.releases = releases;
         this.uploader = uploader;
         this.artifactDestroyer = artifactDestroyer;
+        this.releaseValidator = new ReleaseValidator_1.ReleaseValidator(inputs.updateOnlyUnreleased);
     }
     perform() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -52,6 +54,8 @@ class Action {
                 catch (error) {
                     return yield this.checkForMissingReleaseError(error);
                 }
+                // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
+                this.releaseValidator.validateReleaseUpdate(getResponse.data);
                 return yield this.updateRelease(getResponse.data.id);
             }
             else {
@@ -766,6 +770,9 @@ class CoreInputs {
             return undefined;
         return this.name;
     }
+    get updateOnlyUnreleased() {
+        return core.getInput('updateOnlyUnreleased') == 'true';
+    }
     static get omitNameDuringUpdate() {
         return core.getInput('omitNameDuringUpdate') == 'true';
     }
@@ -817,6 +824,32 @@ class CoreOutputs {
     }
 }
 exports.CoreOutputs = CoreOutputs;
+
+
+/***/ }),
+
+/***/ 7579:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReleaseValidator = void 0;
+class ReleaseValidator {
+    constructor(updateOnlyUnreleased) {
+        this.updateOnlyUnreleased = updateOnlyUnreleased;
+    }
+    validateReleaseUpdate(releaseResponse) {
+        var _a;
+        if (!this.updateOnlyUnreleased) {
+            return;
+        }
+        if (!releaseResponse.draft && !releaseResponse.prerelease) {
+            throw new Error(`Tried to update "${(_a = releaseResponse.name) !== null && _a !== void 0 ? _a : "release"}" which is neither a draft or prerelease. (updateOnlyUnreleased is on)`);
+        }
+    }
+}
+exports.ReleaseValidator = ReleaseValidator;
 
 
 /***/ }),

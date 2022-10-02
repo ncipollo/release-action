@@ -10,13 +10,16 @@ import {ArtifactUploader} from "./ArtifactUploader";
 import {GithubError} from "./GithubError";
 import {Outputs} from "./Outputs";
 import {ArtifactDestroyer} from "./ArtifactDestroyer";
+import {ReleaseValidator} from "./ReleaseValidator";
 
 export class Action {
     private inputs: Inputs
     private outputs: Outputs
     private releases: Releases
-    private artifactDestroyer: ArtifactDestroyer
     private uploader: ArtifactUploader
+    private artifactDestroyer: ArtifactDestroyer
+    
+    private releaseValidator: ReleaseValidator
 
     constructor(inputs: Inputs,
                 outputs: Outputs,
@@ -28,6 +31,7 @@ export class Action {
         this.releases = releases
         this.uploader = uploader
         this.artifactDestroyer = artifactDestroyer
+        this.releaseValidator = new ReleaseValidator(inputs.updateOnlyUnreleased)
     }
 
     async perform() {
@@ -56,6 +60,9 @@ export class Action {
             } catch (error: any) {
                 return await this.checkForMissingReleaseError(error)
             }
+            
+            // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
+            this.releaseValidator.validateReleaseUpdate(getResponse.data)
 
             return await this.updateRelease(getResponse.data.id)
         } else {
