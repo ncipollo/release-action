@@ -125,14 +125,14 @@ const fs_1 = __nccwpck_require__(7147);
 class Artifact {
     constructor(path, contentType = "raw") {
         this.path = path;
-        this.name = (0, path_1.basename)(path);
+        this.name = path_1.basename(path);
         this.contentType = contentType;
     }
     get contentLength() {
-        return (0, fs_1.statSync)(this.path).size;
+        return fs_1.statSync(this.path).size;
     }
     readFile() {
-        return (0, fs_1.readFileSync)(this.path);
+        return fs_1.readFileSync(this.path);
     }
 }
 exports.Artifact = Artifact;
@@ -147,11 +147,7 @@ exports.Artifact = Artifact;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -207,11 +203,7 @@ exports.GithubArtifactDestroyer = GithubArtifactDestroyer;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -275,7 +267,7 @@ class FileArtifactGlobber {
         throw Error(`Artifact pattern :${pattern} did not match any files`);
     }
     static expandPath(path) {
-        return (0, untildify_1.default)(path);
+        return untildify_1.default(path);
     }
 }
 exports.FileArtifactGlobber = FileArtifactGlobber;
@@ -290,11 +282,7 @@ exports.FileArtifactGlobber = FileArtifactGlobber;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -332,7 +320,7 @@ class ArtifactPathValidator {
         }
     }
     verifyNotDirectory(path) {
-        const isDir = (0, fs_1.statSync)(path).isDirectory();
+        const isDir = fs_1.statSync(path).isDirectory();
         if (isDir) {
             const message = `Artifact is a directory:${path}. Directories can not be uploaded to a release.`;
             this.reportError(message);
@@ -360,11 +348,7 @@ exports.ArtifactPathValidator = ArtifactPathValidator;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -591,11 +575,7 @@ exports.FileGlobber = FileGlobber;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -777,7 +757,7 @@ class CoreInputs {
         return core.getInput('omitNameDuringUpdate') == 'true';
     }
     stringFromFile(path) {
-        return (0, fs_1.readFileSync)(path, 'utf-8');
+        return fs_1.readFileSync(path, 'utf-8');
     }
 }
 exports.CoreInputs = CoreInputs;
@@ -792,11 +772,7 @@ exports.CoreInputs = CoreInputs;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -973,11 +949,7 @@ exports.GithubReleases = GithubReleases;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
