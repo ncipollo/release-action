@@ -106,7 +106,7 @@ inputs:
   updateOnlyUnreleased:
     description: "When allowUpdates is enabled, this will fail the action if the release it is updating is not a draft or a prerelease."
     required: false
-    default: 'true'
+    default: 'false'
 outputs:
   id:
     description: 'The identifier of the created release.'
