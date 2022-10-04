@@ -238,6 +238,7 @@ const Globber_1 = __nccwpck_require__(8259);
 const Artifact_1 = __nccwpck_require__(8568);
 const untildify_1 = __importDefault(__nccwpck_require__(6732));
 const ArtifactPathValidator_1 = __nccwpck_require__(7818);
+const PathNormalizer_1 = __nccwpck_require__(8103);
 class FileArtifactGlobber {
     constructor(globber = new Globber_1.FileGlobber()) {
         this.globber = globber;
@@ -246,6 +247,7 @@ class FileArtifactGlobber {
         const split = /[,\n]/;
         return artifact.split(split)
             .map(path => path.trimStart())
+            .map(path => PathNormalizer_1.PathNormalizer.normalizePath(path))
             .map(path => FileArtifactGlobber.expandPath(path))
             .map(pattern => this.globPattern(pattern, errorsFailBuild))
             .map((globResult) => FileArtifactGlobber.validatePattern(errorsFailBuild, globResult[1], globResult[0]))
@@ -824,6 +826,27 @@ class CoreOutputs {
     }
 }
 exports.CoreOutputs = CoreOutputs;
+
+
+/***/ }),
+
+/***/ 8103:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PathNormalizer = void 0;
+const path_1 = __importDefault(__nccwpck_require__(1017));
+class PathNormalizer {
+    static normalizePath(pathString) {
+        return pathString.split(path_1.default.sep).join("/");
+    }
+}
+exports.PathNormalizer = PathNormalizer;
 
 
 /***/ }),
