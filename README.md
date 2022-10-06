@@ -44,7 +44,7 @@ This example will create a release when a tag is pushed:
 ```yml
 name: Releases
 
-on: 
+on:
   push:
     tags:
     - '*'
@@ -57,7 +57,7 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v2
-    - uses: ncipollo/release-action@v1
+    - uses: ncipollo/release-action@v1.11.1
       with:
         artifacts: "release.tar.gz,foo/*.txt"
         bodyFile: "body.md"
