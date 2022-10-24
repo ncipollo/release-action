@@ -2,6 +2,16 @@
 
 This action will create a GitHub release and optionally upload an artifact to it.
 
+<div align="center">
+<strong>
+<samp>
+
+[English](README.md) · [简体中文](README.zh-Hans.md)
+
+</samp>
+</strong>
+</div>
+
 ## Action Inputs
 | Input name                 | Description                                                                               	                                                                                                                                                         | Required 	 | Default Value        |
 |----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|----------------------|
