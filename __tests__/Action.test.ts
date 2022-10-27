@@ -5,16 +5,18 @@ import {Releases} from "../src/Releases";
 import {ArtifactUploader} from "../src/ArtifactUploader";
 import {Outputs} from "../src/Outputs";
 import {ArtifactDestroyer} from "../src/ArtifactDestroyer";
+import {ActionSkipper} from "../src/ActionSkipper";
 
 const applyReleaseDataMock = jest.fn()
+const artifactDestroyMock = jest.fn()
 const createMock = jest.fn()
 const deleteMock = jest.fn()
 const getMock = jest.fn()
 const listArtifactsMock = jest.fn()
 const listMock = jest.fn()
+const shouldSkipMock = jest.fn()
 const updateMock = jest.fn()
 const uploadMock = jest.fn()
-const artifactDestroyMock = jest.fn()
 
 const artifacts = [
     new Artifact('a/art1'),
@@ -45,6 +47,7 @@ describe("Action", () => {
         createMock.mockClear()
         getMock.mockClear()
         listMock.mockClear()
+        shouldSkipMock.mockClear()
         updateMock.mockClear()
         uploadMock.mockClear()
     })
@@ -148,6 +151,16 @@ describe("Action", () => {
 
         expect(artifactDestroyMock).not.toBeCalled()
         assertOutputApplied()
+    })
+
+    it('skips action', async () => {
+        const action = createAction(false, false, false)
+        shouldSkipMock.mockResolvedValue(true)
+
+        await action.perform()
+
+        expect(createMock).not.toBeCalled()
+        expect(updateMock).not.toBeCalled()
     })
 
     it('throws error when create fails', async () => {
@@ -353,6 +366,7 @@ describe("Action", () => {
         listMock.mockResolvedValue({
             data: []
         })
+        shouldSkipMock.mockResolvedValue(false)
         updateMock.mockResolvedValue({
             data: {
                 id: releaseId,
@@ -377,6 +391,7 @@ describe("Action", () => {
                 replacesArtifacts: replacesArtifacts,
                 removeArtifacts: removeArtifacts,
                 repo: "repo",
+                skipIfReleaseExists: false,
                 tag: tag,
                 token: token,
                 updatedDraft: updateDraft,
@@ -401,13 +416,20 @@ describe("Action", () => {
                 destroyArtifacts: artifactDestroyMock
             }
         })
+        
+        const MockActionSkipper = jest.fn<ActionSkipper, any>(() => {
+            return {
+                shouldSkip: shouldSkipMock
+            }
+        })
 
         const inputs = new MockInputs()
         const outputs = new MockOutputs()
         const releases = new MockReleases()
         const uploader = new MockUploader()
         const artifactDestroyer = new MockArtifactDestroyer()
+        const actionSkipper = new MockActionSkipper()
 
-        return new Action(inputs, outputs, releases, uploader, artifactDestroyer)
+        return new Action(inputs, outputs, releases, uploader, artifactDestroyer, actionSkipper)
     }
 })

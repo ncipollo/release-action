@@ -6,6 +6,29 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,19 +40,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Action = void 0;
+const core = __importStar(__nccwpck_require__(2559));
 const GithubError_1 = __nccwpck_require__(7433);
 const ReleaseValidator_1 = __nccwpck_require__(7579);
 class Action {
-    constructor(inputs, outputs, releases, uploader, artifactDestroyer) {
+    constructor(inputs, outputs, releases, uploader, artifactDestroyer, skipper) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.releases = releases;
         this.uploader = uploader;
         this.artifactDestroyer = artifactDestroyer;
+        this.skipper = skipper;
         this.releaseValidator = new ReleaseValidator_1.ReleaseValidator(inputs.updateOnlyUnreleased);
     }
     perform() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (yield this.skipper.shouldSkip()) {
+                core.notice("Skipping action, release already exists and skipIfReleaseExists is enabled.");
+                return;
+            }
             const releaseResponse = yield this.createOrUpdateRelease();
             const releaseData = releaseResponse.data;
             const releaseId = releaseData.id;
@@ -109,6 +138,50 @@ class Action {
     }
 }
 exports.Action = Action;
+
+
+/***/ }),
+
+/***/ 2746:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReleaseActionSkipper = void 0;
+class ReleaseActionSkipper {
+    constructor(skipIfReleaseExists, releases, tag) {
+        this.skipIfReleaseExists = skipIfReleaseExists;
+        this.releases = releases;
+        this.tag = tag;
+    }
+    shouldSkip() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.skipIfReleaseExists) {
+                // Bail if skip flag isn't set.
+                return false;
+            }
+            try {
+                const getResponse = yield this.releases.getByTag(this.tag);
+                return getResponse.data != null;
+            }
+            catch (error) {
+                // There is either no release or something else went wrong. Either way, run the action.
+                return false;
+            }
+        });
+    }
+}
+exports.ReleaseActionSkipper = ReleaseActionSkipper;
 
 
 /***/ }),
@@ -728,6 +801,9 @@ class CoreInputs {
         }
         return this.context.repo.repo;
     }
+    get skipIfReleaseExists() {
+        return core.getBooleanInput("skipIfReleaseExists");
+    }
     get tag() {
         const tag = core.getInput('tag');
         if (tag) {
@@ -1037,6 +1113,7 @@ const ArtifactGlobber_1 = __nccwpck_require__(8924);
 const GithubError_1 = __nccwpck_require__(7433);
 const Outputs_1 = __nccwpck_require__(6650);
 const ArtifactDestroyer_1 = __nccwpck_require__(1770);
+const ActionSkipper_1 = __nccwpck_require__(2746);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -1057,9 +1134,10 @@ function createAction() {
     const inputs = new Inputs_1.CoreInputs(globber, context);
     const outputs = new Outputs_1.CoreOutputs();
     const releases = new Releases_1.GithubReleases(inputs, git);
+    const skipper = new ActionSkipper_1.ReleaseActionSkipper(inputs.skipIfReleaseExists, releases, inputs.tag);
     const uploader = new ArtifactUploader_1.GithubArtifactUploader(releases, inputs.replacesArtifacts, inputs.artifactErrorsFailBuild);
     const artifactDestroyer = new ArtifactDestroyer_1.GithubArtifactDestroyer(releases);
-    return new Action_1.Action(inputs, outputs, releases, uploader, artifactDestroyer);
+    return new Action_1.Action(inputs, outputs, releases, uploader, artifactDestroyer, skipper);
 }
 run();
 

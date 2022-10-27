@@ -8,6 +8,7 @@ import {FileArtifactGlobber} from './ArtifactGlobber';
 import {GithubError} from './GithubError';
 import {CoreOutputs} from "./Outputs";
 import {GithubArtifactDestroyer} from "./ArtifactDestroyer";
+import {ActionSkipper, ReleaseActionSkipper} from "./ActionSkipper";
 
 async function run() {
     try {
@@ -28,10 +29,11 @@ function createAction(): Action {
     const inputs = new CoreInputs(globber, context)
     const outputs = new CoreOutputs()
     const releases = new GithubReleases(inputs, git)
+    const skipper = new ReleaseActionSkipper(inputs.skipIfReleaseExists, releases, inputs.tag)
     const uploader = new GithubArtifactUploader(releases, inputs.replacesArtifacts, inputs.artifactErrorsFailBuild)
     const artifactDestroyer = new GithubArtifactDestroyer(releases)
     
-    return new Action(inputs, outputs, releases, uploader, artifactDestroyer)
+    return new Action(inputs, outputs, releases, uploader, artifactDestroyer, skipper)
 }
 
 run();

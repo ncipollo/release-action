@@ -1,4 +1,5 @@
 const mockGetInput = jest.fn();
+const mockGetBooleanInput = jest.fn();
 const mockGlob = jest.fn()
 const mockReadFileSync = jest.fn();
 const mockStatSync = jest.fn();
@@ -14,7 +15,10 @@ const artifacts = [
 ]
 
 jest.mock('@actions/core', () => {
-    return {getInput: mockGetInput};
+    return {
+        getInput: mockGetInput,
+        getBooleanInput: mockGetBooleanInput
+    };
 })
 
 jest.mock('fs', () => {
@@ -87,7 +91,7 @@ describe('Inputs', () => {
             expect(mockGlob).toBeCalledTimes(1)
             expect(mockGlob).toBeCalledWith('art1', 'contentType', true)
         })
-        
+
         it('returns empty artifacts', () => {
             mockGetInput.mockReturnValueOnce('')
                 .mockReturnValueOnce('')
@@ -202,7 +206,7 @@ describe('Inputs', () => {
             mockGetInput.mockReturnValue('Release')
             expect(inputs.discussionCategory).toBe('Release')
         })
-        
+
         it('returns undefined', () => {
             mockGetInput.mockReturnValue('')
             expect(inputs.discussionCategory).toBe(undefined)
@@ -220,7 +224,7 @@ describe('Inputs', () => {
             expect(inputs.generateReleaseNotes).toBe(false)
         });
     })
-    
+
     describe('owner', () => {
         it('returns owner from context', function () {
             process.env.GITHUB_REPOSITORY = "owner/repo"
@@ -276,6 +280,18 @@ describe('Inputs', () => {
             mockGetInput.mockReturnValue("repo")
             expect(inputs.repo).toBe("repo")
         });
+    })
+
+    describe('skipIfReleaseExists', () => {
+        it('returns false', () => {
+            mockGetBooleanInput.mockReturnValue(false)
+            expect(inputs.skipIfReleaseExists).toBe(false)
+        })
+
+        it('returns true', () => {
+            mockGetBooleanInput.mockReturnValue(true)
+            expect(inputs.skipIfReleaseExists).toBe(true)
+        })
     })
 
     describe('tag', () => {

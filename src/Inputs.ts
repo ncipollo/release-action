@@ -19,6 +19,7 @@ export interface Inputs {
     readonly removeArtifacts: boolean
     readonly replacesArtifacts: boolean
     readonly repo: string
+    readonly skipIfReleaseExists: boolean
     readonly tag: string
     readonly token: string
     readonly updatedDraft?: boolean
@@ -160,6 +161,10 @@ export class CoreInputs implements Inputs {
         return this.context.repo.repo
     }
 
+    get skipIfReleaseExists(): boolean {
+        return core.getBooleanInput("skipIfReleaseExists")
+    }
+    
     get tag(): string {
         const tag = core.getInput('tag')
         if (tag) {

@@ -95,6 +95,10 @@ inputs:
     description: "Optionally specify the repo where the release should be generated. Defaults to current repo"
     required: false
     default: ''
+  skipIfReleaseExists:
+    description: "When skipIfReleaseExists is enabled the action will be skipped if a non-draft release already exists for the provided tag."
+    required: false
+    default: 'false'
   tag:
     description: 'An optional tag for the release. If this is omitted the git ref will be used (if it is a tag).'
     required: false
