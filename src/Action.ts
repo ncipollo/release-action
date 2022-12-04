@@ -96,6 +96,7 @@ export class Action {
             this.inputs.commit,
             this.inputs.discussionCategory,
             this.inputs.updatedDraft,
+            this.inputs.makeLatest,
             this.inputs.updatedReleaseName,
             this.inputs.updatedPrerelease
         )
@@ -132,6 +133,7 @@ export class Action {
             this.inputs.discussionCategory,
             this.inputs.createdDraft,
             this.inputs.generateReleaseNotes,
+            this.inputs.makeLatest,
             this.inputs.createdReleaseName,
             this.inputs.createdPrerelease
         )

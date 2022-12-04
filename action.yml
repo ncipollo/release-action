@@ -47,6 +47,10 @@ inputs:
     description: 'Indicates if release notes should be automatically generated.'
     required: false
     default: 'false'
+  makeLatest:
+    description: 'Indicates if the release should be the "latest" release or not.'
+    required: false
+    default: 'legacy'
   name:
     description: 'An optional name for the release. If this is omitted the tag will be used.'
     required: false
