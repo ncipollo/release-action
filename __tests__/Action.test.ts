@@ -41,6 +41,7 @@ const updateName = 'updateName'
 const updatePrerelease = false
 const updateOnlyUnreleased = false
 const url = 'http://api.example.com'
+const makeLatest = 'legacy'
 
 describe("Action", () => {
     beforeEach(() => {
@@ -63,6 +64,7 @@ describe("Action", () => {
             discussionCategory,
             createDraft,
             generateReleaseNotes,
+            makeLatest,
             createName,
             createPrerelease)
         expect(uploadMock).not.toBeCalled()
@@ -83,6 +85,7 @@ describe("Action", () => {
             discussionCategory,
             createDraft,
             generateReleaseNotes,
+            makeLatest,
             createName,
             createPrerelease)
         expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
@@ -108,6 +111,7 @@ describe("Action", () => {
             discussionCategory,
             createDraft,
             generateReleaseNotes,
+            makeLatest,
             createName,
             createPrerelease
         )
@@ -128,6 +132,7 @@ describe("Action", () => {
             discussionCategory,
             createDraft,
             generateReleaseNotes,
+            makeLatest,
             createName,
             createPrerelease
         )
@@ -181,6 +186,7 @@ describe("Action", () => {
             discussionCategory,
             createDraft,
             generateReleaseNotes,
+            makeLatest,
             createName,
             createPrerelease
         )
@@ -231,6 +237,7 @@ describe("Action", () => {
             commit,
             discussionCategory,
             updateDraft,
+            makeLatest,
             updateName,
             updatePrerelease
         )
@@ -256,6 +263,7 @@ describe("Action", () => {
             discussionCategory,
             createDraft,
             generateReleaseNotes,
+            makeLatest,
             createName,
             createPrerelease
         )
@@ -282,6 +290,7 @@ describe("Action", () => {
             commit,
             discussionCategory,
             updateDraft,
+            makeLatest,
             updateName,
             updatePrerelease
         )
@@ -301,6 +310,7 @@ describe("Action", () => {
             commit,
             discussionCategory,
             updateDraft,
+            makeLatest,
             updateName,
             updatePrerelease
         )
@@ -320,6 +330,7 @@ describe("Action", () => {
             commit,
             discussionCategory,
             updateDraft,
+            makeLatest,
             updateName,
             updatePrerelease
         )
@@ -386,6 +397,7 @@ describe("Action", () => {
                 commit: commit,
                 discussionCategory: discussionCategory,
                 generateReleaseNotes: true,
+                makeLatest: makeLatest,
                 owner: "owner",
                 createdPrerelease: createPrerelease,
                 replacesArtifacts: replacesArtifacts,
