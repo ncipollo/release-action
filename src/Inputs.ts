@@ -137,13 +137,8 @@ export class CoreInputs implements Inputs {
         return generate == 'true'
     }
 
-    get makeLatest(): string | undefined {
-        const makeLatest = core.getInput('makeLatest')
-        if (makeLatest) {
-            return makeLatest
-        }
-
-        return undefined
+    get makeLatest(): string {
+        return core.getInput('makeLatest')
     }
 
     get owner(): string {

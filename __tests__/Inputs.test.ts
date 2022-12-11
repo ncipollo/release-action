@@ -240,11 +240,6 @@ describe('Inputs', () => {
             mockGetInput.mockReturnValueOnce('true')
             expect(inputs.makeLatest).toBe('true')
         })
-
-        it('returns undefined when omitted', () => {
-            mockGetInput.mockReturnValueOnce('')
-            expect(inputs.makeLatest).toBeUndefined()
-        })
     })
 
     describe('owner', () => {
