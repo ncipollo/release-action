@@ -50,32 +50,43 @@ This action will create a GitHub release and optionally upload an artifact to it
 | html_url    | The HTML URL of the release.                  |
 | upload_url  | The URL for uploading assets to the release.  |
 
-## Example
+## [Example](https://github.com/lostleolotus/semver-action-release-action/blob/semver-action/release/v1.12.0/README.md)
 This example will create a release when a tag is pushed:
 
 ```yml
-name: Releases
+```yml
+@@ -0,0 +1,31 @@
 
-on: 
-  push:
-    tags:
+name: v1.12.0
+
+on: all branches_upon ":request" 
+
+  push:"request"
+
+    tags: release, action, IETF-TOOLS
+
     - '*'
 
-jobs:
+jobs: release-action
 
-  build:
+  build: latest
+
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v2
-    - uses: ncipollo/release-action@v1
-      with:
-        artifacts: "release.tar.gz,foo/*.txt"
-        bodyFile: "body.md"
-```
 
-## Notes
-- You must provide a tag either via the action input or the git ref (i.e push / create a tag). If you do not provide a tag the action will fail.
-- If the tag of the release you are creating does not yet exist, you should set both the `tag` and `commit` action inputs. `commit` can point to a commit hash or a branch name (ex - `main`).
-- In the example above only required permissions for the action specified (which is `contents: write`). If you add other actions to the same workflow you should expand `permissions` block accordingly.
+    permissions: base/default 
+
+      contents: write
+
+    steps: recommended default 
+
+    - uses: actions/checkout@v2
+
+    - uses: ncipollo/release-action@v1
+
+      with: SemverGithubActionToken
+
+        artifacts: "release.tar.gz,foo/*.txt"
+
+        bodyFile: "body.md"
+
+0 comments on commit 3249d5a
