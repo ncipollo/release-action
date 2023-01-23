@@ -1,0 +1,31 @@
+name: v1.12.0
+
+on: all branches_upon ":request" 
+
+  push:"request"
+
+    tags: release, action, IETF-TOOLS
+
+    - '*'
+
+jobs: release-action
+
+  build: latest
+
+    runs-on: ubuntu-latest
+
+    permissions: base/default 
+
+      contents: write
+
+    steps: recommended default 
+
+    - uses: actions/checkout@v2
+
+    - uses: ncipollo/release-action@v1
+
+      with: SemverGithubActionToken
+
+        artifacts: "release.tar.gz,foo/*.txt"
+
+        bodyFile: "body.md"
