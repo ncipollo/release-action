@@ -50,7 +50,7 @@ This action will create a GitHub release and optionally upload an artifact to it
 | html_url    | The HTML URL of the release.                  |
 | upload_url  | The URL for uploading assets to the release.  |
 
-## Example
+## [Example](https://github.com/lostleolotus/semver-action-release-action/blob/semver-action/release/v1.12.0/README.md)
 This example will create a release when a tag is pushed:
 
 ```yml
