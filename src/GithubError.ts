@@ -31,14 +31,21 @@ export class GithubError {
         const errors = this.githubErrors
         const status = this.status
         if (errors.length > 0) {
-            return `Error ${status}: ${message}\nErrors:\n${this.errorBulletedList(errors)}`
+            return `Error ${status}: ${message}\nErrors:\n${this.errorBulletedList(errors)}${this.remediation()}`
         } else {
-            return `Error ${status}: ${message}`
+            return `Error ${status}: ${message}${this.remediation()}`
         }
     }
 
     private errorBulletedList(errors: GithubErrorDetail[]): string {
         return errors.map((err) => `- ${err}`).join("\n")
+    }
+    
+    private remediation(): String {
+        if (this.status == 404) {
+            return "\nMake sure your github token has access to the repo and has permission to author releases"
+        }
+        return ""
     }
 }
 

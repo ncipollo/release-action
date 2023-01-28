@@ -29,6 +29,31 @@ describe('ErrorMessage', () => {
         })
     })
 
+    describe('has error with remediation', () => {
+        it('provides remediation with 404 without errors', () => {
+            const error = { status: 404, message: "message" }
+            const githubError = new GithubError(error)
+            expect(githubError.toString())
+                .toBe('Error 404: message\nMake sure your github token has access to the repo and has permission to author releases')
+        })
+
+        it('provides remediation with 404 with errors', () => {
+            const error = {
+                message: 'message',
+                errors: [
+                    {
+                        code: 'missing',
+                        resource: 'release'
+                    }
+                ],
+                status: 404
+            }
+            const githubError = new GithubError(error)
+            expect(githubError.toString())
+                .toBe('Error 404: message\nErrors:\n- release does not exist.\nMake sure your github token has access to the repo and has permission to author releases')
+        })
+    })
+    
     it('generates message with errors', () => {
         const error = {
             message: 'something bad happened',
