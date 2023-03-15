@@ -1,0 +1,38 @@
+name: Scans
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # https://github.com/SonarSource/sonarqube-scan-action
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SONAR_TOKEN: ${{ secrets.sonar_token }}
+          SONAR_HOST_URL: ${{ secrets.sonar_host_url }}
+
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        # Force to fail step after specific time
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.sonar_token }}
+
+      - name: Upload SonarQube Scan Report
+        uses: actions/upload-artifact@master
+        with:
+          name: sonar-scan-log
+          path: .scannerwork/report-task.txt
+        
