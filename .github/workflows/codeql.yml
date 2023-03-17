@@ -23,6 +23,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
+          debug: true
           languages: javascript
           # config-file: ./.github/codeql/codeql-config.yml
 
