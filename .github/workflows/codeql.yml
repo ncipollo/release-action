@@ -25,7 +25,8 @@ jobs:
         with:
           debug: true
           languages: javascript
-          # config-file: ./.github/codeql/codeql-config.yml
+          paths-ignore:
+            - dist
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
