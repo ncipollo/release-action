@@ -21,6 +21,9 @@ jest.mock('fs', () => {
                     return false
                 }
             }
+        },
+        realpathSync: () => {
+            return false
         }
     };
 })
