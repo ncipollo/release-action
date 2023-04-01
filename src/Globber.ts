@@ -1,4 +1,5 @@
-import { GlobSync } from "glob";
+import {globSync} from "glob";
+
 
 export interface Globber {
     glob(pattern: string): string[]
@@ -6,6 +7,6 @@ export interface Globber {
 
 export class FileGlobber implements Globber {
     glob(pattern: string): string[] {
-        return new GlobSync(pattern, { mark: true }).found
+        return globSync(pattern, { mark: true })
     }
 }
