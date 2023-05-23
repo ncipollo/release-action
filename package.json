@@ -56,7 +56,7 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
-    "glob": "^9.3.2",
+    "glob": "^10.2.2",
     "untildify": "^4.0.0"
   },
   "devDependencies": {
