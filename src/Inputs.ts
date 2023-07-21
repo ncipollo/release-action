@@ -66,17 +66,17 @@ export class CoreInputs implements Inputs {
     }
 
     private get body(): string | undefined {
-        const body = core.getInput('body')
-        if (body) {
-            return body
+        let body = core.getInput('body')
+        if (!body) {
+            body = ''
         }
 
         const bodyFile = core.getInput('bodyFile')
         if (bodyFile) {
-            return this.stringFromFile(bodyFile)
+            body += this.stringFromFile(bodyFile)
         }
 
-        return ''
+        return body
     }
 
     get createdDraft(): boolean {
