@@ -96,3 +96,6 @@ fabric.properties
 
 # Coverage
 coverage
+
+# Ignore lib, it contains intermediates
+/lib
