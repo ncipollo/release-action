@@ -1,12 +1,14 @@
-import { Artifact } from "../src/Artifact";
+import {Artifact} from "../src/Artifact";
 
-const fileContents = Buffer.from('artful facts', 'utf-8')
 const contentLength = 42
+const fakeReadStream = {}
 
 jest.mock('fs', () => {
     return {
-        readFileSync: () => fileContents,
-        statSync: () => { return { size: contentLength } }
+        createReadStream: () => fakeReadStream,
+        statSync: () => {
+            return {size: contentLength}
+        }
     };
 })
 
@@ -33,6 +35,6 @@ describe("Artifact", () => {
 
     it('reads artifact', () => {
         const artifact = new Artifact('some/artifact')
-        expect(artifact.readFile()).toBe(fileContents)
+        expect(artifact.readFile()).toBe(fakeReadStream)
     })
 })

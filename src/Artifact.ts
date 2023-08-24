@@ -1,5 +1,5 @@
 import { basename } from "path";
-import { readFileSync, statSync } from "fs";
+import {createReadStream, readFileSync, ReadStream, statSync} from "fs";
 
 export class Artifact {
     readonly contentType: string
@@ -16,7 +16,7 @@ export class Artifact {
         return statSync(this.path).size
     }
 
-    readFile(): Buffer {
-        return readFileSync(this.path)
+    readFile(): ReadStream {
+        return createReadStream(this.path)
     }
 }

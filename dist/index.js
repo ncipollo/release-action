@@ -205,7 +205,7 @@ class Artifact {
         return (0, fs_1.statSync)(this.path).size;
     }
     readFile() {
-        return (0, fs_1.readFileSync)(this.path);
+        return (0, fs_1.createReadStream)(this.path);
     }
 }
 exports.Artifact = Artifact;

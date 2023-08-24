@@ -7,7 +7,7 @@ const artifacts = [
     new Artifact('a/art1'),
     new Artifact('b/art2')
 ]
-const fileContents = Buffer.from('artful facts', 'utf-8')
+const fakeReadStream = {}
 const contentLength = 42
 const releaseId = 100
 const url = 'http://api.example.com'
@@ -19,7 +19,7 @@ const uploadMock = jest.fn()
 jest.mock('fs', () => {
     return {
         promises: {},
-        readFileSync: () => fileContents,
+        createReadStream: () => fakeReadStream,
         statSync: () => {
             return {size: contentLength}
         }
@@ -42,9 +42,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
@@ -58,15 +58,15 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(5)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
@@ -81,9 +81,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(2)
         expect(deleteMock).toBeCalledWith(1)
@@ -100,9 +100,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
@@ -116,13 +116,13 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(4)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
@@ -164,9 +164,9 @@ describe('ArtifactUploader', () => {
 
         expect(uploadMock).toBeCalledTimes(2)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art1', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art1', releaseId)
         expect(uploadMock)
-            .toBeCalledWith(url, contentLength, 'raw', fileContents, 'art2', releaseId)
+            .toBeCalledWith(url, contentLength, 'raw', fakeReadStream, 'art2', releaseId)
 
         expect(deleteMock).toBeCalledTimes(0)
     })
