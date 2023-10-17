@@ -29,21 +29,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Action = void 0;
 const core = __importStar(__nccwpck_require__(1401));
 const GithubError_1 = __nccwpck_require__(6336);
 const ReleaseValidator_1 = __nccwpck_require__(3315);
 class Action {
+    inputs;
+    outputs;
+    releases;
+    uploader;
+    artifactDestroyer;
+    skipper;
+    releaseValidator;
     constructor(inputs, outputs, releases, uploader, artifactDestroyer, skipper) {
         this.inputs = inputs;
         this.outputs = outputs;
@@ -53,88 +51,74 @@ class Action {
         this.skipper = skipper;
         this.releaseValidator = new ReleaseValidator_1.ReleaseValidator(inputs.updateOnlyUnreleased);
     }
-    perform() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (yield this.skipper.shouldSkip()) {
-                core.notice("Skipping action, release already exists and skipIfReleaseExists is enabled.");
-                return;
-            }
-            const releaseResponse = yield this.createOrUpdateRelease();
-            const releaseData = releaseResponse.data;
-            const releaseId = releaseData.id;
-            const uploadUrl = releaseData.upload_url;
-            if (this.inputs.removeArtifacts) {
-                yield this.artifactDestroyer.destroyArtifacts(releaseId);
-            }
-            const artifacts = this.inputs.artifacts;
-            if (artifacts.length > 0) {
-                yield this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl);
-            }
-            this.outputs.applyReleaseData(releaseData);
-        });
+    async perform() {
+        if (await this.skipper.shouldSkip()) {
+            core.notice("Skipping action, release already exists and skipIfReleaseExists is enabled.");
+            return;
+        }
+        const releaseResponse = await this.createOrUpdateRelease();
+        const releaseData = releaseResponse.data;
+        const releaseId = releaseData.id;
+        const uploadUrl = releaseData.upload_url;
+        if (this.inputs.removeArtifacts) {
+            await this.artifactDestroyer.destroyArtifacts(releaseId);
+        }
+        const artifacts = this.inputs.artifacts;
+        if (artifacts.length > 0) {
+            await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl);
+        }
+        this.outputs.applyReleaseData(releaseData);
     }
-    createOrUpdateRelease() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.inputs.allowUpdates) {
-                let getResponse;
-                try {
-                    getResponse = yield this.releases.getByTag(this.inputs.tag);
-                }
-                catch (error) {
-                    return yield this.checkForMissingReleaseError(error);
-                }
-                // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
-                this.releaseValidator.validateReleaseUpdate(getResponse.data);
-                return yield this.updateRelease(getResponse.data.id);
+    async createOrUpdateRelease() {
+        if (this.inputs.allowUpdates) {
+            let getResponse;
+            try {
+                getResponse = await this.releases.getByTag(this.inputs.tag);
             }
-            else {
-                return yield this.createRelease();
+            catch (error) {
+                return await this.checkForMissingReleaseError(error);
             }
-        });
+            // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
+            this.releaseValidator.validateReleaseUpdate(getResponse.data);
+            return await this.updateRelease(getResponse.data.id);
+        }
+        else {
+            return await this.createRelease();
+        }
     }
-    checkForMissingReleaseError(error) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (Action.noPublishedRelease(error)) {
-                return yield this.updateDraftOrCreateRelease();
-            }
-            else {
-                throw error;
-            }
-        });
+    async checkForMissingReleaseError(error) {
+        if (Action.noPublishedRelease(error)) {
+            return await this.updateDraftOrCreateRelease();
+        }
+        else {
+            throw error;
+        }
     }
-    updateRelease(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.releases.update(id, this.inputs.tag, this.inputs.updatedReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.updatedDraft, this.inputs.makeLatest, this.inputs.updatedReleaseName, this.inputs.updatedPrerelease);
-        });
+    async updateRelease(id) {
+        return await this.releases.update(id, this.inputs.tag, this.inputs.updatedReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.updatedDraft, this.inputs.makeLatest, this.inputs.updatedReleaseName, this.inputs.updatedPrerelease);
     }
     static noPublishedRelease(error) {
         const githubError = new GithubError_1.GithubError(error);
         return githubError.status == 404;
     }
-    updateDraftOrCreateRelease() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const draftReleaseId = yield this.findMatchingDraftReleaseId();
-            if (draftReleaseId) {
-                return yield this.updateRelease(draftReleaseId);
-            }
-            else {
-                return yield this.createRelease();
-            }
-        });
+    async updateDraftOrCreateRelease() {
+        const draftReleaseId = await this.findMatchingDraftReleaseId();
+        if (draftReleaseId) {
+            return await this.updateRelease(draftReleaseId);
+        }
+        else {
+            return await this.createRelease();
+        }
     }
-    findMatchingDraftReleaseId() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tag = this.inputs.tag;
-            const response = yield this.releases.listReleases();
-            const releases = response.data;
-            const draftRelease = releases.find(release => release.draft && release.tag_name == tag);
-            return draftRelease === null || draftRelease === void 0 ? void 0 : draftRelease.id;
-        });
+    async findMatchingDraftReleaseId() {
+        const tag = this.inputs.tag;
+        const response = await this.releases.listReleases();
+        const releases = response.data;
+        const draftRelease = releases.find(release => release.draft && release.tag_name == tag);
+        return draftRelease?.id;
     }
-    createRelease() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.releases.create(this.inputs.tag, this.inputs.createdReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.createdDraft, this.inputs.generateReleaseNotes, this.inputs.makeLatest, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
-        });
+    async createRelease() {
+        return await this.releases.create(this.inputs.tag, this.inputs.createdReleaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.createdDraft, this.inputs.generateReleaseNotes, this.inputs.makeLatest, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
     }
 }
 exports.Action = Action;
@@ -143,42 +127,34 @@ exports.Action = Action;
 /***/ }),
 
 /***/ 1223:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ReleaseActionSkipper = void 0;
 class ReleaseActionSkipper {
+    skipIfReleaseExists;
+    releases;
+    tag;
     constructor(skipIfReleaseExists, releases, tag) {
         this.skipIfReleaseExists = skipIfReleaseExists;
         this.releases = releases;
         this.tag = tag;
     }
-    shouldSkip() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.skipIfReleaseExists) {
-                // Bail if skip flag isn't set.
-                return false;
-            }
-            try {
-                const getResponse = yield this.releases.getByTag(this.tag);
-                return getResponse.data != null;
-            }
-            catch (error) {
-                // There is either no release or something else went wrong. Either way, run the action.
-                return false;
-            }
-        });
+    async shouldSkip() {
+        if (!this.skipIfReleaseExists) {
+            // Bail if skip flag isn't set.
+            return false;
+        }
+        try {
+            const getResponse = await this.releases.getByTag(this.tag);
+            return getResponse.data != null;
+        }
+        catch (error) {
+            // There is either no release or something else went wrong. Either way, run the action.
+            return false;
+        }
     }
 }
 exports.ReleaseActionSkipper = ReleaseActionSkipper;
@@ -196,6 +172,9 @@ exports.Artifact = void 0;
 const path_1 = __nccwpck_require__(1017);
 const fs_1 = __nccwpck_require__(7147);
 class Artifact {
+    contentType;
+    name;
+    path;
     constructor(path, contentType = "raw") {
         this.path = path;
         this.name = (0, path_1.basename)(path);
@@ -241,31 +220,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubArtifactDestroyer = void 0;
 const core = __importStar(__nccwpck_require__(1401));
 class GithubArtifactDestroyer {
+    releases;
     constructor(releases) {
         this.releases = releases;
     }
-    destroyArtifacts(releaseId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const releaseAssets = yield this.releases.listArtifactsForRelease(releaseId);
-            for (const artifact of releaseAssets) {
-                const asset = artifact;
-                core.debug(`Deleting existing artifact ${artifact.name}...`);
-                yield this.releases.deleteArtifact(asset.id);
-            }
-        });
+    async destroyArtifacts(releaseId) {
+        const releaseAssets = await this.releases.listArtifactsForRelease(releaseId);
+        for (const artifact of releaseAssets) {
+            const asset = artifact;
+            core.debug(`Deleting existing artifact ${artifact.name}...`);
+            await this.releases.deleteArtifact(asset.id);
+        }
     }
 }
 exports.GithubArtifactDestroyer = GithubArtifactDestroyer;
@@ -313,6 +282,7 @@ const untildify_1 = __importDefault(__nccwpck_require__(9555));
 const ArtifactPathValidator_1 = __nccwpck_require__(2578);
 const PathNormalizer_1 = __nccwpck_require__(9888);
 class FileArtifactGlobber {
+    globber;
     constructor(globber = new Globber_1.FileGlobber()) {
         this.globber = globber;
     }
@@ -391,6 +361,9 @@ exports.ArtifactPathValidator = void 0;
 const core = __importStar(__nccwpck_require__(1401));
 const fs_1 = __nccwpck_require__(7147);
 class ArtifactPathValidator {
+    errorsFailBuild;
+    paths;
+    pattern;
     constructor(errorsFailBuild, paths, pattern) {
         this.paths = paths;
         this.pattern = pattern;
@@ -456,71 +429,59 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubArtifactUploader = void 0;
 const core = __importStar(__nccwpck_require__(1401));
 class GithubArtifactUploader {
+    releases;
+    replacesExistingArtifacts;
+    throwsUploadErrors;
     constructor(releases, replacesExistingArtifacts = true, throwsUploadErrors = false) {
         this.releases = releases;
         this.replacesExistingArtifacts = replacesExistingArtifacts;
         this.throwsUploadErrors = throwsUploadErrors;
     }
-    uploadArtifacts(artifacts, releaseId, uploadUrl) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.replacesExistingArtifacts) {
-                yield this.deleteUpdatedArtifacts(artifacts, releaseId);
-            }
-            for (const artifact of artifacts) {
-                yield this.uploadArtifact(artifact, releaseId, uploadUrl);
-            }
-        });
+    async uploadArtifacts(artifacts, releaseId, uploadUrl) {
+        if (this.replacesExistingArtifacts) {
+            await this.deleteUpdatedArtifacts(artifacts, releaseId);
+        }
+        for (const artifact of artifacts) {
+            await this.uploadArtifact(artifact, releaseId, uploadUrl);
+        }
     }
-    uploadArtifact(artifact, releaseId, uploadUrl, retry = 3) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                core.debug(`Uploading artifact ${artifact.name}...`);
-                yield this.releases.uploadArtifact(uploadUrl, artifact.contentLength, artifact.contentType, artifact.readFile(), artifact.name, releaseId);
+    async uploadArtifact(artifact, releaseId, uploadUrl, retry = 3) {
+        try {
+            core.debug(`Uploading artifact ${artifact.name}...`);
+            await this.releases.uploadArtifact(uploadUrl, artifact.contentLength, artifact.contentType, artifact.readFile(), artifact.name, releaseId);
+        }
+        catch (error) {
+            if (error.status >= 500 && retry > 0) {
+                core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}. Retrying...`);
+                await this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1);
             }
-            catch (error) {
-                if (error.status >= 500 && retry > 0) {
-                    core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}. Retrying...`);
-                    yield this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1);
+            else {
+                if (this.throwsUploadErrors) {
+                    throw Error(`Failed to upload artifact ${artifact.name}. ${error.message}.`);
                 }
                 else {
-                    if (this.throwsUploadErrors) {
-                        throw Error(`Failed to upload artifact ${artifact.name}. ${error.message}.`);
-                    }
-                    else {
-                        core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}.`);
-                    }
+                    core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}.`);
                 }
             }
-        });
+        }
     }
-    deleteUpdatedArtifacts(artifacts, releaseId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const releaseAssets = yield this.releases.listArtifactsForRelease(releaseId);
-            const assetByName = {};
-            releaseAssets.forEach(asset => {
-                assetByName[asset.name] = asset;
-            });
-            for (const artifact of artifacts) {
-                const asset = assetByName[artifact.name];
-                if (asset) {
-                    core.debug(`Deleting existing artifact ${artifact.name}...`);
-                    yield this.releases.deleteArtifact(asset.id);
-                }
-            }
+    async deleteUpdatedArtifacts(artifacts, releaseId) {
+        const releaseAssets = await this.releases.listArtifactsForRelease(releaseId);
+        const assetByName = {};
+        releaseAssets.forEach(asset => {
+            assetByName[asset.name] = asset;
         });
+        for (const artifact of artifacts) {
+            const asset = assetByName[artifact.name];
+            if (asset) {
+                core.debug(`Deleting existing artifact ${artifact.name}...`);
+                await this.releases.deleteArtifact(asset.id);
+            }
+        }
     }
 }
 exports.GithubArtifactUploader = GithubArtifactUploader;
@@ -537,6 +498,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubError = void 0;
 const GithubErrorDetail_1 = __nccwpck_require__(697);
 class GithubError {
+    error;
+    githubErrors;
     constructor(error) {
         this.error = error;
         this.githubErrors = this.generateGithubErrors();
@@ -590,6 +553,7 @@ exports.GithubError = GithubError;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubErrorDetail = void 0;
 class GithubErrorDetail {
+    error;
     constructor(error) {
         this.error = error;
     }
@@ -698,6 +662,8 @@ exports.CoreInputs = void 0;
 const core = __importStar(__nccwpck_require__(1401));
 const fs_1 = __nccwpck_require__(7147);
 class CoreInputs {
+    artifactGlobber;
+    context;
     constructor(artifactGlobber, context) {
         this.artifactGlobber = artifactGlobber;
         this.context = context;
@@ -944,16 +910,16 @@ exports.PathNormalizer = PathNormalizer;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ReleaseValidator = void 0;
 class ReleaseValidator {
+    updateOnlyUnreleased;
     constructor(updateOnlyUnreleased) {
         this.updateOnlyUnreleased = updateOnlyUnreleased;
     }
     validateReleaseUpdate(releaseResponse) {
-        var _a;
         if (!this.updateOnlyUnreleased) {
             return;
         }
         if (!releaseResponse.draft && !releaseResponse.prerelease) {
-            throw new Error(`Tried to update "${(_a = releaseResponse.name) !== null && _a !== void 0 ? _a : "release"}" which is neither a draft or prerelease. (updateOnlyUnreleased is on)`);
+            throw new Error(`Tried to update "${releaseResponse.name ?? "release"}" which is neither a draft or prerelease. (updateOnlyUnreleased is on)`);
         }
     }
 }
@@ -963,111 +929,90 @@ exports.ReleaseValidator = ReleaseValidator;
 /***/ }),
 
 /***/ 1495:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubReleases = void 0;
 class GithubReleases {
+    git;
+    inputs;
     constructor(inputs, git) {
         this.inputs = inputs;
         this.git = git;
     }
-    create(tag, body, commitHash, discussionCategory, draft, generateReleaseNotes, makeLatest, name, prerelease) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // noinspection TypeScriptValidateJSTypes
-            return this.git.rest.repos.createRelease({
-                body: body,
-                name: name,
-                discussion_category_name: discussionCategory,
-                draft: draft,
-                generate_release_notes: generateReleaseNotes,
-                make_latest: makeLatest,
-                owner: this.inputs.owner,
-                prerelease: prerelease,
-                repo: this.inputs.repo,
-                target_commitish: commitHash,
-                tag_name: tag
-            });
+    async create(tag, body, commitHash, discussionCategory, draft, generateReleaseNotes, makeLatest, name, prerelease) {
+        // noinspection TypeScriptValidateJSTypes
+        return this.git.rest.repos.createRelease({
+            body: body,
+            name: name,
+            discussion_category_name: discussionCategory,
+            draft: draft,
+            generate_release_notes: generateReleaseNotes,
+            make_latest: makeLatest,
+            owner: this.inputs.owner,
+            prerelease: prerelease,
+            repo: this.inputs.repo,
+            target_commitish: commitHash,
+            tag_name: tag
         });
     }
-    deleteArtifact(assetId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.git.rest.repos.deleteReleaseAsset({
-                asset_id: assetId,
-                owner: this.inputs.owner,
-                repo: this.inputs.repo
-            });
+    async deleteArtifact(assetId) {
+        return this.git.rest.repos.deleteReleaseAsset({
+            asset_id: assetId,
+            owner: this.inputs.owner,
+            repo: this.inputs.repo
         });
     }
-    getByTag(tag) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.git.rest.repos.getReleaseByTag({
-                owner: this.inputs.owner,
-                repo: this.inputs.repo,
-                tag: tag
-            });
+    async getByTag(tag) {
+        return this.git.rest.repos.getReleaseByTag({
+            owner: this.inputs.owner,
+            repo: this.inputs.repo,
+            tag: tag
         });
     }
-    listArtifactsForRelease(releaseId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.git.paginate(this.git.rest.repos.listReleaseAssets, {
-                owner: this.inputs.owner,
-                release_id: releaseId,
-                repo: this.inputs.repo
-            });
+    async listArtifactsForRelease(releaseId) {
+        return this.git.paginate(this.git.rest.repos.listReleaseAssets, {
+            owner: this.inputs.owner,
+            release_id: releaseId,
+            repo: this.inputs.repo
         });
     }
-    listReleases() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.git.rest.repos.listReleases({
-                owner: this.inputs.owner,
-                repo: this.inputs.repo
-            });
+    async listReleases() {
+        return this.git.rest.repos.listReleases({
+            owner: this.inputs.owner,
+            repo: this.inputs.repo
         });
     }
-    update(id, tag, body, commitHash, discussionCategory, draft, makeLatest, name, prerelease) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // noinspection TypeScriptValidateJSTypes
-            return this.git.rest.repos.updateRelease({
-                release_id: id,
-                body: body,
-                name: name,
-                discussion_category_name: discussionCategory,
-                draft: draft,
-                make_latest: makeLatest,
-                owner: this.inputs.owner,
-                prerelease: prerelease,
-                repo: this.inputs.repo,
-                target_commitish: commitHash,
-                tag_name: tag
-            });
+    async update(id, tag, body, commitHash, discussionCategory, draft, makeLatest, name, prerelease) {
+        // noinspection TypeScriptValidateJSTypes
+        return this.git.rest.repos.updateRelease({
+            release_id: id,
+            body: body,
+            name: name,
+            discussion_category_name: discussionCategory,
+            draft: draft,
+            make_latest: makeLatest,
+            owner: this.inputs.owner,
+            prerelease: prerelease,
+            repo: this.inputs.repo,
+            target_commitish: commitHash,
+            tag_name: tag
         });
     }
-    uploadArtifact(assetUrl, contentLength, contentType, file, name, releaseId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.git.rest.repos.uploadReleaseAsset({
-                url: assetUrl,
-                headers: {
-                    "content-length": contentLength,
-                    "content-type": contentType
-                },
-                data: file,
-                name: name,
-                owner: this.inputs.owner,
-                release_id: releaseId,
-                repo: this.inputs.repo
-            });
+    async uploadArtifact(assetUrl, contentLength, contentType, file, name, releaseId) {
+        return this.git.rest.repos.uploadReleaseAsset({
+            url: assetUrl,
+            headers: {
+                "content-length": contentLength,
+                "content-type": contentType
+            },
+            data: file,
+            name: name,
+            owner: this.inputs.owner,
+            release_id: releaseId,
+            repo: this.inputs.repo
         });
     }
 }
@@ -1104,15 +1049,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github = __importStar(__nccwpck_require__(2215));
 const core = __importStar(__nccwpck_require__(1401));
@@ -1125,17 +1061,15 @@ const GithubError_1 = __nccwpck_require__(6336);
 const Outputs_1 = __nccwpck_require__(8811);
 const ArtifactDestroyer_1 = __nccwpck_require__(3633);
 const ActionSkipper_1 = __nccwpck_require__(1223);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const action = createAction();
-            yield action.perform();
-        }
-        catch (error) {
-            const githubError = new GithubError_1.GithubError(error);
-            core.setFailed(githubError.toString());
-        }
-    });
+async function run() {
+    try {
+        const action = createAction();
+        await action.perform();
+    }
+    catch (error) {
+        const githubError = new GithubError_1.GithubError(error);
+        core.setFailed(githubError.toString());
+    }
 }
 function createAction() {
     const token = core.getInput('token');
