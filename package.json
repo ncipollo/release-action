@@ -24,6 +24,9 @@
   ],
   "author": "GitHub",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "jest": {
     "clearMocks": true,
     "collectCoverage": true,
