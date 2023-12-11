@@ -25,7 +25,7 @@ export interface Releases {
         discussionCategory?: string,
         draft?: boolean,
         generateReleaseNotes?: boolean,
-        makeLatest?: string,
+        makeLatest?:  "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<CreateReleaseResponse>
@@ -45,7 +45,7 @@ export interface Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
-        makeLatest?: string,
+        makeLatest?:  "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<UpdateReleaseResponse>
@@ -76,7 +76,7 @@ export class GithubReleases implements Releases {
         discussionCategory?: string,
         draft?: boolean,
         generateReleaseNotes?: boolean,
-        makeLatest?: string,
+        makeLatest?:  "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<CreateReleaseResponse> {
@@ -138,7 +138,7 @@ export class GithubReleases implements Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
-        makeLatest?: string,
+        makeLatest?:  "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<UpdateReleaseResponse> {

@@ -15,7 +15,7 @@ export interface Inputs {
     readonly createdReleaseName?: string
     readonly discussionCategory?: string
     readonly generateReleaseNotes: boolean
-    readonly makeLatest?: string
+    readonly makeLatest?: "legacy" | "true" | "false" | undefined
     readonly owner: string
     readonly removeArtifacts: boolean
     readonly replacesArtifacts: boolean
@@ -131,14 +131,19 @@ export class CoreInputs implements Inputs {
 
         return this.tag
     }
-    
+
     get generateReleaseNotes(): boolean {
         const generate = core.getInput('generateReleaseNotes')
         return generate == 'true'
     }
 
-    get makeLatest(): string {
-        return core.getInput('makeLatest')
+    get makeLatest(): "legacy" | "true" | "false" | undefined {
+        let latest = core.getInput('makeLatest')
+        if (latest == "true" || latest == "false" || latest == "legacy") {
+            return latest;
+        }
+        
+        return undefined
     }
 
     get owner(): string {
@@ -148,11 +153,12 @@ export class CoreInputs implements Inputs {
         }
         return this.context.repo.owner
     }
-    
+
     get removeArtifacts(): boolean {
         const removes = core.getInput('removeArtifacts')
         return removes == 'true'
     }
+
     get replacesArtifacts(): boolean {
         const replaces = core.getInput('replacesArtifacts')
         return replaces == 'true'
@@ -169,7 +175,7 @@ export class CoreInputs implements Inputs {
     get skipIfReleaseExists(): boolean {
         return core.getBooleanInput("skipIfReleaseExists")
     }
-    
+
     get tag(): string {
         const tag = core.getInput('tag')
         if (tag) {
@@ -197,7 +203,7 @@ export class CoreInputs implements Inputs {
     private static get omitDraftDuringUpdate(): boolean {
         return core.getInput('omitDraftDuringUpdate') == 'true'
     }
-    
+
     get updatedPrerelease(): boolean | undefined {
         if (CoreInputs.omitPrereleaseDuringUpdate) return undefined
         return this.createdPrerelease
@@ -220,7 +226,7 @@ export class CoreInputs implements Inputs {
         if (CoreInputs.omitName || CoreInputs.omitNameDuringUpdate) return undefined
         return this.name
     }
-    
+
     get updateOnlyUnreleased(): boolean {
         return core.getInput('updateOnlyUnreleased') == 'true'
     }
