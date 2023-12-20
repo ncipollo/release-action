@@ -20,6 +20,7 @@ export type ReleaseData = {
 export interface Releases {
     create(
         tag: string,
+        previous_tag?: string,
         body?: string,
         commitHash?: string,
         discussionCategory?: string,
@@ -71,6 +72,7 @@ export class GithubReleases implements Releases {
 
     async create(
         tag: string,
+        previous_tag?: string,
         body?: string,
         commitHash?: string,
         discussionCategory?: string,
@@ -92,7 +94,8 @@ export class GithubReleases implements Releases {
             prerelease: prerelease,
             repo: this.inputs.repo,
             target_commitish: commitHash,
-            tag_name: tag
+            tag_name: tag,
+            previous_tag_name: previous_tag,
         })
     }
 
