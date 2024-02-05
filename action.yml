@@ -123,7 +123,7 @@ outputs:
   upload_url:
     description: 'The URL for uploading assets to the release.'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: 'tag'
