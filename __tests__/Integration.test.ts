@@ -10,7 +10,7 @@ import {GithubArtifactDestroyer} from "../src/ArtifactDestroyer";
 import {ReleaseActionSkipper} from "../src/ActionSkipper";
 
 // This test is currently intended to be manually run during development. To run:
-// - Make sure you have an environment variable named GITHUB_TOKEN assigned to your token
+// - Make sure you have an environment variable named GH_TOKEN assigned to your token
 // - Remove skip from the test below
 describe.skip('Integration Test', () => {
     let action: Action
@@ -86,7 +86,7 @@ describe.skip('Integration Test', () => {
     }
 
     function getToken(): string {
-        return process.env.GITHUB_TOKEN ?? ""
+        return process.env.GH_TOKEN ?? ""
     }
 
 })
