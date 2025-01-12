@@ -17,14 +17,16 @@ const listArtifactsMock = jest.fn()
 const uploadMock = jest.fn()
 
 jest.mock('fs', () => {
+    const originalFs = jest.requireActual('fs');
     return {
+        ...originalFs,
         promises: {},
         createReadStream: () => fakeReadStream,
         statSync: () => {
-            return {size: contentLength}
+            return {size: contentLength};
         }
     };
-})
+});
 
 describe('ArtifactUploader', () => {
     beforeEach(() => {
