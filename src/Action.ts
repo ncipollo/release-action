@@ -120,6 +120,10 @@ export class Action {
         const tag = this.inputs.tag
         const response = await this.releases.listReleases()
         const releases = response.data
+        if(!releases) {
+            throw new Error(`No releases found. Response: ${JSON.stringify(response)}`)
+        }
+
         const draftRelease = releases.find(release => release.draft && release.tag_name == tag)
 
         return draftRelease?.id

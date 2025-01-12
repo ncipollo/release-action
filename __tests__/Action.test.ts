@@ -218,6 +218,32 @@ describe("Action", () => {
 
     })
 
+    it('throws error when list has no data', async () => {
+
+        const action = createAction(true, true)
+        getMock.mockRejectedValue({status: 404})
+        const error = {
+            errors: [
+                {
+                    code: 'already_exists'
+                }
+            ]
+        }
+
+        createMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({})
+        expect.hasAssertions()
+        try {
+            await action.perform()
+        } catch (error) {
+            expect(error).toEqual(Error("No releases found. Response: {}"))
+        }
+
+        expect(listMock).toBeCalled()
+        expect(createMock).not.toBeCalled()
+        expect(updateMock).not.toBeCalled()
+    })
+
     it('throws error when update fails', async () => {
         const action = createAction(true, true)
 
@@ -428,7 +454,7 @@ describe("Action", () => {
                 destroyArtifacts: artifactDestroyMock
             }
         })
-        
+
         const MockActionSkipper = jest.fn<ActionSkipper, any>(() => {
             return {
                 shouldSkip: shouldSkipMock
