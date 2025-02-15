@@ -1,5 +1,5 @@
-import {ActionSkipper, ReleaseActionSkipper} from "../src/ActionSkipper";
-import {Releases} from "../src/Releases";
+import { ReleaseActionSkipper } from "../src/ActionSkipper"
+import type { Releases } from "../src/Releases"
 
 describe("shouldSkip", () => {
     const getMock = jest.fn()
@@ -12,31 +12,32 @@ describe("shouldSkip", () => {
             listArtifactsForRelease: jest.fn(),
             listReleases: jest.fn(),
             update: jest.fn(),
-            uploadArtifact: jest.fn()
+            uploadArtifact: jest.fn(),
+            generateReleaseNotes: jest.fn(),
         }
     })
 
-    it('should return false when skipIfReleaseExists is false', async () => {
+    it("should return false when skipIfReleaseExists is false", async () => {
         const actionSkipper = new ReleaseActionSkipper(false, MockReleases(), tag)
         expect(await actionSkipper.shouldSkip()).toBe(false)
     })
 
-    it('should return false when error occurs', async () => {
+    it("should return false when error occurs", async () => {
         getMock.mockRejectedValue(new Error())
 
         const actionSkipper = new ReleaseActionSkipper(true, MockReleases(), tag)
         expect(await actionSkipper.shouldSkip()).toBe(false)
     })
 
-    it('should return false when release does not exist', async () => {
+    it("should return false when release does not exist", async () => {
         getMock.mockResolvedValue({})
-        
+
         const actionSkipper = new ReleaseActionSkipper(true, MockReleases(), tag)
         expect(await actionSkipper.shouldSkip()).toBe(false)
     })
 
-    it('should return true when release does exist', async () => {
-        getMock.mockResolvedValue({data: {}})
+    it("should return true when release does exist", async () => {
+        getMock.mockResolvedValue({ data: {} })
 
         const actionSkipper = new ReleaseActionSkipper(true, MockReleases(), tag)
         expect(await actionSkipper.shouldSkip()).toBe(true)

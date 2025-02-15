@@ -1,11 +1,11 @@
-import {Action} from "../src/Action";
-import {Artifact} from "../src/Artifact";
-import {Inputs} from "../src/Inputs";
-import {Releases} from "../src/Releases";
-import {ArtifactUploader} from "../src/ArtifactUploader";
-import {Outputs} from "../src/Outputs";
-import {ArtifactDestroyer} from "../src/ArtifactDestroyer";
-import {ActionSkipper} from "../src/ActionSkipper";
+import { Action } from "../src/Action"
+import type { ActionSkipper } from "../src/ActionSkipper"
+import { Artifact } from "../src/Artifact"
+import type { ArtifactDestroyer } from "../src/ArtifactDestroyer"
+import type { ArtifactUploader } from "../src/ArtifactUploader"
+import type { Inputs } from "../src/Inputs"
+import type { Outputs } from "../src/Outputs"
+import type { Releases } from "../src/Releases"
 
 const applyReleaseDataMock = jest.fn()
 const artifactDestroyMock = jest.fn()
@@ -17,31 +17,30 @@ const listMock = jest.fn()
 const shouldSkipMock = jest.fn()
 const updateMock = jest.fn()
 const uploadMock = jest.fn()
+const genReleaseNotesMock = jest.fn()
 
-const artifacts = [
-    new Artifact('a/art1'),
-    new Artifact('b/art2')
-]
+const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
 
-const createBody = 'createBody'
+const createBody = "createBody"
 const createDraft = true
-const createName = 'createName'
-const commit = 'commit'
-const discussionCategory = 'discussionCategory'
+const createName = "createName"
+const commit = "commit"
+const discussionCategory = "discussionCategory"
 const generateReleaseNotes = true
 const id = 100
 const createPrerelease = true
 const releaseId = 101
 const replacesArtifacts = true
-const tag = 'tag'
-const token = 'token'
-const updateBody = 'updateBody'
+const tag = "tag"
+const token = "token"
+const updateBody = "updateBody"
 const updateDraft = false
-const updateName = 'updateName'
+const updateName = "updateName"
 const updatePrerelease = false
 const updateOnlyUnreleased = false
-const url = 'http://api.example.com'
-const makeLatest = 'legacy'
+const url = "http://api.example.com"
+const makeLatest = "legacy"
+const generatedReleaseBody = "test release notes"
 
 describe("Action", () => {
     beforeEach(() => {
@@ -53,32 +52,12 @@ describe("Action", () => {
         uploadMock.mockClear()
     })
 
-    it('creates release but does not upload if no artifact', async () => {
+    it("creates release but does not upload if no artifact", async () => {
         const action = createAction(false, false)
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(tag,
-            createBody,
-            commit,
-            discussionCategory,
-            createDraft,
-            generateReleaseNotes,
-            makeLatest,
-            createName,
-            createPrerelease)
-        expect(uploadMock).not.toBeCalled()
-        assertOutputApplied()
-    })
-
-    it('creates release if no release exists to update', async () => {
-        const action = createAction(true, true)
-        const error = {status: 404}
-        getMock.mockRejectedValue(error)
-
-        await action.perform()
-
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -87,24 +66,45 @@ describe("Action", () => {
             generateReleaseNotes,
             makeLatest,
             createName,
-            createPrerelease)
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+            createPrerelease
+        )
+        expect(uploadMock).not.toHaveBeenCalled()
         assertOutputApplied()
     })
 
-    it('creates release if no draft releases', async () => {
+    it("creates release if no release exists to update", async () => {
         const action = createAction(true, true)
-        const error = {status: 404}
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+
+        await action.perform()
+
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            createBody,
+            commit,
+            discussionCategory,
+            createDraft,
+            generateReleaseNotes,
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
+        assertOutputApplied()
+    })
+
+    it("creates release if no draft releases", async () => {
+        const action = createAction(true, true)
+        const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({
-            data: [
-                {id: id, draft: false, tag_name: tag}
-            ]
+            data: [{ id: id, draft: false, tag_name: tag }],
         })
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -115,17 +115,16 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
-
     })
 
-    it('creates release then uploads artifact', async () => {
+    it("creates release then uploads artifact", async () => {
         const action = createAction(false, true)
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -136,39 +135,39 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
-    it('removes all artifacts when artifact destroyer is enabled', async () => {
+    it("removes all artifacts when artifact destroyer is enabled", async () => {
         const action = createAction(false, true, true)
 
         await action.perform()
 
-        expect(artifactDestroyMock).toBeCalledWith(releaseId)
+        expect(artifactDestroyMock).toHaveBeenCalledWith(releaseId)
         assertOutputApplied()
     })
 
-    it('removes no artifacts when artifact destroyer is disabled', async () => {
+    it("removes no artifacts when artifact destroyer is disabled", async () => {
         const action = createAction(false, true)
 
         await action.perform()
 
-        expect(artifactDestroyMock).not.toBeCalled()
+        expect(artifactDestroyMock).not.toHaveBeenCalled()
         assertOutputApplied()
     })
 
-    it('skips action', async () => {
+    it("skips action", async () => {
         const action = createAction(false, false, false)
         shouldSkipMock.mockResolvedValue(true)
 
         await action.perform()
 
-        expect(createMock).not.toBeCalled()
-        expect(updateMock).not.toBeCalled()
+        expect(createMock).not.toHaveBeenCalled()
+        expect(updateMock).not.toHaveBeenCalled()
     })
 
-    it('throws error when create fails', async () => {
+    it("throws error when create fails", async () => {
         const action = createAction(false, true)
         createMock.mockRejectedValue("error")
 
@@ -179,7 +178,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -190,17 +189,17 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
     })
 
-    it('throws error when get fails', async () => {
+    it("throws error when get fails", async () => {
         const action = createAction(true, true)
         const error = {
             errors: [
                 {
-                    code: 'already_exists'
-                }
-            ]
+                    code: "already_exists",
+                },
+            ],
         }
 
         createMock.mockRejectedValue(error)
@@ -212,39 +211,12 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(getMock).toBeCalledWith(tag)
-        expect(updateMock).not.toBeCalled()
-        expect(uploadMock).not.toBeCalled()
-
+        expect(getMock).toHaveBeenCalledWith(tag)
+        expect(updateMock).not.toHaveBeenCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
     })
 
-    it('throws error when list has no data', async () => {
-
-        const action = createAction(true, true)
-        getMock.mockRejectedValue({status: 404})
-        const error = {
-            errors: [
-                {
-                    code: 'already_exists'
-                }
-            ]
-        }
-
-        createMock.mockRejectedValue(error)
-        listMock.mockResolvedValue({})
-        expect.hasAssertions()
-        try {
-            await action.perform()
-        } catch (error) {
-            expect(error).toEqual(Error("No releases found. Response: {}"))
-        }
-
-        expect(listMock).toBeCalled()
-        expect(createMock).not.toBeCalled()
-        expect(updateMock).not.toBeCalled()
-    })
-
-    it('throws error when update fails', async () => {
+    it("throws error when update fails", async () => {
         const action = createAction(true, true)
 
         updateMock.mockRejectedValue("error")
@@ -256,10 +228,10 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -267,12 +239,12 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
     })
 
-    it('throws error when upload fails', async () => {
+    it("throws error when upload fails", async () => {
         const action = createAction(false, true)
-        const expectedError = {status: 404}
+        const expectedError = { status: 404 }
         uploadMock.mockRejectedValue(expectedError)
 
         expect.hasAssertions()
@@ -282,7 +254,7 @@ describe("Action", () => {
             expect(error).toEqual(expectedError)
         }
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -293,26 +265,26 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
     })
 
-    it('updates draft release', async () => {
+    it("updates draft release", async () => {
         const action = createAction(true, true)
-        const error = {status: 404}
+        const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({
             data: [
-                {id: 123, draft: false, tag_name: tag},
-                {id: id, draft: true, tag_name: tag}
-            ]
+                { id: 123, draft: false, tag_name: tag },
+                { id: id, draft: true, tag_name: tag },
+            ],
         })
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -320,19 +292,19 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
-    it('updates release but does not upload if no artifact', async () => {
+    it("updates release but does not upload if no artifact", async () => {
         const action = createAction(true, false)
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -340,19 +312,19 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
         assertOutputApplied()
     })
 
-    it('updates release then uploads artifact', async () => {
+    it("updates release then uploads artifact", async () => {
         const action = createAction(true, true)
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -360,23 +332,23 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
     function assertOutputApplied() {
-        expect(applyReleaseDataMock).toBeCalledWith({id: releaseId, upload_url: url})
+        expect(applyReleaseDataMock).toHaveBeenCalledWith({ id: releaseId, upload_url: url })
     }
 
-    function createAction(allowUpdates: boolean,
-                          hasArtifact: boolean,
-                          removeArtifacts: boolean = false): Action {
+    function createAction(allowUpdates: boolean, hasArtifact: boolean, removeArtifacts = false): Action {
         let inputArtifact: Artifact[]
+
         if (hasArtifact) {
             inputArtifact = artifacts
         } else {
             inputArtifact = []
         }
+
         const MockReleases = jest.fn<Releases, any>(() => {
             return {
                 create: createMock,
@@ -385,30 +357,37 @@ describe("Action", () => {
                 listArtifactsForRelease: listArtifactsMock,
                 listReleases: listMock,
                 update: updateMock,
-                uploadArtifact: jest.fn()
+                uploadArtifact: jest.fn(),
+                generateReleaseNotes: genReleaseNotesMock,
             }
         })
 
         createMock.mockResolvedValue({
             data: {
                 id: releaseId,
-                upload_url: url
-            }
+                upload_url: url,
+            },
+        })
+
+        genReleaseNotesMock.mockResolvedValue({
+            data: {
+                body: generatedReleaseBody,
+            },
         })
         getMock.mockResolvedValue({
             data: {
-                id: id
-            }
+                id: id,
+            },
         })
         listMock.mockResolvedValue({
-            data: []
+            data: [],
         })
         shouldSkipMock.mockResolvedValue(false)
         updateMock.mockResolvedValue({
             data: {
                 id: releaseId,
-                upload_url: url
-            }
+                upload_url: url,
+            },
         })
         uploadMock.mockResolvedValue({})
 
@@ -436,28 +415,28 @@ describe("Action", () => {
                 updatedReleaseBody: updateBody,
                 updatedReleaseName: updateName,
                 updatedPrerelease: updatePrerelease,
-                updateOnlyUnreleased: updateOnlyUnreleased
+                updateOnlyUnreleased: updateOnlyUnreleased,
             }
         })
         const MockOutputs = jest.fn<Outputs, any>(() => {
             return {
-                applyReleaseData: applyReleaseDataMock
+                applyReleaseData: applyReleaseDataMock,
             }
         })
         const MockUploader = jest.fn<ArtifactUploader, any>(() => {
             return {
-                uploadArtifacts: uploadMock
+                uploadArtifacts: uploadMock,
             }
         })
         const MockArtifactDestroyer = jest.fn<ArtifactDestroyer, any>(() => {
             return {
-                destroyArtifacts: artifactDestroyMock
+                destroyArtifacts: artifactDestroyMock,
             }
         })
 
         const MockActionSkipper = jest.fn<ActionSkipper, any>(() => {
             return {
-                shouldSkip: shouldSkipMock
+                shouldSkip: shouldSkipMock,
             }
         })
 

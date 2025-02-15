@@ -1,18 +1,18 @@
-import * as core from '@actions/core';
-import {Inputs} from "./Inputs";
-import {
+import * as core from "@actions/core"
+import type { ActionSkipper } from "./ActionSkipper"
+import type { ArtifactDestroyer } from "./ArtifactDestroyer"
+import type { ArtifactUploader } from "./ArtifactUploader"
+import { GithubError } from "./GithubError"
+import type { Inputs } from "./Inputs"
+import type { Outputs } from "./Outputs"
+import { ReleaseValidator } from "./ReleaseValidator"
+import type {
     CreateOrUpdateReleaseResponse,
     CreateReleaseResponse,
     ReleaseByTagResponse,
     Releases,
-    UpdateReleaseResponse
-} from "./Releases";
-import {ArtifactUploader} from "./ArtifactUploader";
-import {GithubError} from "./GithubError";
-import {Outputs} from "./Outputs";
-import {ArtifactDestroyer} from "./ArtifactDestroyer";
-import {ReleaseValidator} from "./ReleaseValidator";
-import {ActionSkipper} from "./ActionSkipper";
+    UpdateReleaseResponse,
+} from "./Releases"
 
 export class Action {
     private inputs: Inputs
@@ -21,15 +21,17 @@ export class Action {
     private uploader: ArtifactUploader
     private artifactDestroyer: ArtifactDestroyer
     private skipper: ActionSkipper
-    
+
     private releaseValidator: ReleaseValidator
 
-    constructor(inputs: Inputs,
-                outputs: Outputs,
-                releases: Releases,
-                uploader: ArtifactUploader,
-                artifactDestroyer: ArtifactDestroyer,
-                skipper: ActionSkipper) {
+    constructor(
+        inputs: Inputs,
+        outputs: Outputs,
+        releases: Releases,
+        uploader: ArtifactUploader,
+        artifactDestroyer: ArtifactDestroyer,
+        skipper: ActionSkipper
+    ) {
         this.inputs = inputs
         this.outputs = outputs
         this.releases = releases
@@ -44,16 +46,16 @@ export class Action {
             core.notice("Skipping action, release already exists and skipIfReleaseExists is enabled.")
             return
         }
-        
-        const releaseResponse = await this.createOrUpdateRelease();
+
+        const releaseResponse = await this.createOrUpdateRelease()
         const releaseData = releaseResponse.data
         const releaseId = releaseData.id
         const uploadUrl = releaseData.upload_url
-        
+
         if (this.inputs.removeArtifacts) {
             await this.artifactDestroyer.destroyArtifacts(releaseId)
         }
-        
+
         const artifacts = this.inputs.artifacts
         if (artifacts.length > 0) {
             await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
@@ -70,7 +72,7 @@ export class Action {
             } catch (error: any) {
                 return await this.checkForMissingReleaseError(error)
             }
-            
+
             // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
             this.releaseValidator.validateReleaseUpdate(getResponse.data)
 
@@ -89,10 +91,17 @@ export class Action {
     }
 
     private async updateRelease(id: number): Promise<UpdateReleaseResponse> {
+        let releaseBody = this.inputs.updatedReleaseBody
+
+        if (this.inputs.generateReleaseNotes) {
+            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
+            releaseBody = response.data.body
+        }
+
         return await this.releases.update(
             id,
             this.inputs.tag,
-            this.inputs.updatedReleaseBody,
+            releaseBody,
             this.inputs.commit,
             this.inputs.discussionCategory,
             this.inputs.updatedDraft,
@@ -120,11 +129,7 @@ export class Action {
         const tag = this.inputs.tag
         const response = await this.releases.listReleases()
         const releases = response.data
-        if(!releases) {
-            throw new Error(`No releases found. Response: ${JSON.stringify(response)}`)
-        }
-
-        const draftRelease = releases.find(release => release.draft && release.tag_name == tag)
+        const draftRelease = releases.find((release) => release.draft && release.tag_name == tag)
 
         return draftRelease?.id
     }

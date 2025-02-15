@@ -1,7 +1,7 @@
-import {GitHub} from '@actions/github/lib/utils'
-import {OctokitResponse} from "@octokit/types";
-import {RestEndpointMethodTypes} from "@octokit/plugin-rest-endpoint-methods";
-import {Inputs} from "./Inputs";
+import type { GitHub } from "@actions/github/lib/utils"
+import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods"
+import type { OctokitResponse } from "@octokit/types"
+import type { Inputs } from "./Inputs"
 
 export type CreateReleaseResponse = RestEndpointMethodTypes["repos"]["createRelease"]["response"]
 export type ReleaseByTagResponse = RestEndpointMethodTypes["repos"]["getReleaseByTag"]["response"]
@@ -10,6 +10,7 @@ export type ListReleaseAssetsResponseData = RestEndpointMethodTypes["repos"]["li
 export type UpdateReleaseResponse = RestEndpointMethodTypes["repos"]["updateRelease"]["response"]
 export type UploadArtifactResponse = RestEndpointMethodTypes["repos"]["uploadReleaseAsset"]["response"]
 export type CreateOrUpdateReleaseResponse = CreateReleaseResponse | UpdateReleaseResponse
+export type GenerateReleaseNotesResponse = RestEndpointMethodTypes["repos"]["generateReleaseNotes"]["response"]
 
 export type ReleaseData = {
     id: number
@@ -25,7 +26,7 @@ export interface Releases {
         discussionCategory?: string,
         draft?: boolean,
         generateReleaseNotes?: boolean,
-        makeLatest?:  "legacy" | "true" | "false" | undefined,
+        makeLatest?: "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<CreateReleaseResponse>
@@ -33,6 +34,8 @@ export interface Releases {
     deleteArtifact(assetId: number): Promise<OctokitResponse<any>>
 
     getByTag(tag: string): Promise<ReleaseByTagResponse>
+
+    generateReleaseNotes(tag: string): Promise<GenerateReleaseNotesResponse>
 
     listArtifactsForRelease(releaseId: number): Promise<ListReleaseAssetsResponseData>
 
@@ -45,7 +48,7 @@ export interface Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
-        makeLatest?:  "legacy" | "true" | "false" | undefined,
+        makeLatest?: "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<UpdateReleaseResponse>
@@ -56,7 +59,7 @@ export interface Releases {
         contentType: string,
         file: string | object,
         name: string,
-        releaseId: number,
+        releaseId: number
     ): Promise<UploadArtifactResponse>
 }
 
@@ -76,7 +79,7 @@ export class GithubReleases implements Releases {
         discussionCategory?: string,
         draft?: boolean,
         generateReleaseNotes?: boolean,
-        makeLatest?:  "legacy" | "true" | "false" | undefined,
+        makeLatest?: "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<CreateReleaseResponse> {
@@ -92,17 +95,23 @@ export class GithubReleases implements Releases {
             prerelease: prerelease,
             repo: this.inputs.repo,
             target_commitish: commitHash,
-            tag_name: tag
+            tag_name: tag,
         })
     }
 
-    async deleteArtifact(
-        assetId: number
-    ): Promise<OctokitResponse<any>> {
+    async deleteArtifact(assetId: number): Promise<OctokitResponse<any>> {
         return this.git.rest.repos.deleteReleaseAsset({
             asset_id: assetId,
             owner: this.inputs.owner,
-            repo: this.inputs.repo
+            repo: this.inputs.repo,
+        })
+    }
+
+    async generateReleaseNotes(tag: string): Promise<GenerateReleaseNotesResponse> {
+        return this.git.rest.repos.generateReleaseNotes({
+            owner: this.inputs.owner,
+            repo: this.inputs.repo,
+            tag_name: tag,
         })
     }
 
@@ -110,24 +119,22 @@ export class GithubReleases implements Releases {
         return this.git.rest.repos.getReleaseByTag({
             owner: this.inputs.owner,
             repo: this.inputs.repo,
-            tag: tag
+            tag: tag,
         })
     }
 
-    async listArtifactsForRelease(
-        releaseId: number
-    ): Promise<ListReleaseAssetsResponseData> {
+    async listArtifactsForRelease(releaseId: number): Promise<ListReleaseAssetsResponseData> {
         return this.git.paginate(this.git.rest.repos.listReleaseAssets, {
             owner: this.inputs.owner,
             release_id: releaseId,
-            repo: this.inputs.repo
+            repo: this.inputs.repo,
         })
     }
 
     async listReleases(): Promise<ListReleasesResponse> {
         return this.git.rest.repos.listReleases({
             owner: this.inputs.owner,
-            repo: this.inputs.repo
+            repo: this.inputs.repo,
         })
     }
 
@@ -138,7 +145,7 @@ export class GithubReleases implements Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
-        makeLatest?:  "legacy" | "true" | "false" | undefined,
+        makeLatest?: "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
     ): Promise<UpdateReleaseResponse> {
@@ -154,7 +161,7 @@ export class GithubReleases implements Releases {
             prerelease: prerelease,
             repo: this.inputs.repo,
             target_commitish: commitHash,
-            tag_name: tag
+            tag_name: tag,
         })
     }
 
@@ -164,19 +171,19 @@ export class GithubReleases implements Releases {
         contentType: string,
         file: string | object,
         name: string,
-        releaseId: number,
+        releaseId: number
     ): Promise<UploadArtifactResponse> {
         return this.git.rest.repos.uploadReleaseAsset({
             url: assetUrl,
             headers: {
                 "content-length": contentLength,
-                "content-type": contentType
+                "content-type": contentType,
             },
             data: file as any,
             name: name,
             owner: this.inputs.owner,
             release_id: releaseId,
-            repo: this.inputs.repo
+            repo: this.inputs.repo,
         })
     }
 }

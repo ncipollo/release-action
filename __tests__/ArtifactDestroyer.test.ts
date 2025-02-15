@@ -1,45 +1,41 @@
-import {Artifact} from "../src/Artifact"
-import {GithubArtifactUploader} from "../src/ArtifactUploader"
-import {Releases} from "../src/Releases";
-import {RequestError} from '@octokit/request-error'
-import {GithubArtifactDestroyer} from "../src/ArtifactDestroyer";
+import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer"
+import type { Releases } from "../src/Releases"
 
 const releaseId = 100
 
 const deleteMock = jest.fn()
 const listArtifactsMock = jest.fn()
 
-
-describe('ArtifactDestroyer', () => {
+describe("ArtifactDestroyer", () => {
     beforeEach(() => {
         deleteMock.mockClear()
         listArtifactsMock.mockClear()
     })
 
-    it('destroys all artifacts', async () => {
+    it("destroys all artifacts", async () => {
         mockListWithAssets()
         mockDeleteSuccess()
         const destroyer = createDestroyer()
 
         await destroyer.destroyArtifacts(releaseId)
 
-        expect(deleteMock).toBeCalledTimes(2)
+        expect(deleteMock).toHaveBeenCalledTimes(2)
     })
 
-    it('destroys nothing when no artifacts found', async () => {
+    it("destroys nothing when no artifacts found", async () => {
         mockListWithoutAssets()
         const destroyer = createDestroyer()
 
         await destroyer.destroyArtifacts(releaseId)
 
-        expect(deleteMock).toBeCalledTimes(0)
+        expect(deleteMock).toHaveBeenCalledTimes(0)
     })
 
-    it('throws when delete call fails', async () => {
+    it("throws when delete call fails", async () => {
         mockListWithAssets()
         mockDeleteError()
         const destroyer = createDestroyer()
-        
+
         expect.hasAssertions()
         try {
             await destroyer.destroyArtifacts(releaseId)
@@ -57,7 +53,8 @@ describe('ArtifactDestroyer', () => {
                 listArtifactsForRelease: listArtifactsMock,
                 listReleases: jest.fn(),
                 update: jest.fn(),
-                uploadArtifact: jest.fn()
+                uploadArtifact: jest.fn(),
+                generateReleaseNotes: jest.fn(),
             }
         })
         return new GithubArtifactDestroyer(new MockReleases())
@@ -75,16 +72,16 @@ describe('ArtifactDestroyer', () => {
         listArtifactsMock.mockResolvedValue([
             {
                 name: "art1",
-                id: 1
+                id: 1,
             },
             {
                 name: "art2",
-                id: 2
-            }
+                id: 2,
+            },
         ])
     }
 
     function mockListWithoutAssets() {
         listArtifactsMock.mockResolvedValue([])
     }
-});
+})
