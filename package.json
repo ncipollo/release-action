@@ -59,7 +59,7 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
-    "@types/node": "^22.10.3",
+    "@types/node": "^22.13.4",
     "glob": "^11.0.1",
     "untildify": "^4.0.0"
   },
