@@ -1,6 +1,5 @@
 export class ReleaseValidator {
-    constructor(private updateOnlyUnreleased: boolean) {
-    }
+    constructor(private updateOnlyUnreleased: boolean) {}
 
     validateReleaseUpdate(releaseResponse: ReleaseStageArguments) {
         if (!this.updateOnlyUnreleased) {
@@ -8,7 +7,9 @@ export class ReleaseValidator {
         }
 
         if (!releaseResponse.draft && !releaseResponse.prerelease) {
-            throw new Error(`Tried to update "${releaseResponse.name ?? "release"}" which is neither a draft or prerelease. (updateOnlyUnreleased is on)`)
+            throw new Error(
+                `Tried to update "${releaseResponse.name ?? "release"}" which is neither a draft or prerelease. (updateOnlyUnreleased is on)`
+            )
         }
     }
 }

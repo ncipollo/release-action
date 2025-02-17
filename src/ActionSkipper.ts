@@ -1,19 +1,20 @@
-import {Releases} from "./Releases";
+import { Releases } from "./Releases"
 
 export interface ActionSkipper {
     shouldSkip(): Promise<boolean>
 }
 
 export class ReleaseActionSkipper {
-    constructor(private skipIfReleaseExists: boolean,
-                private releases: Releases,
-                private tag: string) {
-    }
+    constructor(
+        private skipIfReleaseExists: boolean,
+        private releases: Releases,
+        private tag: string
+    ) {}
 
     async shouldSkip(): Promise<boolean> {
         if (!this.skipIfReleaseExists) {
             // Bail if skip flag isn't set.
-            return false;
+            return false
         }
 
         try {
@@ -21,7 +22,7 @@ export class ReleaseActionSkipper {
             return getResponse.data != null
         } catch (error: any) {
             // There is either no release or something else went wrong. Either way, run the action.
-            return false;
+            return false
         }
     }
 }

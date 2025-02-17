@@ -323,14 +323,15 @@ class FileArtifactGlobber {
     }
     globArtifactString(artifact, contentType, errorsFailBuild) {
         const split = /[,\n]/;
-        return artifact.split(split)
-            .map(path => path.trimStart())
-            .map(path => PathNormalizer_1.PathNormalizer.normalizePath(path))
-            .map(path => FileArtifactGlobber.expandPath(path))
-            .map(pattern => this.globPattern(pattern, errorsFailBuild))
+        return artifact
+            .split(split)
+            .map((path) => path.trimStart())
+            .map((path) => PathNormalizer_1.PathNormalizer.normalizePath(path))
+            .map((path) => FileArtifactGlobber.expandPath(path))
+            .map((pattern) => this.globPattern(pattern, errorsFailBuild))
             .map((globResult) => FileArtifactGlobber.validatePattern(errorsFailBuild, globResult[1], globResult[0]))
             .reduce((accumulated, current) => accumulated.concat(current))
-            .map(path => new Artifact_1.Artifact(path, contentType));
+            .map((path) => new Artifact_1.Artifact(path, contentType));
     }
     globPattern(pattern, errorsFailBuild) {
         const paths = this.globber.glob(pattern);
@@ -527,7 +528,7 @@ class GithubArtifactUploader {
     async deleteUpdatedArtifacts(artifacts, releaseId) {
         const releaseAssets = await this.releases.listArtifactsForRelease(releaseId);
         const assetByName = {};
-        releaseAssets.forEach(asset => {
+        releaseAssets.forEach((asset) => {
             assetByName[asset.name] = asset;
         });
         for (const artifact of artifacts) {
@@ -618,13 +619,13 @@ class GithubErrorDetail {
     toString() {
         const code = this.error.code;
         switch (code) {
-            case 'missing':
+            case "missing":
                 return this.missingResourceMessage();
-            case 'missing_field':
+            case "missing_field":
                 return this.missingFieldMessage();
-            case 'invalid':
+            case "invalid":
                 return this.invalidFieldMessage();
-            case 'already_exists':
+            case "already_exists":
                 return this.resourceAlreadyExists();
             default:
                 return this.customErrorMessage();
@@ -734,46 +735,45 @@ class CoreInputs {
         this.context = context;
     }
     get allowUpdates() {
-        const allow = core.getInput('allowUpdates');
-        return allow == 'true';
+        const allow = core.getInput("allowUpdates");
+        return allow == "true";
     }
     get artifacts() {
-        let artifacts = core.getInput('artifacts');
+        let artifacts = core.getInput("artifacts");
         if (!artifacts) {
-            artifacts = core.getInput('artifact');
+            artifacts = core.getInput("artifact");
         }
         if (artifacts) {
-            let contentType = core.getInput('artifactContentType');
+            let contentType = core.getInput("artifactContentType");
             if (!contentType) {
-                contentType = 'raw';
+                contentType = "raw";
             }
-            return this.artifactGlobber
-                .globArtifactString(artifacts, contentType, this.artifactErrorsFailBuild);
+            return this.artifactGlobber.globArtifactString(artifacts, contentType, this.artifactErrorsFailBuild);
         }
         return [];
     }
     get artifactErrorsFailBuild() {
-        const allow = core.getInput('artifactErrorsFailBuild');
-        return allow == 'true';
+        const allow = core.getInput("artifactErrorsFailBuild");
+        return allow == "true";
     }
     get body() {
-        const body = core.getInput('body');
+        const body = core.getInput("body");
         if (body) {
             return body;
         }
-        const bodyFile = core.getInput('bodyFile');
+        const bodyFile = core.getInput("bodyFile");
         if (bodyFile) {
             return this.stringFromFile(bodyFile);
         }
-        return '';
+        return "";
     }
     get createdDraft() {
-        const draft = core.getInput('draft');
-        return draft == 'true';
+        const draft = core.getInput("draft");
+        return draft == "true";
     }
     get createdPrerelease() {
-        const preRelease = core.getInput('prerelease');
-        return preRelease == 'true';
+        const preRelease = core.getInput("prerelease");
+        return preRelease == "true";
     }
     get createdReleaseBody() {
         if (CoreInputs.omitBody)
@@ -781,7 +781,7 @@ class CoreInputs {
         return this.body;
     }
     static get omitBody() {
-        return core.getInput('omitBody') == 'true';
+        return core.getInput("omitBody") == "true";
     }
     get createdReleaseName() {
         if (CoreInputs.omitName)
@@ -789,57 +789,57 @@ class CoreInputs {
         return this.name;
     }
     static get omitName() {
-        return core.getInput('omitName') == 'true';
+        return core.getInput("omitName") == "true";
     }
     get commit() {
-        const commit = core.getInput('commit');
+        const commit = core.getInput("commit");
         if (commit) {
             return commit;
         }
         return undefined;
     }
     get discussionCategory() {
-        const category = core.getInput('discussionCategory');
+        const category = core.getInput("discussionCategory");
         if (category) {
             return category;
         }
         return undefined;
     }
     get name() {
-        const name = core.getInput('name');
+        const name = core.getInput("name");
         if (name) {
             return name;
         }
         return this.tag;
     }
     get generateReleaseNotes() {
-        const generate = core.getInput('generateReleaseNotes');
-        return generate == 'true';
+        const generate = core.getInput("generateReleaseNotes");
+        return generate == "true";
     }
     get makeLatest() {
-        let latest = core.getInput('makeLatest');
+        let latest = core.getInput("makeLatest");
         if (latest == "true" || latest == "false" || latest == "legacy") {
             return latest;
         }
         return undefined;
     }
     get owner() {
-        let owner = core.getInput('owner');
+        let owner = core.getInput("owner");
         if (owner) {
             return owner;
         }
         return this.context.repo.owner;
     }
     get removeArtifacts() {
-        const removes = core.getInput('removeArtifacts');
-        return removes == 'true';
+        const removes = core.getInput("removeArtifacts");
+        return removes == "true";
     }
     get replacesArtifacts() {
-        const replaces = core.getInput('replacesArtifacts');
-        return replaces == 'true';
+        const replaces = core.getInput("replacesArtifacts");
+        return replaces == "true";
     }
     get repo() {
-        let repo = core.getInput('repo');
+        let repo = core.getInput("repo");
         if (repo) {
             return repo;
         }
@@ -849,7 +849,7 @@ class CoreInputs {
         return core.getBooleanInput("skipIfReleaseExists");
     }
     get tag() {
-        const tag = core.getInput('tag');
+        const tag = core.getInput("tag");
         if (tag) {
             return tag;
         }
@@ -861,7 +861,7 @@ class CoreInputs {
         throw Error("No tag found in ref or input!");
     }
     get token() {
-        return core.getInput('token', { required: true });
+        return core.getInput("token", { required: true });
     }
     get updatedDraft() {
         if (CoreInputs.omitDraftDuringUpdate)
@@ -869,7 +869,7 @@ class CoreInputs {
         return this.createdDraft;
     }
     static get omitDraftDuringUpdate() {
-        return core.getInput('omitDraftDuringUpdate') == 'true';
+        return core.getInput("omitDraftDuringUpdate") == "true";
     }
     get updatedPrerelease() {
         if (CoreInputs.omitPrereleaseDuringUpdate)
@@ -877,7 +877,7 @@ class CoreInputs {
         return this.createdPrerelease;
     }
     static get omitPrereleaseDuringUpdate() {
-        return core.getInput('omitPrereleaseDuringUpdate') == 'true';
+        return core.getInput("omitPrereleaseDuringUpdate") == "true";
     }
     get updatedReleaseBody() {
         if (CoreInputs.omitBody || CoreInputs.omitBodyDuringUpdate)
@@ -885,7 +885,7 @@ class CoreInputs {
         return this.body;
     }
     static get omitBodyDuringUpdate() {
-        return core.getInput('omitBodyDuringUpdate') == 'true';
+        return core.getInput("omitBodyDuringUpdate") == "true";
     }
     get updatedReleaseName() {
         if (CoreInputs.omitName || CoreInputs.omitNameDuringUpdate)
@@ -893,13 +893,13 @@ class CoreInputs {
         return this.name;
     }
     get updateOnlyUnreleased() {
-        return core.getInput('updateOnlyUnreleased') == 'true';
+        return core.getInput("updateOnlyUnreleased") == "true";
     }
     static get omitNameDuringUpdate() {
-        return core.getInput('omitNameDuringUpdate') == 'true';
+        return core.getInput("omitNameDuringUpdate") == "true";
     }
     stringFromFile(path) {
-        return (0, fs_1.readFileSync)(path, 'utf-8');
+        return (0, fs_1.readFileSync)(path, "utf-8");
     }
 }
 exports.CoreInputs = CoreInputs;
@@ -950,9 +950,9 @@ exports.CoreOutputs = void 0;
 const core = __importStar(__nccwpck_require__(4962));
 class CoreOutputs {
     applyReleaseData(releaseData) {
-        core.setOutput('id', releaseData.id);
-        core.setOutput('html_url', releaseData.html_url);
-        core.setOutput('upload_url', releaseData.upload_url);
+        core.setOutput("id", releaseData.id);
+        core.setOutput("html_url", releaseData.html_url);
+        core.setOutput("upload_url", releaseData.upload_url);
     }
 }
 exports.CoreOutputs = CoreOutputs;
@@ -1168,7 +1168,7 @@ async function run() {
     }
 }
 function createAction() {
-    const token = core.getInput('token');
+    const token = core.getInput("token");
     const context = github.context;
     const git = github.getOctokit(token);
     const globber = new ArtifactGlobber_1.FileArtifactGlobber();
@@ -17124,6 +17124,14 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(8253)
 const { File: UndiciFile } = __nccwpck_require__(9375)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(4148)
 
+let random
+try {
+  const crypto = __nccwpck_require__(7598)
+  random = (max) => crypto.randomInt(0, max)
+} catch {
+  random = (max) => Math.floor(Math.random(max))
+}
+
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -17209,7 +17217,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -31411,6 +31419,14 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 7598:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:crypto");
 
 /***/ }),
 

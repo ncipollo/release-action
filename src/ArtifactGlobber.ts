@@ -1,9 +1,9 @@
-import * as core from '@actions/core';
-import {Globber, FileGlobber} from "./Globber";
-import {Artifact} from "./Artifact";
-import untildify from "untildify";
-import {ArtifactPathValidator} from "./ArtifactPathValidator";
-import {PathNormalizer} from "./PathNormalizer";
+import * as core from "@actions/core"
+import { Globber, FileGlobber } from "./Globber"
+import { Artifact } from "./Artifact"
+import untildify from "untildify"
+import { ArtifactPathValidator } from "./ArtifactPathValidator"
+import { PathNormalizer } from "./PathNormalizer"
 
 export interface ArtifactGlobber {
     globArtifactString(artifact: string, contentType: string, errorsFailBuild: boolean): Artifact[]
@@ -18,14 +18,15 @@ export class FileArtifactGlobber implements ArtifactGlobber {
 
     globArtifactString(artifact: string, contentType: string, errorsFailBuild: boolean): Artifact[] {
         const split = /[,\n]/
-        return artifact.split(split)
-            .map(path => path.trimStart())
-            .map(path => PathNormalizer.normalizePath(path))
-            .map(path => FileArtifactGlobber.expandPath(path))
-            .map(pattern => this.globPattern(pattern, errorsFailBuild))
+        return artifact
+            .split(split)
+            .map((path) => path.trimStart())
+            .map((path) => PathNormalizer.normalizePath(path))
+            .map((path) => FileArtifactGlobber.expandPath(path))
+            .map((pattern) => this.globPattern(pattern, errorsFailBuild))
             .map((globResult) => FileArtifactGlobber.validatePattern(errorsFailBuild, globResult[1], globResult[0]))
             .reduce((accumulated, current) => accumulated.concat(current))
-            .map(path => new Artifact(path, contentType))
+            .map((path) => new Artifact(path, contentType))
     }
 
     private globPattern(pattern: string, errorsFailBuild: boolean): [string, string[]] {

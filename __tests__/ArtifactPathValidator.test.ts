@@ -1,20 +1,20 @@
 const directoryMock = jest.fn()
 const warnMock = jest.fn()
 
-import {ArtifactPathValidator} from "../src/ArtifactPathValidator";
+import { ArtifactPathValidator } from "../src/ArtifactPathValidator"
 
-const pattern = 'pattern'
+const pattern = "pattern"
 
-jest.mock('@actions/core', () => {
-    return {warning: warnMock};
+jest.mock("@actions/core", () => {
+    return { warning: warnMock }
 })
 
-jest.mock('fs', () => {
+jest.mock("fs", () => {
     return {
         statSync: () => {
-            return {isDirectory: directoryMock}
-        }
-    };
+            return { isDirectory: directoryMock }
+        },
+    }
 })
 
 describe("ArtifactPathValidator", () => {
@@ -24,14 +24,14 @@ describe("ArtifactPathValidator", () => {
     })
 
     it("warns and filters out path which points to a directory", () => {
-        const paths = ['path1', 'path2']
+        const paths = ["path1", "path2"]
         directoryMock.mockReturnValueOnce(true).mockReturnValueOnce(false)
 
         const validator = new ArtifactPathValidator(false, paths, pattern)
 
         const result = validator.validate()
         expect(warnMock).toBeCalled()
-        expect(result).toEqual(['path2'])
+        expect(result).toEqual(["path2"])
     })
 
     it("warns when no glob results are produced and empty results shouldn't throw", () => {
@@ -48,7 +48,7 @@ describe("ArtifactPathValidator", () => {
     })
 
     it("throws when path points to directory", () => {
-        const paths = ['path1', 'path2']
+        const paths = ["path1", "path2"]
         directoryMock.mockReturnValueOnce(true).mockReturnValueOnce(false)
 
         const validator = new ArtifactPathValidator(true, paths, pattern)
