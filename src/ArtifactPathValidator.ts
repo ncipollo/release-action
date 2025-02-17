@@ -1,29 +1,29 @@
-import * as core from "@actions/core";
-import {statSync} from "fs";
+import * as core from "@actions/core"
+import { statSync } from "fs"
 
 export class ArtifactPathValidator {
-    private readonly errorsFailBuild: boolean;
-    private paths: string[];
+    private readonly errorsFailBuild: boolean
+    private paths: string[]
     private readonly pattern: string
-    
+
     constructor(errorsFailBuild: boolean, paths: string[], pattern: string) {
-        this.paths = paths;
+        this.paths = paths
         this.pattern = pattern
-        this.errorsFailBuild = errorsFailBuild;
+        this.errorsFailBuild = errorsFailBuild
     }
-    
+
     validate(): string[] {
         this.verifyPathsNotEmpty()
         return this.paths.filter((path) => this.verifyNotDirectory(path))
     }
-    
+
     private verifyPathsNotEmpty() {
         if (this.paths.length == 0) {
             const message = `Artifact pattern:${this.pattern} did not match any files`
             this.reportError(message)
         }
     }
-    
+
     private verifyNotDirectory(path: string): boolean {
         const isDir = statSync(path).isDirectory()
         if (isDir) {
@@ -32,7 +32,7 @@ export class ArtifactPathValidator {
         }
         return !isDir
     }
-    
+
     private reportError(message: string) {
         if (this.errorsFailBuild) {
             throw Error(message)

@@ -1,5 +1,5 @@
-import { basename } from "path";
-import {createReadStream, readFileSync, ReadStream, statSync} from "fs";
+import { basename } from "path"
+import { createReadStream, readFileSync, ReadStream, statSync } from "fs"
 
 export class Artifact {
     readonly contentType: string
@@ -9,7 +9,7 @@ export class Artifact {
     constructor(path: string, contentType: string = "raw") {
         this.path = path
         this.name = basename(path)
-        this.contentType = contentType;
+        this.contentType = contentType
     }
 
     get contentLength(): number {

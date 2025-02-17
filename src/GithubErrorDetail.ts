@@ -1,5 +1,5 @@
 export class GithubErrorDetail {
-    private error: any;
+    private error: any
 
     constructor(error: any) {
         this.error = error
@@ -12,13 +12,13 @@ export class GithubErrorDetail {
     toString(): string {
         const code = this.error.code
         switch (code) {
-            case 'missing':
+            case "missing":
                 return this.missingResourceMessage()
-            case 'missing_field':
+            case "missing_field":
                 return this.missingFieldMessage()
-            case 'invalid':
+            case "invalid":
                 return this.invalidFieldMessage()
-            case 'already_exists':
+            case "already_exists":
                 return this.resourceAlreadyExists()
             default:
                 return this.customErrorMessage()
@@ -26,7 +26,7 @@ export class GithubErrorDetail {
     }
 
     private customErrorMessage(): string {
-        const message = this.error.message;
+        const message = this.error.message
         const documentation = this.error.documentation_url
 
         let documentationMessage: string

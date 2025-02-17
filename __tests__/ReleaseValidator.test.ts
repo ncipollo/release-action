@@ -1,13 +1,13 @@
-import {ReleaseValidator} from "../src/ReleaseValidator";
+import { ReleaseValidator } from "../src/ReleaseValidator"
 
 describe("validateReleaseUpdate", () => {
     describe("updateOnlyUnreleased is disabled", () => {
         const validator = new ReleaseValidator(false)
-        it('should not throw', () => {
+        it("should not throw", () => {
             const releaseResponse = {
                 draft: false,
                 prerelease: false,
-                name: "Name"
+                name: "Name",
             }
             expect(() => {
                 validator.validateReleaseUpdate(releaseResponse)
@@ -16,55 +16,55 @@ describe("validateReleaseUpdate", () => {
     })
     describe("updateOnlyUnreleased is enabled", () => {
         const validator = new ReleaseValidator(true)
-        it('should throw if neither draft or prerelease are enabled', () => {
+        it("should throw if neither draft or prerelease are enabled", () => {
             const releaseResponse = {
                 draft: false,
                 prerelease: false,
-                name: "Name"
+                name: "Name",
             }
             expect(() => {
                 validator.validateReleaseUpdate(releaseResponse)
             }).toThrow()
         })
-        
-        it('should not throw if draft is enabled', () => {
+
+        it("should not throw if draft is enabled", () => {
             const releaseResponse = {
                 draft: true,
                 prerelease: false,
-                name: "Name"
+                name: "Name",
             }
             expect(() => {
                 validator.validateReleaseUpdate(releaseResponse)
             }).not.toThrow()
         })
 
-        it('should not throw if prerelease is enabled', () => {
+        it("should not throw if prerelease is enabled", () => {
             const releaseResponse = {
                 draft: false,
                 prerelease: true,
-                name: "Name"
+                name: "Name",
             }
             expect(() => {
                 validator.validateReleaseUpdate(releaseResponse)
             }).not.toThrow()
         })
 
-        it('should not throw if draft & prerelease is enabled', () => {
+        it("should not throw if draft & prerelease is enabled", () => {
             const releaseResponse = {
                 draft: true,
                 prerelease: true,
-                name: "Name"
+                name: "Name",
             }
             expect(() => {
                 validator.validateReleaseUpdate(releaseResponse)
             }).not.toThrow()
         })
 
-        it('should default error message release name to release', () => {
+        it("should default error message release name to release", () => {
             const releaseResponse = {
                 draft: false,
                 prerelease: false,
-                name: null
+                name: null,
             }
             expect(() => {
                 validator.validateReleaseUpdate(releaseResponse)

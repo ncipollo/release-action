@@ -1,13 +1,12 @@
-import {Releases} from "./Releases";
-import * as core from "@actions/core";
+import { Releases } from "./Releases"
+import * as core from "@actions/core"
 
 export interface ArtifactDestroyer {
     destroyArtifacts(releaseId: number): Promise<void>
 }
 
 export class GithubArtifactDestroyer implements ArtifactDestroyer {
-    constructor(private releases: Releases) {
-    }
+    constructor(private releases: Releases) {}
 
     async destroyArtifacts(releaseId: number): Promise<void> {
         const releaseAssets = await this.releases.listArtifactsForRelease(releaseId)

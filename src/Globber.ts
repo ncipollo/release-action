@@ -1,5 +1,4 @@
-import {globSync} from "glob";
-
+import { globSync } from "glob"
 
 export interface Globber {
     glob(pattern: string): string[]

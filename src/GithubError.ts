@@ -1,4 +1,4 @@
-import {GithubErrorDetail} from "./GithubErrorDetail"
+import { GithubErrorDetail } from "./GithubErrorDetail"
 
 export class GithubError {
     private error: any
@@ -40,7 +40,7 @@ export class GithubError {
     private errorBulletedList(errors: GithubErrorDetail[]): string {
         return errors.map((err) => `- ${err}`).join("\n")
     }
-    
+
     private remediation(): String {
         if (this.status == 404) {
             return "\nMake sure your github token has access to the repo and has permission to author releases"
@@ -48,4 +48,3 @@ export class GithubError {
         return ""
     }
 }
-
