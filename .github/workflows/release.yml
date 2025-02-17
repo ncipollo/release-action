@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+    tags-ignore:
+      - 'v1'
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    name: Create Release
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          draft: true
+          generateReleaseNotes: true
