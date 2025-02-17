@@ -1,0 +1,5 @@
+[repository]
+enable_commit = true
+
+[scripts]
+before_commit = "yarn release"
