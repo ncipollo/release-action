@@ -4,11 +4,10 @@ on:
   push:
     tags:
       - '*'
-    tags-ignore:
-      - 'v1'
 
 jobs:
   create_release:
+    if: github.ref != 'refs/tags/v1'
     runs-on: ubuntu-latest
     name: Create Release
 
