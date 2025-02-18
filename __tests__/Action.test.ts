@@ -216,6 +216,34 @@ describe("Action", () => {
         expect(uploadMock).not.toHaveBeenCalled()
     })
 
+    it("throws error when list has no data", async () => {
+        const action = createAction(true, true)
+        getMock.mockRejectedValue({ status: 404 })
+        const error = {
+            errors: [
+                {
+                    code: "already_exists",
+                },
+            ],
+        }
+
+        createMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({})
+        expect.hasAssertions()
+        try {
+            await action.perform()
+        } catch (error) {
+            expect(error).toEqual(Error("No releases found. Response: {}"))
+        }
+
+        expect(listMock).toHaveBeenCalled()
+        expect(createMock).not.toHaveBeenCalled()
+        expect(updateMock).not.toHaveBeenCalled()
+        expect(getMock).toHaveBeenCalledWith(tag)
+        expect(updateMock).not.toHaveBeenCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
+    })
+
     it("throws error when update fails", async () => {
         const action = createAction(true, true)
 
@@ -337,7 +365,10 @@ describe("Action", () => {
     })
 
     function assertOutputApplied() {
-        expect(applyReleaseDataMock).toHaveBeenCalledWith({ id: releaseId, upload_url: url })
+        expect(applyReleaseDataMock).toHaveBeenCalledWith({
+            id: releaseId,
+            upload_url: url,
+        })
     }
 
     function createAction(allowUpdates: boolean, hasArtifact: boolean, removeArtifacts = false): Action {
