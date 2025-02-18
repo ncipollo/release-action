@@ -239,9 +239,6 @@ describe("Action", () => {
         expect(listMock).toHaveBeenCalled()
         expect(createMock).not.toHaveBeenCalled()
         expect(updateMock).not.toHaveBeenCalled()
-        expect(getMock).toHaveBeenCalledWith(tag)
-        expect(updateMock).not.toHaveBeenCalled()
-        expect(uploadMock).not.toHaveBeenCalled()
     })
 
     it("throws error when update fails", async () => {

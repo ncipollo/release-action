@@ -1,5 +1,6 @@
 node_modules/
 __tests__/runner/*
+.DS_Store
 
 # Created by https://www.gitignore.io/api/webstorm
 # Edit at https://www.gitignore.io/?templates=webstorm
