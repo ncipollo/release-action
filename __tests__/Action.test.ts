@@ -321,6 +321,34 @@ describe("Action", () => {
         assertOutputApplied()
     })
 
+    it("updates draft release with static body", async () => {
+        const action = createAction(true, true, false, false)
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({
+            data: [
+                { id: 123, draft: false, tag_name: tag },
+                { id: id, draft: true, tag_name: tag },
+            ],
+        })
+
+        await action.perform()
+
+        expect(updateMock).toHaveBeenCalledWith(
+            id,
+            tag,
+            updateBody,
+            commit,
+            discussionCategory,
+            updateDraft,
+            makeLatest,
+            updateName,
+            updatePrerelease
+        )
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
+        assertOutputApplied()
+    })
+
     it("updates release but does not upload if no artifact", async () => {
         const action = createAction(true, false)
 
@@ -368,7 +396,12 @@ describe("Action", () => {
         })
     }
 
-    function createAction(allowUpdates: boolean, hasArtifact: boolean, removeArtifacts = false): Action {
+    function createAction(
+        allowUpdates: boolean,
+        hasArtifact: boolean,
+        removeArtifacts = false,
+        generateReleaseNotes = true
+    ): Action {
         let inputArtifact: Artifact[]
 
         if (hasArtifact) {
@@ -421,24 +454,24 @@ describe("Action", () => {
 
         const MockInputs = jest.fn<Inputs, any>(() => {
             return {
-                allowUpdates: allowUpdates,
+                allowUpdates,
                 artifactErrorsFailBuild: true,
                 artifacts: inputArtifact,
                 createdDraft: createDraft,
                 createdReleaseBody: createBody,
                 createdReleaseName: createName,
-                commit: commit,
-                discussionCategory: discussionCategory,
-                generateReleaseNotes: true,
+                commit,
+                discussionCategory,
+                generateReleaseNotes,
                 makeLatest: makeLatest,
                 owner: "owner",
                 createdPrerelease: createPrerelease,
-                replacesArtifacts: replacesArtifacts,
-                removeArtifacts: removeArtifacts,
+                replacesArtifacts,
+                removeArtifacts,
                 repo: "repo",
                 skipIfReleaseExists: false,
-                tag: tag,
-                token: token,
+                tag,
+                token,
                 updatedDraft: updateDraft,
                 updatedReleaseBody: updateBody,
                 updatedReleaseName: updateName,
