@@ -1,5 +1,5 @@
-import { ActionSkipper, ReleaseActionSkipper } from "../src/ActionSkipper"
-import { Releases } from "../src/Releases"
+import { ReleaseActionSkipper } from "../src/ActionSkipper"
+import type { Releases } from "../src/Releases"
 
 describe("shouldSkip", () => {
     const getMock = jest.fn()
@@ -13,6 +13,7 @@ describe("shouldSkip", () => {
             listReleases: jest.fn(),
             update: jest.fn(),
             uploadArtifact: jest.fn(),
+            generateReleaseNotes: jest.fn(),
         }
     })
 

@@ -1,11 +1,11 @@
 import { Action } from "../src/Action"
+import type { ActionSkipper } from "../src/ActionSkipper"
 import { Artifact } from "../src/Artifact"
-import { Inputs } from "../src/Inputs"
-import { Releases } from "../src/Releases"
-import { ArtifactUploader } from "../src/ArtifactUploader"
-import { Outputs } from "../src/Outputs"
-import { ArtifactDestroyer } from "../src/ArtifactDestroyer"
-import { ActionSkipper } from "../src/ActionSkipper"
+import type { ArtifactDestroyer } from "../src/ArtifactDestroyer"
+import type { ArtifactUploader } from "../src/ArtifactUploader"
+import type { Inputs } from "../src/Inputs"
+import type { Outputs } from "../src/Outputs"
+import type { Releases } from "../src/Releases"
 
 const applyReleaseDataMock = jest.fn()
 const artifactDestroyMock = jest.fn()
@@ -17,6 +17,7 @@ const listMock = jest.fn()
 const shouldSkipMock = jest.fn()
 const updateMock = jest.fn()
 const uploadMock = jest.fn()
+const genReleaseNotesMock = jest.fn()
 
 const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
 
@@ -39,6 +40,7 @@ const updatePrerelease = false
 const updateOnlyUnreleased = false
 const url = "http://api.example.com"
 const makeLatest = "legacy"
+const generatedReleaseBody = "test release notes"
 
 describe("Action", () => {
     beforeEach(() => {
@@ -55,7 +57,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -66,7 +68,7 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
         assertOutputApplied()
     })
 
@@ -77,7 +79,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -88,7 +90,7 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
@@ -102,7 +104,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -113,7 +115,7 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
@@ -122,7 +124,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -133,7 +135,7 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
@@ -142,7 +144,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(artifactDestroyMock).toBeCalledWith(releaseId)
+        expect(artifactDestroyMock).toHaveBeenCalledWith(releaseId)
         assertOutputApplied()
     })
 
@@ -151,7 +153,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(artifactDestroyMock).not.toBeCalled()
+        expect(artifactDestroyMock).not.toHaveBeenCalled()
         assertOutputApplied()
     })
 
@@ -161,8 +163,8 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(createMock).not.toBeCalled()
-        expect(updateMock).not.toBeCalled()
+        expect(createMock).not.toHaveBeenCalled()
+        expect(updateMock).not.toHaveBeenCalled()
     })
 
     it("throws error when create fails", async () => {
@@ -176,7 +178,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -187,7 +189,7 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
     })
 
     it("throws error when get fails", async () => {
@@ -209,9 +211,9 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(getMock).toBeCalledWith(tag)
-        expect(updateMock).not.toBeCalled()
-        expect(uploadMock).not.toBeCalled()
+        expect(getMock).toHaveBeenCalledWith(tag)
+        expect(updateMock).not.toHaveBeenCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
     })
 
     it("throws error when list has no data", async () => {
@@ -234,9 +236,9 @@ describe("Action", () => {
             expect(error).toEqual(Error("No releases found. Response: {}"))
         }
 
-        expect(listMock).toBeCalled()
-        expect(createMock).not.toBeCalled()
-        expect(updateMock).not.toBeCalled()
+        expect(listMock).toHaveBeenCalled()
+        expect(createMock).not.toHaveBeenCalled()
+        expect(updateMock).not.toHaveBeenCalled()
     })
 
     it("throws error when update fails", async () => {
@@ -251,10 +253,10 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -262,7 +264,7 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
     })
 
     it("throws error when upload fails", async () => {
@@ -277,7 +279,7 @@ describe("Action", () => {
             expect(error).toEqual(expectedError)
         }
 
-        expect(createMock).toBeCalledWith(
+        expect(createMock).toHaveBeenCalledWith(
             tag,
             createBody,
             commit,
@@ -288,7 +290,7 @@ describe("Action", () => {
             createName,
             createPrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
     })
 
     it("updates draft release", async () => {
@@ -304,7 +306,35 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
+            id,
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            updateDraft,
+            makeLatest,
+            updateName,
+            updatePrerelease
+        )
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
+        assertOutputApplied()
+    })
+
+    it("updates draft release with static body", async () => {
+        const action = createAction(true, true, false, false)
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({
+            data: [
+                { id: 123, draft: false, tag_name: tag },
+                { id: id, draft: true, tag_name: tag },
+            ],
+        })
+
+        await action.perform()
+
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
             updateBody,
@@ -315,7 +345,7 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
@@ -324,10 +354,10 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -335,7 +365,7 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).not.toBeCalled()
+        expect(uploadMock).not.toHaveBeenCalled()
         assertOutputApplied()
     })
 
@@ -344,10 +374,10 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(updateMock).toBeCalledWith(
+        expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
-            updateBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             updateDraft,
@@ -355,21 +385,31 @@ describe("Action", () => {
             updateName,
             updatePrerelease
         )
-        expect(uploadMock).toBeCalledWith(artifacts, releaseId, url)
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
     })
 
     function assertOutputApplied() {
-        expect(applyReleaseDataMock).toBeCalledWith({ id: releaseId, upload_url: url })
+        expect(applyReleaseDataMock).toHaveBeenCalledWith({
+            id: releaseId,
+            upload_url: url,
+        })
     }
 
-    function createAction(allowUpdates: boolean, hasArtifact: boolean, removeArtifacts: boolean = false): Action {
+    function createAction(
+        allowUpdates: boolean,
+        hasArtifact: boolean,
+        removeArtifacts = false,
+        generateReleaseNotes = true
+    ): Action {
         let inputArtifact: Artifact[]
+
         if (hasArtifact) {
             inputArtifact = artifacts
         } else {
             inputArtifact = []
         }
+
         const MockReleases = jest.fn<Releases, any>(() => {
             return {
                 create: createMock,
@@ -379,6 +419,7 @@ describe("Action", () => {
                 listReleases: listMock,
                 update: updateMock,
                 uploadArtifact: jest.fn(),
+                generateReleaseNotes: genReleaseNotesMock,
             }
         })
 
@@ -386,6 +427,12 @@ describe("Action", () => {
             data: {
                 id: releaseId,
                 upload_url: url,
+            },
+        })
+
+        genReleaseNotesMock.mockResolvedValue({
+            data: {
+                body: generatedReleaseBody,
             },
         })
         getMock.mockResolvedValue({
@@ -407,24 +454,24 @@ describe("Action", () => {
 
         const MockInputs = jest.fn<Inputs, any>(() => {
             return {
-                allowUpdates: allowUpdates,
+                allowUpdates,
                 artifactErrorsFailBuild: true,
                 artifacts: inputArtifact,
                 createdDraft: createDraft,
                 createdReleaseBody: createBody,
                 createdReleaseName: createName,
-                commit: commit,
-                discussionCategory: discussionCategory,
-                generateReleaseNotes: true,
+                commit,
+                discussionCategory,
+                generateReleaseNotes,
                 makeLatest: makeLatest,
                 owner: "owner",
                 createdPrerelease: createPrerelease,
-                replacesArtifacts: replacesArtifacts,
-                removeArtifacts: removeArtifacts,
+                replacesArtifacts,
+                removeArtifacts,
                 repo: "repo",
                 skipIfReleaseExists: false,
-                tag: tag,
-                token: token,
+                tag,
+                token,
                 updatedDraft: updateDraft,
                 updatedReleaseBody: updateBody,
                 updatedReleaseName: updateName,

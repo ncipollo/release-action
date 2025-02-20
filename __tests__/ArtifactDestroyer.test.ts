@@ -1,8 +1,5 @@
-import { Artifact } from "../src/Artifact"
-import { GithubArtifactUploader } from "../src/ArtifactUploader"
-import { Releases } from "../src/Releases"
-import { RequestError } from "@octokit/request-error"
 import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer"
+import type { Releases } from "../src/Releases"
 
 const releaseId = 100
 
@@ -22,7 +19,7 @@ describe("ArtifactDestroyer", () => {
 
         await destroyer.destroyArtifacts(releaseId)
 
-        expect(deleteMock).toBeCalledTimes(2)
+        expect(deleteMock).toHaveBeenCalledTimes(2)
     })
 
     it("destroys nothing when no artifacts found", async () => {
@@ -31,7 +28,7 @@ describe("ArtifactDestroyer", () => {
 
         await destroyer.destroyArtifacts(releaseId)
 
-        expect(deleteMock).toBeCalledTimes(0)
+        expect(deleteMock).toHaveBeenCalledTimes(0)
     })
 
     it("throws when delete call fails", async () => {
@@ -57,6 +54,7 @@ describe("ArtifactDestroyer", () => {
                 listReleases: jest.fn(),
                 update: jest.fn(),
                 uploadArtifact: jest.fn(),
+                generateReleaseNotes: jest.fn(),
             }
         })
         return new GithubArtifactDestroyer(new MockReleases())

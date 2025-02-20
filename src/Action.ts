@@ -1,18 +1,18 @@
 import * as core from "@actions/core"
-import { Inputs } from "./Inputs"
-import {
+import type { ActionSkipper } from "./ActionSkipper"
+import type { ArtifactDestroyer } from "./ArtifactDestroyer"
+import type { ArtifactUploader } from "./ArtifactUploader"
+import { GithubError } from "./GithubError"
+import type { Inputs } from "./Inputs"
+import type { Outputs } from "./Outputs"
+import { ReleaseValidator } from "./ReleaseValidator"
+import type {
     CreateOrUpdateReleaseResponse,
     CreateReleaseResponse,
     ReleaseByTagResponse,
     Releases,
     UpdateReleaseResponse,
 } from "./Releases"
-import { ArtifactUploader } from "./ArtifactUploader"
-import { GithubError } from "./GithubError"
-import { Outputs } from "./Outputs"
-import { ArtifactDestroyer } from "./ArtifactDestroyer"
-import { ReleaseValidator } from "./ReleaseValidator"
-import { ActionSkipper } from "./ActionSkipper"
 
 export class Action {
     private inputs: Inputs
@@ -91,10 +91,17 @@ export class Action {
     }
 
     private async updateRelease(id: number): Promise<UpdateReleaseResponse> {
+        let releaseBody = this.inputs.updatedReleaseBody
+
+        if (this.inputs.generateReleaseNotes) {
+            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
+            releaseBody = response.data.body
+        }
+
         return await this.releases.update(
             id,
             this.inputs.tag,
-            this.inputs.updatedReleaseBody,
+            releaseBody,
             this.inputs.commit,
             this.inputs.discussionCategory,
             this.inputs.updatedDraft,
