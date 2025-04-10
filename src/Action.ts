@@ -95,7 +95,10 @@ export class Action {
 
         if (this.inputs.generateReleaseNotes) {
             const response = await this.releases.generateReleaseNotes(this.inputs.tag)
-            releaseBody = response.data.body
+            if (releaseBody) {
+                releaseBody += "\n\n"
+            }
+            releaseBody += response.data.body
         }
 
         return await this.releases.update(
