@@ -93,7 +93,7 @@ export class Action {
     private async updateRelease(id: number): Promise<UpdateReleaseResponse> {
         let releaseBody = this.inputs.updatedReleaseBody
 
-        if (this.inputs.generateReleaseNotes) {
+        if (this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate) {
             const response = await this.releases.generateReleaseNotes(this.inputs.tag)
             releaseBody = response.data.body
         }

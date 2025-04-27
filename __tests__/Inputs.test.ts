@@ -421,6 +421,17 @@ describe("Inputs", () => {
         })
     })
 
+    describe("omitBodyDuringUpdate", () => {
+        it("returns false", () => {
+            expect(inputs.omitBodyDuringUpdate).toBe(false)
+        })
+
+        it("returns true", () => {
+            mockGetInput.mockReturnValueOnce("true")
+            expect(inputs.omitBodyDuringUpdate).toBe(true)
+        })
+    })
+
     function createGlobber(): ArtifactGlobber {
         const MockGlobber = jest.fn<ArtifactGlobber, any>(() => {
             return {

@@ -16,6 +16,7 @@ export interface Inputs {
     readonly discussionCategory?: string
     readonly generateReleaseNotes: boolean
     readonly makeLatest?: "legacy" | "true" | "false" | undefined
+    readonly omitBodyDuringUpdate: boolean
     readonly owner: string
     readonly removeArtifacts: boolean
     readonly replacesArtifacts: boolean
@@ -217,8 +218,8 @@ export class CoreInputs implements Inputs {
         return this.body
     }
 
-    private static get omitBodyDuringUpdate(): boolean {
-        return core.getInput("omitBodyDuringUpdate") == "true"
+    get updateOnlyUnreleased(): boolean {
+        return core.getInput("updateOnlyUnreleased") == "true"
     }
 
     get updatedReleaseName(): string | undefined {
@@ -226,8 +227,12 @@ export class CoreInputs implements Inputs {
         return this.name
     }
 
-    get updateOnlyUnreleased(): boolean {
-        return core.getInput("updateOnlyUnreleased") == "true"
+    private static get omitBodyDuringUpdate(): boolean {
+        return core.getInput("omitBodyDuringUpdate") == "true"
+    }
+
+    get omitBodyDuringUpdate(): boolean {
+        return CoreInputs.omitBodyDuringUpdate
     }
 
     private static get omitNameDuringUpdate(): boolean {
