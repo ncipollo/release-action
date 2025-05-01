@@ -49,7 +49,7 @@
         "@actions/core": "^1.11.1",
         "@actions/github": "^6.0.0",
         "@types/node": "^22.13.8",
-        "glob": "^11.0.1",
+        "glob": "^11.0.2",
         "untildify": "^4.0.0"
     },
     "devDependencies": {
