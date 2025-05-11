@@ -389,6 +389,34 @@ describe("Action", () => {
         assertOutputApplied()
     })
 
+    it("updates release with static body when generateReleaseNotes is true but omitBodyDuringUpdate is true", async () => {
+        const action = createAction(true, true, false, true, true)
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({
+            data: [
+                { id: 123, draft: false, tag_name: tag },
+                { id: id, draft: true, tag_name: tag },
+            ],
+        })
+
+        await action.perform()
+
+        expect(updateMock).toHaveBeenCalledWith(
+            id,
+            tag,
+            updateBody,
+            commit,
+            discussionCategory,
+            updateDraft,
+            makeLatest,
+            updateName,
+            updatePrerelease
+        )
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
+        assertOutputApplied()
+    })
+
     function assertOutputApplied() {
         expect(applyReleaseDataMock).toHaveBeenCalledWith({
             id: releaseId,
@@ -400,7 +428,8 @@ describe("Action", () => {
         allowUpdates: boolean,
         hasArtifact: boolean,
         removeArtifacts = false,
-        generateReleaseNotes = true
+        generateReleaseNotes = true,
+        omitBodyDuringUpdate = false
     ): Action {
         let inputArtifact: Artifact[]
 
@@ -477,6 +506,7 @@ describe("Action", () => {
                 updatedReleaseName: updateName,
                 updatedPrerelease: updatePrerelease,
                 updateOnlyUnreleased: updateOnlyUnreleased,
+                omitBodyDuringUpdate,
             }
         })
         const MockOutputs = jest.fn<Outputs, any>(() => {

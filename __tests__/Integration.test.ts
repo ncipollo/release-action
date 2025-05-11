@@ -45,6 +45,7 @@ describe.skip("Integration Test", () => {
                 commit: undefined,
                 discussionCategory: "Release",
                 generateReleaseNotes: true,
+                omitBodyDuringUpdate: false,
                 owner: "ncipollo",
                 createdPrerelease: false,
                 replacesArtifacts: true,
