@@ -47,7 +47,7 @@
     },
     "dependencies": {
         "@actions/core": "^1.11.1",
-        "@actions/github": "^6.0.0",
+        "@actions/github": "^6.0.1",
         "@types/node": "^22.15.18",
         "glob": "^11.0.2",
         "untildify": "^4.0.0"
