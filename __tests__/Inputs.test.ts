@@ -83,31 +83,31 @@ describe("Inputs", () => {
             mockGetInput.mockReturnValueOnce("art1").mockReturnValueOnce("contentType").mockReturnValueOnce("true")
 
             expect(inputs.artifacts).toEqual(artifacts)
-            expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith("art1", "contentType", true)
+            expect(mockGlob).toHaveBeenCalledTimes(1)
+            expect(mockGlob).toHaveBeenCalledWith("art1", "contentType", true)
         })
 
         it("returns empty artifacts", () => {
             mockGetInput.mockReturnValueOnce("").mockReturnValueOnce("")
 
             expect(inputs.artifacts).toEqual([])
-            expect(mockGlob).toBeCalledTimes(0)
+            expect(mockGlob).toHaveBeenCalledTimes(0)
         })
 
         it("returns input.artifacts", () => {
             mockGetInput.mockReturnValueOnce("art1").mockReturnValueOnce("contentType").mockReturnValueOnce("false")
 
             expect(inputs.artifacts).toEqual(artifacts)
-            expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith("art1", "contentType", false)
+            expect(mockGlob).toHaveBeenCalledTimes(1)
+            expect(mockGlob).toHaveBeenCalledWith("art1", "contentType", false)
         })
 
         it("returns input.artifacts with default contentType", () => {
             mockGetInput.mockReturnValueOnce("art1").mockReturnValueOnce("").mockReturnValueOnce("false")
 
             expect(inputs.artifacts).toEqual(artifacts)
-            expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith("art1", "raw", false)
+            expect(mockGlob).toHaveBeenCalledTimes(1)
+            expect(mockGlob).toHaveBeenCalledWith("art1", "raw", false)
         })
 
         it("returns input.artifact", () => {
@@ -118,8 +118,8 @@ describe("Inputs", () => {
                 .mockReturnValueOnce("false")
 
             expect(inputs.artifacts).toEqual(artifacts)
-            expect(mockGlob).toBeCalledTimes(1)
-            expect(mockGlob).toBeCalledWith("art2", "contentType", false)
+            expect(mockGlob).toHaveBeenCalledTimes(1)
+            expect(mockGlob).toHaveBeenCalledWith("art2", "contentType", false)
         })
     })
 

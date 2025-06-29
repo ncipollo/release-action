@@ -39,8 +39,8 @@ describe("ArtifactGlobber", () => {
         const expectedArtifacts = globResults.map((path) => new Artifact(path, contentType))
 
         expect(globber.globArtifactString("~/path", "raw", false)).toEqual(expectedArtifacts)
-        expect(globMock).toBeCalledWith(untildify("~/path"))
-        expect(warnMock).not.toBeCalled()
+        expect(globMock).toHaveBeenCalledWith(untildify("~/path"))
+        expect(warnMock).not.toHaveBeenCalled()
     })
 
     it("globs simple path", () => {
@@ -49,8 +49,8 @@ describe("ArtifactGlobber", () => {
         const expectedArtifacts = globResults.map((path) => new Artifact(path, contentType))
 
         expect(globber.globArtifactString("path", "raw", false)).toEqual(expectedArtifacts)
-        expect(globMock).toBeCalledWith("path")
-        expect(warnMock).not.toBeCalled()
+        expect(globMock).toHaveBeenCalledWith("path")
+        expect(warnMock).not.toHaveBeenCalled()
     })
 
     it("splits multiple paths with comma separator", () => {
@@ -59,9 +59,9 @@ describe("ArtifactGlobber", () => {
         const expectedArtifacts = globResults.concat(globResults).map((path) => new Artifact(path, contentType))
 
         expect(globber.globArtifactString("path1,path2", "raw", false)).toEqual(expectedArtifacts)
-        expect(globMock).toBeCalledWith("path1")
-        expect(globMock).toBeCalledWith("path2")
-        expect(warnMock).not.toBeCalled()
+        expect(globMock).toHaveBeenCalledWith("path1")
+        expect(globMock).toHaveBeenCalledWith("path2")
+        expect(warnMock).not.toHaveBeenCalled()
     })
 
     it("splits multiple paths with new line separator and trims start", () => {
@@ -70,16 +70,16 @@ describe("ArtifactGlobber", () => {
         const expectedArtifacts = globResults.concat(globResults).map((path) => new Artifact(path, contentType))
 
         expect(globber.globArtifactString("path1\n  path2", "raw", false)).toEqual(expectedArtifacts)
-        expect(globMock).toBeCalledWith("path1")
-        expect(globMock).toBeCalledWith("path2")
-        expect(warnMock).not.toBeCalled()
+        expect(globMock).toHaveBeenCalledWith("path1")
+        expect(globMock).toHaveBeenCalledWith("path2")
+        expect(warnMock).not.toHaveBeenCalled()
     })
 
     it("warns when no glob results are produced and empty results shouldn't throw", () => {
         const globber = createArtifactGlobber([])
 
         expect(globber.globArtifactString("path", "raw", false)).toEqual([])
-        expect(warnMock).toBeCalled()
+        expect(warnMock).toHaveBeenCalled()
     })
 
     it("throws when no glob results are produced and empty results shouild throw", () => {

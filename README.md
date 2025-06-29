@@ -49,6 +49,8 @@ This action will create a GitHub release and optionally upload an artifact to it
 | id          | The identifier of the created release.        |
 | html_url    | The HTML URL of the release.                  |
 | upload_url  | The URL for [uploading assets](https://docs.github.com/en/rest/releases/assets?apiVersion=2022-11-28#upload-a-release-asset) to the release. |
+| tarball_url | The URL for downloading the release as a tarball (.tar.gz). |
+| zipball_url | The URL for downloading the release as a zipball (.zip). |
 
 ## Example
 This example will create a release when a tag is pushed:

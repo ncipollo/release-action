@@ -30,14 +30,14 @@ describe("ArtifactPathValidator", () => {
         const validator = new ArtifactPathValidator(false, paths, pattern)
 
         const result = validator.validate()
-        expect(warnMock).toBeCalled()
+        expect(warnMock).toHaveBeenCalled()
         expect(result).toEqual(["path2"])
     })
 
     it("warns when no glob results are produced and empty results shouldn't throw", () => {
         const validator = new ArtifactPathValidator(false, [], pattern)
         const result = validator.validate()
-        expect(warnMock).toBeCalled()
+        expect(warnMock).toHaveBeenCalled()
     })
 
     it("throws when no glob results are produced and empty results shouild throw", () => {

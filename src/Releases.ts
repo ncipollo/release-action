@@ -16,6 +16,8 @@ export type ReleaseData = {
     id: number
     html_url: string
     upload_url: string
+    tarball_url: string | null
+    zipball_url: string | null
 }
 
 export interface Releases {

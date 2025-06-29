@@ -7,6 +7,13 @@ import type { Inputs } from "../src/Inputs"
 import type { Outputs } from "../src/Outputs"
 import type { Releases } from "../src/Releases"
 
+const TEST_URLS = {
+    UPLOAD_URL: "http://api.example.com",
+    HTML_URL: "https://github.com/owner/repo/releases/tag/v1.0.0",
+    TARBALL_URL: "https://api.github.com/repos/owner/repo/tarball/v1.0.0",
+    ZIPBALL_URL: "https://api.github.com/repos/owner/repo/zipball/v1.0.0",
+} as const
+
 const applyReleaseDataMock = jest.fn()
 const artifactDestroyMock = jest.fn()
 const createMock = jest.fn()
@@ -38,7 +45,7 @@ const updateDraft = false
 const updateName = "updateName"
 const updatePrerelease = false
 const updateOnlyUnreleased = false
-const url = "http://api.example.com"
+const url = TEST_URLS.UPLOAD_URL
 const makeLatest = "legacy"
 const generatedReleaseBody = "test release notes"
 
@@ -421,6 +428,9 @@ describe("Action", () => {
         expect(applyReleaseDataMock).toHaveBeenCalledWith({
             id: releaseId,
             upload_url: url,
+            html_url: TEST_URLS.HTML_URL,
+            tarball_url: TEST_URLS.TARBALL_URL,
+            zipball_url: TEST_URLS.ZIPBALL_URL,
         })
     }
 
@@ -456,6 +466,9 @@ describe("Action", () => {
             data: {
                 id: releaseId,
                 upload_url: url,
+                html_url: TEST_URLS.HTML_URL,
+                tarball_url: TEST_URLS.TARBALL_URL,
+                zipball_url: TEST_URLS.ZIPBALL_URL,
             },
         })
 
@@ -477,6 +490,9 @@ describe("Action", () => {
             data: {
                 id: releaseId,
                 upload_url: url,
+                html_url: TEST_URLS.HTML_URL,
+                tarball_url: TEST_URLS.TARBALL_URL,
+                zipball_url: TEST_URLS.ZIPBALL_URL,
             },
         })
         uploadMock.mockResolvedValue({})
