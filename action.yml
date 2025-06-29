@@ -122,6 +122,12 @@ outputs:
     description: 'The HTML URL of the release.'
   upload_url:
     description: 'The URL for uploading assets to the release.'
+  tarball_url:
+    description: 'The URL for downloading the release as a tarball (.tar.gz).'
+  zipball_url:
+    description: 'The URL for downloading the release as a zipball (.zip).'
+  assets:
+    description: 'JSON string containing a map of asset names to download URLs for uploaded assets.'
 runs:
   using: 'node20'
   main: 'dist/index.js'

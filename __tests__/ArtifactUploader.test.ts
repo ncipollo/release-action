@@ -13,6 +13,15 @@ const deleteMock = jest.fn()
 const listArtifactsMock = jest.fn()
 const uploadMock = jest.fn()
 
+// Mock response with browser_download_url
+const mockUploadResponse = (name: string) => ({
+    data: {
+        browser_download_url: `https://github.com/octocat/Hello-World/releases/download/v1.0.0/${name}`,
+        name: name,
+        id: 1,
+    }
+})
+
 jest.mock("fs", () => {
     const originalFs = jest.requireActual("fs")
     return {
@@ -32,13 +41,48 @@ describe("ArtifactUploader", () => {
         uploadMock.mockClear()
     })
 
+    it("returns asset URLs when upload succeeds", async () => {
+        mockListWithoutAssets()
+        mockUploadSuccess()
+        const uploader = createUploader(true)
+
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
+
+        expect(result).toEqual({
+            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+        })
+        expect(uploadMock).toHaveBeenCalledTimes(2)
+    })
+
+    it("returns empty object when no artifacts are uploaded", async () => {
+        const uploader = createUploader(true)
+
+        const result = await uploader.uploadArtifacts([], releaseId, url)
+
+        expect(result).toEqual({})
+        expect(uploadMock).toHaveBeenCalledTimes(0)
+    })
+
+    it("excludes failed uploads from returned URLs", async () => {
+        mockListWithoutAssets()
+        mockUploadArtifact(401, 2)
+        const uploader = createUploader(true)
+
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
+
+        expect(result).toEqual({})
+        expect(uploadMock).toHaveBeenCalledTimes(2)
+    })
+
     it("abort when upload failed with non-5xx response", async () => {
         mockListWithoutAssets()
         mockUploadArtifact(401, 2)
         const uploader = createUploader(true)
 
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
+        expect(result).toEqual({})
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art2", releaseId)
@@ -51,8 +95,9 @@ describe("ArtifactUploader", () => {
         mockUploadArtifact(500, 4)
         const uploader = createUploader(true)
 
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
+        expect(result).toEqual({})
         expect(uploadMock).toHaveBeenCalledTimes(5)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
@@ -66,11 +111,15 @@ describe("ArtifactUploader", () => {
     it("replaces all artifacts", async () => {
         mockDeleteSuccess()
         mockListWithAssets()
-        mockUploadArtifact()
+        mockUploadSuccess()
         const uploader = createUploader(true)
 
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
+        expect(result).toEqual({
+            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+        })
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art2", releaseId)
@@ -83,11 +132,15 @@ describe("ArtifactUploader", () => {
     it("replaces no artifacts when previous asset list empty", async () => {
         mockDeleteSuccess()
         mockListWithoutAssets()
-        mockUploadArtifact()
+        mockUploadSuccess()
         const uploader = createUploader(true)
 
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
+        expect(result).toEqual({
+            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+        })
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art2", releaseId)
@@ -100,8 +153,9 @@ describe("ArtifactUploader", () => {
         mockUploadArtifact(500, 2)
         const uploader = createUploader(true)
 
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
+        expect(result).toEqual({})
         expect(uploadMock).toHaveBeenCalledTimes(4)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
@@ -127,7 +181,7 @@ describe("ArtifactUploader", () => {
     it("throws error from replace", async () => {
         mockDeleteError()
         mockListWithAssets()
-        mockUploadArtifact()
+        mockUploadSuccess()
         const uploader = createUploader(true)
 
         expect.hasAssertions()
@@ -141,11 +195,15 @@ describe("ArtifactUploader", () => {
     it("updates all artifacts, delete none", async () => {
         mockDeleteError()
         mockListWithAssets()
-        mockUploadArtifact()
+        mockUploadSuccess()
         const uploader = createUploader(false)
 
-        await uploader.uploadArtifacts(artifacts, releaseId, url)
+        const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
+        expect(result).toEqual({
+            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+        })
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art2", releaseId)
@@ -192,6 +250,10 @@ describe("ArtifactUploader", () => {
 
     function mockListWithoutAssets() {
         listArtifactsMock.mockResolvedValue([])
+    }
+
+    function mockUploadSuccess() {
+        uploadMock.mockImplementation((_, __, ___, ____, name) => Promise.resolve(mockUploadResponse(name)))
     }
 
     function mockUploadArtifact(status = 200, failures = 0) {

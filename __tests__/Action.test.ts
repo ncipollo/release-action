@@ -15,6 +15,7 @@ const TEST_URLS = {
 } as const
 
 const applyReleaseDataMock = jest.fn()
+const applyAssetUrlsMock = jest.fn()
 const artifactDestroyMock = jest.fn()
 const createMock = jest.fn()
 const deleteMock = jest.fn()
@@ -51,6 +52,8 @@ const generatedReleaseBody = "test release notes"
 
 describe("Action", () => {
     beforeEach(() => {
+        applyReleaseDataMock.mockClear()
+        applyAssetUrlsMock.mockClear()
         createMock.mockClear()
         getMock.mockClear()
         listMock.mockClear()
@@ -77,6 +80,7 @@ describe("Action", () => {
         )
         expect(uploadMock).not.toHaveBeenCalled()
         assertOutputApplied()
+        assertAssetUrlsApplied({})
     })
 
     it("creates release if no release exists to update", async () => {
@@ -99,6 +103,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("creates release if no draft releases", async () => {
@@ -124,6 +132,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("creates release then uploads artifact", async () => {
@@ -144,6 +156,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("removes all artifacts when artifact destroyer is enabled", async () => {
@@ -153,6 +169,10 @@ describe("Action", () => {
 
         expect(artifactDestroyMock).toHaveBeenCalledWith(releaseId)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("removes no artifacts when artifact destroyer is disabled", async () => {
@@ -162,6 +182,10 @@ describe("Action", () => {
 
         expect(artifactDestroyMock).not.toHaveBeenCalled()
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("skips action", async () => {
@@ -326,6 +350,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("updates draft release with static body", async () => {
@@ -354,6 +382,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("updates release but does not upload if no artifact", async () => {
@@ -374,6 +406,7 @@ describe("Action", () => {
         )
         expect(uploadMock).not.toHaveBeenCalled()
         assertOutputApplied()
+        assertAssetUrlsApplied({})
     })
 
     it("updates release then uploads artifact", async () => {
@@ -394,6 +427,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     it("updates release with static body when generateReleaseNotes is true but omitBodyDuringUpdate is true", async () => {
@@ -422,6 +459,10 @@ describe("Action", () => {
         )
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
     })
 
     function assertOutputApplied() {
@@ -432,6 +473,10 @@ describe("Action", () => {
             tarball_url: TEST_URLS.TARBALL_URL,
             zipball_url: TEST_URLS.ZIPBALL_URL,
         })
+    }
+
+    function assertAssetUrlsApplied(expectedUrls: Record<string, string>) {
+        expect(applyAssetUrlsMock).toHaveBeenCalledWith(expectedUrls)
     }
 
     function createAction(
@@ -495,7 +540,10 @@ describe("Action", () => {
                 zipball_url: TEST_URLS.ZIPBALL_URL,
             },
         })
-        uploadMock.mockResolvedValue({})
+        uploadMock.mockResolvedValue({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
 
         const MockInputs = jest.fn<Inputs, any>(() => {
             return {
@@ -528,6 +576,7 @@ describe("Action", () => {
         const MockOutputs = jest.fn<Outputs, any>(() => {
             return {
                 applyReleaseData: applyReleaseDataMock,
+                applyAssetUrls: applyAssetUrlsMock,
             }
         })
         const MockUploader = jest.fn<ArtifactUploader, any>(() => {

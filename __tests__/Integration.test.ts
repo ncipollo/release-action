@@ -70,6 +70,9 @@ describe.skip("Integration Test", () => {
                 applyReleaseData(releaseData: ReleaseData) {
                     console.log(`Release Data: ${releaseData}`)
                 },
+                applyAssetUrls(assetUrls: Record<string, string>) {
+                    console.log(`Asset URLs: ${JSON.stringify(assetUrls)}`)
+                },
             }
         })
         return new MockOutputs()

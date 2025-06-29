@@ -3,7 +3,7 @@ import { Artifact } from "./Artifact"
 import { Releases } from "./Releases"
 
 export interface ArtifactUploader {
-    uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<void>
+    uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<Record<string, string>>
 }
 
 export class GithubArtifactUploader implements ArtifactUploader {
@@ -13,19 +13,24 @@ export class GithubArtifactUploader implements ArtifactUploader {
         private throwsUploadErrors: boolean = false
     ) {}
 
-    async uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<void> {
+    async uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<Record<string, string>> {
         if (this.replacesExistingArtifacts) {
             await this.deleteUpdatedArtifacts(artifacts, releaseId)
         }
+        const assetUrls: Record<string, string> = {}
         for (const artifact of artifacts) {
-            await this.uploadArtifact(artifact, releaseId, uploadUrl)
+            const assetUrl = await this.uploadArtifact(artifact, releaseId, uploadUrl)
+            if (assetUrl !== null) {
+                assetUrls[artifact.name] = assetUrl
+            }
         }
+        return assetUrls
     }
 
-    private async uploadArtifact(artifact: Artifact, releaseId: number, uploadUrl: string, retry = 3) {
+    private async uploadArtifact(artifact: Artifact, releaseId: number, uploadUrl: string, retry = 3): Promise<string | null> {
         try {
             core.debug(`Uploading artifact ${artifact.name}...`)
-            await this.releases.uploadArtifact(
+            const assetResponse = await this.releases.uploadArtifact(
                 uploadUrl,
                 artifact.contentLength,
                 artifact.contentType,
@@ -33,15 +38,17 @@ export class GithubArtifactUploader implements ArtifactUploader {
                 artifact.name,
                 releaseId
             )
+            return assetResponse.data.browser_download_url
         } catch (error: any) {
             if (error.status >= 500 && retry > 0) {
                 core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}. Retrying...`)
-                await this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1)
+                return this.uploadArtifact(artifact, releaseId, uploadUrl, retry - 1)
             } else {
                 if (this.throwsUploadErrors) {
                     throw Error(`Failed to upload artifact ${artifact.name}. ${error.message}.`)
                 } else {
                     core.warning(`Failed to upload artifact ${artifact.name}. ${error.message}.`)
+                    return null
                 }
             }
         }

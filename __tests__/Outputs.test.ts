@@ -1,11 +1,8 @@
-const mockSetOutput = jest.fn()
+import { CoreOutputs, type Outputs } from "../src/Outputs"
+import type { ReleaseData } from "../src/Releases"
 
-import { CoreOutputs, Outputs } from "../src/Outputs"
-import { ReleaseData } from "../src/Releases"
-
-jest.mock("@actions/core", () => {
-    return { setOutput: mockSetOutput }
-})
+jest.mock("@actions/core")
+const { setOutput: mockSetOutput } = jest.mocked(require("@actions/core"))
 
 const TEST_URLS = {
     HTML_URL: "https://api.example.com/assets",
@@ -47,5 +44,20 @@ describe("Outputs", () => {
         outputs.applyReleaseData(releaseDataWithNulls)
         expect(mockSetOutput).toHaveBeenCalledWith("tarball_url", "")
         expect(mockSetOutput).toHaveBeenCalledWith("zipball_url", "")
+    })
+
+    it("Applies asset URLs to the action output", () => {
+        const assetUrls = {
+            "example.zip": "https://github.com/owner/repo/releases/download/v1.0.0/example.zip",
+            "example.tar.gz": "https://github.com/owner/repo/releases/download/v1.0.0/example.tar.gz",
+        }
+        outputs.applyAssetUrls(assetUrls)
+        expect(mockSetOutput).toHaveBeenCalledWith("assets", JSON.stringify(assetUrls))
+    })
+
+    it("Applies empty asset URLs to the action output", () => {
+        const assetUrls = {}
+        outputs.applyAssetUrls(assetUrls)
+        expect(mockSetOutput).toHaveBeenCalledWith("assets", JSON.stringify(assetUrls))
     })
 })

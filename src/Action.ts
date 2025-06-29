@@ -57,11 +57,13 @@ export class Action {
         }
 
         const artifacts = this.inputs.artifacts
+        let assetUrls: Record<string, string> = {}
         if (artifacts.length > 0) {
-            await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
+            assetUrls = await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
         }
 
         this.outputs.applyReleaseData(releaseData)
+        this.outputs.applyAssetUrls(assetUrls)
     }
 
     private async createOrUpdateRelease(): Promise<CreateOrUpdateReleaseResponse> {
