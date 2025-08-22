@@ -141,13 +141,19 @@ export class Action {
     }
 
     private async createRelease(): Promise<CreateReleaseResponse> {
+        let releaseBody = this.inputs.createdReleaseBody
+
+        if (this.inputs.generateReleaseNotes) {
+            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
+            releaseBody = response.data.body
+        }
+
         return await this.releases.create(
             this.inputs.tag,
-            this.inputs.createdReleaseBody,
+            releaseBody,
             this.inputs.commit,
             this.inputs.discussionCategory,
             this.inputs.createdDraft,
-            this.inputs.generateReleaseNotes,
             this.inputs.makeLatest,
             this.inputs.createdReleaseName,
             this.inputs.createdPrerelease
