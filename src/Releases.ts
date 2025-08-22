@@ -27,7 +27,6 @@ export interface Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
-        generateReleaseNotes?: boolean,
         makeLatest?: "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
@@ -80,7 +79,6 @@ export class GithubReleases implements Releases {
         commitHash?: string,
         discussionCategory?: string,
         draft?: boolean,
-        generateReleaseNotes?: boolean,
         makeLatest?: "legacy" | "true" | "false" | undefined,
         name?: string,
         prerelease?: boolean
@@ -91,7 +89,6 @@ export class GithubReleases implements Releases {
             name: name,
             discussion_category_name: discussionCategory,
             draft: draft,
-            generate_release_notes: generateReleaseNotes,
             make_latest: makeLatest,
             owner: this.inputs.owner,
             prerelease: prerelease,

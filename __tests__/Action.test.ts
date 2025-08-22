@@ -55,6 +55,7 @@ describe("Action", () => {
         applyReleaseDataMock.mockClear()
         applyAssetUrlsMock.mockClear()
         createMock.mockClear()
+        genReleaseNotesMock.mockClear()
         getMock.mockClear()
         listMock.mockClear()
         shouldSkipMock.mockClear()
@@ -62,18 +63,81 @@ describe("Action", () => {
         uploadMock.mockClear()
     })
 
+    it("creates release with generated release notes when no body provided", async () => {
+        const action = createAction(false, false, false, true, false, "")
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            createDraft,
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        expect(uploadMock).not.toHaveBeenCalled()
+        assertOutputApplied()
+        assertAssetUrlsApplied({})
+    })
+
+    it("creates release with generated release notes that override existing body", async () => {
+        const action = createAction(false, false, false, true, false, "existing body")
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            createDraft,
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        expect(uploadMock).not.toHaveBeenCalled()
+        assertOutputApplied()
+        assertAssetUrlsApplied({})
+    })
+
+    it("creates release with static body when generateReleaseNotes is false", async () => {
+        const action = createAction(false, false, false, false, false, "static body")
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).not.toHaveBeenCalled()
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            "static body",
+            commit,
+            discussionCategory,
+            createDraft,
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        expect(uploadMock).not.toHaveBeenCalled()
+        assertOutputApplied()
+        assertAssetUrlsApplied({})
+    })
+
     it("creates release but does not upload if no artifact", async () => {
         const action = createAction(false, false)
 
         await action.perform()
 
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
         expect(createMock).toHaveBeenCalledWith(
             tag,
-            createBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             createDraft,
-            generateReleaseNotes,
             makeLatest,
             createName,
             createPrerelease
@@ -90,13 +154,13 @@ describe("Action", () => {
 
         await action.perform()
 
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
         expect(createMock).toHaveBeenCalledWith(
             tag,
-            createBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             createDraft,
-            generateReleaseNotes,
             makeLatest,
             createName,
             createPrerelease
@@ -119,13 +183,13 @@ describe("Action", () => {
 
         await action.perform()
 
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
         expect(createMock).toHaveBeenCalledWith(
             tag,
-            createBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             createDraft,
-            generateReleaseNotes,
             makeLatest,
             createName,
             createPrerelease
@@ -143,13 +207,13 @@ describe("Action", () => {
 
         await action.perform()
 
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
         expect(createMock).toHaveBeenCalledWith(
             tag,
-            createBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             createDraft,
-            generateReleaseNotes,
             makeLatest,
             createName,
             createPrerelease
@@ -209,13 +273,13 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
         expect(createMock).toHaveBeenCalledWith(
             tag,
-            createBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             createDraft,
-            generateReleaseNotes,
             makeLatest,
             createName,
             createPrerelease
@@ -310,13 +374,13 @@ describe("Action", () => {
             expect(error).toEqual(expectedError)
         }
 
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
         expect(createMock).toHaveBeenCalledWith(
             tag,
-            createBody,
+            generatedReleaseBody,
             commit,
             discussionCategory,
             createDraft,
-            generateReleaseNotes,
             makeLatest,
             createName,
             createPrerelease
@@ -484,7 +548,8 @@ describe("Action", () => {
         hasArtifact: boolean,
         removeArtifacts = false,
         generateReleaseNotes = true,
-        omitBodyDuringUpdate = false
+        omitBodyDuringUpdate = false,
+        createdReleaseBody = createBody
     ): Action {
         let inputArtifact: Artifact[]
 
@@ -551,7 +616,7 @@ describe("Action", () => {
                 artifactErrorsFailBuild: true,
                 artifacts: inputArtifact,
                 createdDraft: createDraft,
-                createdReleaseBody: createBody,
+                createdReleaseBody: createdReleaseBody,
                 createdReleaseName: createName,
                 commit,
                 discussionCategory,
