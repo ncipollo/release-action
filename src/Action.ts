@@ -47,70 +47,34 @@ export class Action {
             return
         }
 
-        const releaseResponse = await this.createOrUpdateRelease()
-        const releaseData = releaseResponse.data
-        const releaseId = releaseData.id
-        const uploadUrl = releaseData.upload_url
-
-        if (this.inputs.removeArtifacts) {
-            await this.artifactDestroyer.destroyArtifacts(releaseId)
-        }
-
-        const artifacts = this.inputs.artifacts
-        let assetUrls: Record<string, string> = {}
-        if (artifacts.length > 0) {
-            assetUrls = await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
-        }
-
-        this.outputs.applyReleaseData(releaseData)
-        this.outputs.applyAssetUrls(assetUrls)
+        await this.createOrUpdateRelease()
     }
 
-    private async createOrUpdateRelease(): Promise<CreateOrUpdateReleaseResponse> {
+    private async createOrUpdateRelease() {
         if (this.inputs.allowUpdates) {
             let getResponse: ReleaseByTagResponse
             try {
                 getResponse = await this.releases.getByTag(this.inputs.tag)
             } catch (error: any) {
-                return await this.checkForMissingReleaseError(error)
+                await this.checkForMissingReleaseError(error)
+                return
             }
 
             // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
             this.releaseValidator.validateReleaseUpdate(getResponse.data)
 
-            return await this.updateRelease(getResponse.data.id)
+            await this.updateRelease(getResponse.data.id)
         } else {
-            return await this.createRelease()
+            await this.createRelease()
         }
     }
 
-    private async checkForMissingReleaseError(error: Error): Promise<CreateOrUpdateReleaseResponse> {
+    private async checkForMissingReleaseError(error: Error): Promise<void> {
         if (Action.noPublishedRelease(error)) {
-            return await this.updateDraftOrCreateRelease()
+            await this.updateDraftOrCreateRelease()
         } else {
             throw error
         }
-    }
-
-    private async updateRelease(id: number): Promise<UpdateReleaseResponse> {
-        let releaseBody = this.inputs.updatedReleaseBody
-
-        if (this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate) {
-            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
-            releaseBody = response.data.body
-        }
-
-        return await this.releases.update(
-            id,
-            this.inputs.tag,
-            releaseBody,
-            this.inputs.commit,
-            this.inputs.discussionCategory,
-            this.inputs.updatedDraft,
-            this.inputs.makeLatest,
-            this.inputs.updatedReleaseName,
-            this.inputs.updatedPrerelease
-        )
     }
 
     private static noPublishedRelease(error: any): boolean {
@@ -118,12 +82,12 @@ export class Action {
         return githubError.status == 404
     }
 
-    private async updateDraftOrCreateRelease(): Promise<CreateReleaseResponse | UpdateReleaseResponse> {
+    private async updateDraftOrCreateRelease(): Promise<void> {
         const draftReleaseId = await this.findMatchingDraftReleaseId()
         if (draftReleaseId) {
-            return await this.updateRelease(draftReleaseId)
+            await this.updateRelease(draftReleaseId)
         } else {
-            return await this.createRelease()
+            await this.createRelease()
         }
     }
 
@@ -140,7 +104,30 @@ export class Action {
         return draftRelease?.id
     }
 
-    private async createRelease(): Promise<CreateReleaseResponse> {
+    private async updateRelease(id: number) {
+        let releaseBody = this.inputs.updatedReleaseBody
+
+        if (this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate) {
+            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
+            releaseBody = response.data.body
+        }
+
+        const releaseResponse = await this.releases.update(
+            id,
+            this.inputs.tag,
+            releaseBody,
+            this.inputs.commit,
+            this.inputs.discussionCategory,
+            this.inputs.updatedDraft,
+            this.inputs.makeLatest,
+            this.inputs.updatedReleaseName,
+            this.inputs.updatedPrerelease
+        )
+
+        await this.processReleaseArtifactsAndOutputs(releaseResponse, false)
+    }
+
+    private async createRelease() {
         let releaseBody = this.inputs.createdReleaseBody
 
         if (this.inputs.generateReleaseNotes) {
@@ -148,15 +135,70 @@ export class Action {
             releaseBody = response.data.body
         }
 
-        return await this.releases.create(
+        // If immutableCreate is enabled we need to start with a draft release
+        const draft = this.inputs.createdDraft || this.inputs.immutableCreate
+
+        const releaseResponse = await this.releases.create(
             this.inputs.tag,
             releaseBody,
             this.inputs.commit,
             this.inputs.discussionCategory,
-            this.inputs.createdDraft,
+            draft,
             this.inputs.makeLatest,
             this.inputs.createdReleaseName,
             this.inputs.createdPrerelease
         )
+
+        await this.processReleaseArtifactsAndOutputs(releaseResponse, true)
+    }
+
+    private async processReleaseArtifactsAndOutputs(releaseResponse: CreateOrUpdateReleaseResponse, wasCreated: boolean) {
+        const releaseData = releaseResponse.data
+        const releaseId = releaseData.id
+        const uploadUrl = releaseData.upload_url
+
+        if (this.inputs.removeArtifacts) {
+            await this.artifactDestroyer.destroyArtifacts(releaseId)
+        }
+
+        const artifacts = this.inputs.artifacts
+        let assetUrls: Record<string, string> = {}
+        if (artifacts.length > 0) {
+            assetUrls = await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl)
+        }
+
+        if (wasCreated) {
+            const immutableRelease = await this.publishImmutableRelease(releaseId)
+            if (immutableRelease) {
+                this.setOutputs(immutableRelease.data, assetUrls)
+                return
+            }
+        }
+
+        this.setOutputs(releaseData, assetUrls)
+    }
+
+    private async publishImmutableRelease(releaseId: number): Promise<CreateOrUpdateReleaseResponse | undefined> {
+        // Check if immutableCreate is on and createdDraft is off
+        if (!this.inputs.immutableCreate || this.inputs.createdDraft) {
+            return undefined
+        }
+
+        return await this.releases.update(
+            releaseId,
+            this.inputs.tag,
+            undefined, // body is omitted
+            undefined, // commit is omitted
+            this.inputs.discussionCategory,
+            false, // We want to publish the release, set draft to false
+            this.inputs.makeLatest,
+            this.inputs.createdReleaseName,
+            this.inputs.createdPrerelease
+        )
+    }
+
+    private setOutputs(releaseData: any, assetUrls: Record<string, string>): void {
+        this.outputs.applyReleaseData(releaseData)
+        this.outputs.applyAssetUrls(assetUrls)
     }
 }

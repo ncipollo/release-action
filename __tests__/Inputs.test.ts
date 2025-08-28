@@ -200,6 +200,23 @@ describe("Inputs", () => {
         })
     })
 
+    describe("immutableCreate", () => {
+        it("returns true by default", function () {
+            mockGetInput.mockReturnValue("")
+            expect(inputs.immutableCreate).toBe(true)
+        })
+
+        it("returns true when explicitly set", function () {
+            mockGetInput.mockReturnValue("true")
+            expect(inputs.immutableCreate).toBe(true)
+        })
+
+        it("returns false when explicitly disabled", function () {
+            mockGetInput.mockReturnValue("false")
+            expect(inputs.immutableCreate).toBe(false)
+        })
+    })
+
     describe("makeLatest", () => {
         it("returns legacy", () => {
             mockGetInput.mockReturnValueOnce("legacy")

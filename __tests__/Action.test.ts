@@ -529,6 +529,145 @@ describe("Action", () => {
         })
     })
 
+    it("does not publish immutable release when immutableCreate is false", async () => {
+        const action = createAction(false, true, false, true, false, createBody, false, false)
+
+        await action.perform()
+
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            false, // draft should be false when createdDraft is false
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        // Should only call update once for regular create, not for publishImmutableRelease
+        expect(updateMock).not.toHaveBeenCalled()
+        assertOutputApplied()
+    })
+
+    it("does not publish immutable release when createdDraft is true", async () => {
+        const action = createAction(false, true, false, true, false, createBody, true, true)
+
+        await action.perform()
+
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            true, // draft should be true when createdDraft is true or immutableCreate is true
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        // Should only call update once for regular create, not for publishImmutableRelease
+        expect(updateMock).not.toHaveBeenCalled()
+        assertOutputApplied()
+    })
+
+    it("publishes immutable release when immutableCreate is true and createdDraft is false", async () => {
+        const action = createAction(false, true, false, true, false, createBody, true, false)
+        const immutableReleaseResponse = {
+            data: {
+                id: 999,
+                upload_url: "http://immutable.example.com",
+                html_url: "https://github.com/owner/repo/releases/tag/v1.0.0-immutable",
+                tarball_url: "https://api.github.com/repos/owner/repo/tarball/v1.0.0-immutable",
+                zipball_url: "https://api.github.com/repos/owner/repo/zipball/v1.0.0-immutable",
+            },
+        }
+        updateMock.mockResolvedValueOnce(immutableReleaseResponse)
+
+        await action.perform()
+
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            true, // draft should be true when immutableCreate is true
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        // Should call update for publishImmutableRelease
+        expect(updateMock).toHaveBeenCalledWith(
+            releaseId,
+            tag,
+            undefined, // body is omitted
+            undefined, // commit is omitted
+            discussionCategory,
+            false, // draft is set to false to publish the release
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        // Should apply the immutable release data instead of the original
+        expect(applyReleaseDataMock).toHaveBeenCalledWith(immutableReleaseResponse.data)
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
+    })
+
+    it("publishes immutable release when allowUpdates is true but release does not exist", async () => {
+        const action = createAction(true, true, false, true, false, createBody, true, false)
+        const error = { status: 404 }
+        getMock.mockRejectedValue(error)
+        listMock.mockResolvedValue({ data: [] }) // No draft releases found
+        
+        const immutableReleaseResponse = {
+            data: {
+                id: 888,
+                upload_url: "http://immutable-update.example.com",
+                html_url: "https://github.com/owner/repo/releases/tag/v1.0.0-immutable-update",
+                tarball_url: "https://api.github.com/repos/owner/repo/tarball/v1.0.0-immutable-update",
+                zipball_url: "https://api.github.com/repos/owner/repo/zipball/v1.0.0-immutable-update",
+            },
+        }
+        updateMock.mockResolvedValueOnce(immutableReleaseResponse)
+
+        await action.perform()
+
+        // Should try to get the release first (allowUpdates=true)
+        expect(getMock).toHaveBeenCalledWith(tag)
+        // Should check for draft releases when get fails with 404
+        expect(listMock).toHaveBeenCalled()
+        // Should create a new release when no drafts found
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            generatedReleaseBody,
+            commit,
+            discussionCategory,
+            true, // draft should be true when immutableCreate is true
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        // Should call update for publishImmutableRelease
+        expect(updateMock).toHaveBeenCalledWith(
+            releaseId,
+            tag,
+            undefined, // body is omitted
+            undefined, // commit is omitted
+            discussionCategory,
+            false, // draft is set to false to publish the release
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        // Should apply the immutable release data instead of the original
+        expect(applyReleaseDataMock).toHaveBeenCalledWith(immutableReleaseResponse.data)
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
+    })
+
     function assertOutputApplied() {
         expect(applyReleaseDataMock).toHaveBeenCalledWith({
             id: releaseId,
@@ -549,7 +688,9 @@ describe("Action", () => {
         removeArtifacts = false,
         generateReleaseNotes = true,
         omitBodyDuringUpdate = false,
-        createdReleaseBody = createBody
+        createdReleaseBody = createBody,
+        immutableCreate = true,
+        createdDraft = createDraft
     ): Action {
         let inputArtifact: Artifact[]
 
@@ -615,12 +756,13 @@ describe("Action", () => {
                 allowUpdates,
                 artifactErrorsFailBuild: true,
                 artifacts: inputArtifact,
-                createdDraft: createDraft,
+                createdDraft: createdDraft,
                 createdReleaseBody: createdReleaseBody,
                 createdReleaseName: createName,
                 commit,
                 discussionCategory,
                 generateReleaseNotes,
+                immutableCreate: immutableCreate,
                 makeLatest: makeLatest,
                 owner: "owner",
                 createdPrerelease: createPrerelease,
