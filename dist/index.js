@@ -66,20 +66,7 @@ class Action {
             core.notice("Skipping action, release already exists and skipIfReleaseExists is enabled.");
             return;
         }
-        const releaseResponse = await this.createOrUpdateRelease();
-        const releaseData = releaseResponse.data;
-        const releaseId = releaseData.id;
-        const uploadUrl = releaseData.upload_url;
-        if (this.inputs.removeArtifacts) {
-            await this.artifactDestroyer.destroyArtifacts(releaseId);
-        }
-        const artifacts = this.inputs.artifacts;
-        let assetUrls = {};
-        if (artifacts.length > 0) {
-            assetUrls = await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl);
-        }
-        this.outputs.applyReleaseData(releaseData);
-        this.outputs.applyAssetUrls(assetUrls);
+        await this.createOrUpdateRelease();
     }
     async createOrUpdateRelease() {
         if (this.inputs.allowUpdates) {
@@ -88,31 +75,24 @@ class Action {
                 getResponse = await this.releases.getByTag(this.inputs.tag);
             }
             catch (error) {
-                return await this.checkForMissingReleaseError(error);
+                await this.checkForMissingReleaseError(error);
+                return;
             }
             // Fail if this isn't an unreleased release & updateOnlyUnreleased is enabled.
             this.releaseValidator.validateReleaseUpdate(getResponse.data);
-            return await this.updateRelease(getResponse.data.id);
+            await this.updateRelease(getResponse.data.id);
         }
         else {
-            return await this.createRelease();
+            await this.createRelease();
         }
     }
     async checkForMissingReleaseError(error) {
         if (Action.noPublishedRelease(error)) {
-            return await this.updateDraftOrCreateRelease();
+            await this.updateDraftOrCreateRelease();
         }
         else {
             throw error;
         }
-    }
-    async updateRelease(id) {
-        let releaseBody = this.inputs.updatedReleaseBody;
-        if (this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate) {
-            const response = await this.releases.generateReleaseNotes(this.inputs.tag);
-            releaseBody = response.data.body;
-        }
-        return await this.releases.update(id, this.inputs.tag, releaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.updatedDraft, this.inputs.makeLatest, this.inputs.updatedReleaseName, this.inputs.updatedPrerelease);
     }
     static noPublishedRelease(error) {
         const githubError = new GithubError_1.GithubError(error);
@@ -121,10 +101,10 @@ class Action {
     async updateDraftOrCreateRelease() {
         const draftReleaseId = await this.findMatchingDraftReleaseId();
         if (draftReleaseId) {
-            return await this.updateRelease(draftReleaseId);
+            await this.updateRelease(draftReleaseId);
         }
         else {
-            return await this.createRelease();
+            await this.createRelease();
         }
     }
     async findMatchingDraftReleaseId() {
@@ -137,13 +117,60 @@ class Action {
         const draftRelease = releases.find((release) => release.draft && release.tag_name == tag);
         return draftRelease?.id;
     }
+    async updateRelease(id) {
+        let releaseBody = this.inputs.updatedReleaseBody;
+        if (this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate) {
+            const response = await this.releases.generateReleaseNotes(this.inputs.tag);
+            releaseBody = response.data.body;
+        }
+        const releaseResponse = await this.releases.update(id, this.inputs.tag, releaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.updatedDraft, this.inputs.makeLatest, this.inputs.updatedReleaseName, this.inputs.updatedPrerelease);
+        await this.processReleaseArtifactsAndOutputs(releaseResponse, false);
+    }
     async createRelease() {
         let releaseBody = this.inputs.createdReleaseBody;
         if (this.inputs.generateReleaseNotes) {
             const response = await this.releases.generateReleaseNotes(this.inputs.tag);
             releaseBody = response.data.body;
         }
-        return await this.releases.create(this.inputs.tag, releaseBody, this.inputs.commit, this.inputs.discussionCategory, this.inputs.createdDraft, this.inputs.makeLatest, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
+        // If immutableCreate is enabled we need to start with a draft release
+        const draft = this.inputs.createdDraft || this.inputs.immutableCreate;
+        const releaseResponse = await this.releases.create(this.inputs.tag, releaseBody, this.inputs.commit, this.inputs.discussionCategory, draft, this.inputs.makeLatest, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
+        await this.processReleaseArtifactsAndOutputs(releaseResponse, true);
+    }
+    async processReleaseArtifactsAndOutputs(releaseResponse, wasCreated) {
+        const releaseData = releaseResponse.data;
+        const releaseId = releaseData.id;
+        const uploadUrl = releaseData.upload_url;
+        if (this.inputs.removeArtifacts) {
+            await this.artifactDestroyer.destroyArtifacts(releaseId);
+        }
+        const artifacts = this.inputs.artifacts;
+        let assetUrls = {};
+        if (artifacts.length > 0) {
+            assetUrls = await this.uploader.uploadArtifacts(artifacts, releaseId, uploadUrl);
+        }
+        if (wasCreated) {
+            const immutableRelease = await this.publishImmutableRelease(releaseId);
+            if (immutableRelease) {
+                this.setOutputs(immutableRelease.data, assetUrls);
+                return;
+            }
+        }
+        this.setOutputs(releaseData, assetUrls);
+    }
+    async publishImmutableRelease(releaseId) {
+        // Check if immutableCreate is on and createdDraft is off
+        if (!this.inputs.immutableCreate || this.inputs.createdDraft) {
+            return undefined;
+        }
+        return await this.releases.update(releaseId, this.inputs.tag, undefined, // body is omitted
+        undefined, // commit is omitted
+        this.inputs.discussionCategory, false, // We want to publish the release, set draft to false
+        this.inputs.makeLatest, this.inputs.createdReleaseName, this.inputs.createdPrerelease);
+    }
+    setOutputs(releaseData, assetUrls) {
+        this.outputs.applyReleaseData(releaseData);
+        this.outputs.applyAssetUrls(assetUrls);
     }
 }
 exports.Action = Action;
@@ -832,6 +859,10 @@ class CoreInputs {
     get generateReleaseNotes() {
         const generate = core.getInput("generateReleaseNotes");
         return generate == "true";
+    }
+    get immutableCreate() {
+        const immutable = core.getInput("immutableCreate");
+        return immutable != "false";
     }
     get makeLatest() {
         let latest = core.getInput("makeLatest");
