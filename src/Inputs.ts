@@ -140,7 +140,7 @@ export class CoreInputs implements Inputs {
 
     get immutableCreate(): boolean {
         const immutable = core.getInput("immutableCreate")
-        return immutable != "false"
+        return immutable == "true"
     }
 
     get makeLatest(): "legacy" | "true" | "false" | undefined {

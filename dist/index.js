@@ -862,7 +862,7 @@ class CoreInputs {
     }
     get immutableCreate() {
         const immutable = core.getInput("immutableCreate");
-        return immutable != "false";
+        return immutable == "true";
     }
     get makeLatest() {
         let latest = core.getInput("makeLatest");

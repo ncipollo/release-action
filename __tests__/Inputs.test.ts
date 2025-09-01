@@ -201,9 +201,9 @@ describe("Inputs", () => {
     })
 
     describe("immutableCreate", () => {
-        it("returns true by default", function () {
+        it("returns false by default", function () {
             mockGetInput.mockReturnValue("")
-            expect(inputs.immutableCreate).toBe(true)
+            expect(inputs.immutableCreate).toBe(false)
         })
 
         it("returns true when explicitly set", function () {
