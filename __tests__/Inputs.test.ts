@@ -200,6 +200,18 @@ describe("Inputs", () => {
         })
     })
 
+    describe("generateReleaseNotesPreviousTag", () => {
+        it("returns the previous tag when provided", function () {
+            mockGetInput.mockReturnValue("v1.0.0")
+            expect(inputs.generateReleaseNotesPreviousTag).toBe("v1.0.0")
+        })
+
+        it("returns undefined when omitted", function () {
+            mockGetInput.mockReturnValue("")
+            expect(inputs.generateReleaseNotesPreviousTag).toBeUndefined()
+        })
+    })
+
     describe("immutableCreate", () => {
         it("returns false by default", function () {
             mockGetInput.mockReturnValue("")

@@ -47,6 +47,10 @@ inputs:
     description: 'Indicates if release notes should be automatically generated.'
     required: false
     default: 'false'
+  generateReleaseNotesPreviousTag:
+    description: 'An optional previous tag to use when generating release notes. This will limit the release notes to changes between the two tags.'
+    required: false
+    default: ''
   immutableCreate:
     description: 'Indicates if immutable release creation should be used. When enabled, the action will first create a draft, upload artifacts, then publish the release.'
     required: false
