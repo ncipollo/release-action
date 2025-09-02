@@ -105,12 +105,7 @@ export class Action {
     }
 
     private async updateRelease(id: number) {
-        let releaseBody = this.inputs.updatedReleaseBody
-
-        if (this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate) {
-            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
-            releaseBody = response.data.body
-        }
+        const releaseBody = await this.combineBodyWithReleaseNotes(this.inputs.updatedReleaseBody, true)
 
         const releaseResponse = await this.releases.update(
             id,
@@ -128,12 +123,7 @@ export class Action {
     }
 
     private async createRelease() {
-        let releaseBody = this.inputs.createdReleaseBody
-
-        if (this.inputs.generateReleaseNotes) {
-            const response = await this.releases.generateReleaseNotes(this.inputs.tag)
-            releaseBody = response.data.body
-        }
+        const releaseBody = await this.combineBodyWithReleaseNotes(this.inputs.createdReleaseBody, false)
 
         // If immutableCreate is enabled we need to start with a draft release
         const draft = this.inputs.createdDraft || this.inputs.immutableCreate
@@ -195,6 +185,26 @@ export class Action {
             this.inputs.createdReleaseName,
             this.inputs.createdPrerelease
         )
+    }
+
+    private async combineBodyWithReleaseNotes(body: string | undefined, isUpdate: boolean): Promise<string | undefined> {
+        // Determine if we should generate release notes based on operation type
+        const shouldGenerateReleaseNotes = isUpdate 
+            ? this.inputs.generateReleaseNotes && !this.inputs.omitBodyDuringUpdate
+            : this.inputs.generateReleaseNotes
+
+        if (!shouldGenerateReleaseNotes) {
+            return body
+        }
+
+        const response = await this.releases.generateReleaseNotes(this.inputs.tag)
+        const releaseNotes = response.data.body
+
+        if (!body || body.trim() === "") {
+            return releaseNotes
+        }
+
+        return `${body}\n${releaseNotes}`
     }
 
     private setOutputs(releaseData: any, assetUrls: Record<string, string>): void {
