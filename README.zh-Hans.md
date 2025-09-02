@@ -26,7 +26,7 @@
 | discussionCategory         | 当提供该选项时，将生成指定类别的 discussion。指定的类别必须存在，否则将导致 Action 失败。这对草案状态的发布不生效。API 不支持默认的 Announcement 分类，使用这个分类会引发错误。     | false | ""                   |
 | draft                      | 可选择将此版本标记为草稿版本。 设置为 true 以启用。                                                                                                                        | false | ""                   |
 | generateReleaseNotes       | 指示是否应自动生成发行说明。                                                                                                                                               | false | false                |
-| immutableCreate            | 指示是否应使用不可变发布创建。启用时，操作将首先创建草稿，上传产出文件，然后发布版本。                                                                                                          | false | true                 |
+| immutableCreate            | 指示是否应使用不可变发布创建。启用时，操作将首先创建草稿，上传产出文件，然后发布版本。                                                                                                          | false | false                |
 | makeLatest                 | 指示是否将这个发布设置为 latest。使用"lagecy"值则会根据发布时间和语义化版本号自动决定。                                                                                     | false | "legacy"               |
 | name                       | 版本的可选名称。 如果省略，将使用标签。                                                                                                                                    | false | ""                   |
 | omitBody                   | 指示是否应省略发布主体。                                                                                                                                                   | false | false                |

@@ -50,7 +50,7 @@ inputs:
   immutableCreate:
     description: 'Indicates if immutable release creation should be used. When enabled, the action will first create a draft, upload artifacts, then publish the release.'
     required: false
-    default: 'true'
+    default: 'false'
   makeLatest:
     description: 'Indicates if the release should be the "latest" release or not.'
     required: false
