@@ -49,6 +49,7 @@ const updateOnlyUnreleased = false
 const url = TEST_URLS.UPLOAD_URL
 const makeLatest = "legacy"
 const generatedReleaseBody = "test release notes"
+const previousTag = "v1.0.0"
 
 describe("Action", () => {
     beforeEach(() => {
@@ -68,7 +69,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -89,7 +90,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -131,7 +132,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             `${createBody}\n${generatedReleaseBody}`,
@@ -147,12 +148,31 @@ describe("Action", () => {
         assertAssetUrlsApplied({})
     })
 
+    it("creates release with combined body and generated release notes using previous tag", async () => {
+        const action = createAction(false, false, false, true, false, createBody, true, createDraft, updateBody, previousTag)
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, previousTag)
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            `${createBody}\n${generatedReleaseBody}`,
+            commit,
+            discussionCategory,
+            createDraft,
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        expect(uploadMock).not.toHaveBeenCalled()
+    })
+
     it("creates release but does not upload if no artifact", async () => {
         const action = createAction(false, false, false, true, false, "")
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -175,7 +195,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -204,7 +224,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -228,7 +248,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -294,7 +314,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -395,7 +415,7 @@ describe("Action", () => {
             expect(error).toEqual(expectedError)
         }
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -478,7 +498,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
         expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
@@ -496,6 +516,26 @@ describe("Action", () => {
             "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
             "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
+    })
+
+    it("updates release with combined body and generated release notes using previous tag", async () => {
+        const action = createAction(true, true, false, true, false, "", true, createDraft, updateBody, previousTag)
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, previousTag)
+        expect(updateMock).toHaveBeenCalledWith(
+            id,
+            tag,
+            `${updateBody}\n${generatedReleaseBody}`,
+            commit,
+            discussionCategory,
+            updateDraft,
+            makeLatest,
+            updateName,
+            updatePrerelease
+        )
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
     })
 
     it("updates release but does not upload if no artifact", async () => {
@@ -737,7 +777,8 @@ describe("Action", () => {
         createdReleaseBody = createBody,
         immutableCreate = true,
         createdDraft = createDraft,
-        updatedReleaseBody = updateBody
+        updatedReleaseBody = updateBody,
+        generateReleaseNotesPreviousTag: string | undefined = undefined
     ): Action {
         let inputArtifact: Artifact[]
 
@@ -809,6 +850,7 @@ describe("Action", () => {
                 commit,
                 discussionCategory,
                 generateReleaseNotes,
+                generateReleaseNotesPreviousTag: generateReleaseNotesPreviousTag,
                 immutableCreate: immutableCreate,
                 makeLatest: makeLatest,
                 owner: "owner",

@@ -168,7 +168,7 @@ class Action {
         if (!shouldGenerateReleaseNotes) {
             return body;
         }
-        const response = await this.releases.generateReleaseNotes(this.inputs.tag);
+        const response = await this.releases.generateReleaseNotes(this.inputs.tag, this.inputs.generateReleaseNotesPreviousTag);
         const releaseNotes = response.data.body;
         if (!body || body.trim() === "") {
             return releaseNotes;
@@ -867,6 +867,10 @@ class CoreInputs {
         const generate = core.getInput("generateReleaseNotes");
         return generate == "true";
     }
+    get generateReleaseNotesPreviousTag() {
+        const previousTag = core.getInput("generateReleaseNotesPreviousTag");
+        return previousTag || undefined;
+    }
     get immutableCreate() {
         const immutable = core.getInput("immutableCreate");
         return immutable == "true";
@@ -1107,12 +1111,16 @@ class GithubReleases {
             repo: this.inputs.repo,
         });
     }
-    async generateReleaseNotes(tag) {
-        return this.git.rest.repos.generateReleaseNotes({
+    async generateReleaseNotes(tag, previousTag) {
+        const params = {
             owner: this.inputs.owner,
             repo: this.inputs.repo,
             tag_name: tag,
-        });
+        };
+        if (previousTag) {
+            params.previous_tag_name = previousTag;
+        }
+        return this.git.rest.repos.generateReleaseNotes(params);
     }
     async getByTag(tag) {
         return this.git.rest.repos.getReleaseByTag({

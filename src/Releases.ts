@@ -36,7 +36,7 @@ export interface Releases {
 
     getByTag(tag: string): Promise<ReleaseByTagResponse>
 
-    generateReleaseNotes(tag: string): Promise<GenerateReleaseNotesResponse>
+    generateReleaseNotes(tag: string, previousTag?: string): Promise<GenerateReleaseNotesResponse>
 
     listArtifactsForRelease(releaseId: number): Promise<ListReleaseAssetsResponseData>
 
@@ -106,12 +106,18 @@ export class GithubReleases implements Releases {
         })
     }
 
-    async generateReleaseNotes(tag: string): Promise<GenerateReleaseNotesResponse> {
-        return this.git.rest.repos.generateReleaseNotes({
+    async generateReleaseNotes(tag: string, previousTag?: string): Promise<GenerateReleaseNotesResponse> {
+        const params: any = {
             owner: this.inputs.owner,
             repo: this.inputs.repo,
             tag_name: tag,
-        })
+        }
+        
+        if (previousTag) {
+            params.previous_tag_name = previousTag
+        }
+        
+        return this.git.rest.repos.generateReleaseNotes(params)
     }
 
     async getByTag(tag: string): Promise<ReleaseByTagResponse> {
