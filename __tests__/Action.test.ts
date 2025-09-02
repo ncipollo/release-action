@@ -85,7 +85,7 @@ describe("Action", () => {
     })
 
     it("creates release with generated release notes that override existing body", async () => {
-        const action = createAction(false, false, false, true, false, "existing body")
+        const action = createAction(false, false, false, true, false, "")
 
         await action.perform()
 
@@ -126,8 +126,29 @@ describe("Action", () => {
         assertAssetUrlsApplied({})
     })
 
+    it("creates release with combined body and generated release notes", async () => {
+        const action = createAction(false, false, false, true, false, createBody)
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(createMock).toHaveBeenCalledWith(
+            tag,
+            `${createBody}\n${generatedReleaseBody}`,
+            commit,
+            discussionCategory,
+            createDraft,
+            makeLatest,
+            createName,
+            createPrerelease
+        )
+        expect(uploadMock).not.toHaveBeenCalled()
+        assertOutputApplied()
+        assertAssetUrlsApplied({})
+    })
+
     it("creates release but does not upload if no artifact", async () => {
-        const action = createAction(false, false)
+        const action = createAction(false, false, false, true, false, "")
 
         await action.perform()
 
@@ -148,7 +169,7 @@ describe("Action", () => {
     })
 
     it("creates release if no release exists to update", async () => {
-        const action = createAction(true, true)
+        const action = createAction(true, true, false, true, false, "")
         const error = { status: 404 }
         getMock.mockRejectedValue(error)
 
@@ -174,7 +195,7 @@ describe("Action", () => {
     })
 
     it("creates release if no draft releases", async () => {
-        const action = createAction(true, true)
+        const action = createAction(true, true, false, true, false, "")
         const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({
@@ -203,7 +224,7 @@ describe("Action", () => {
     })
 
     it("creates release then uploads artifact", async () => {
-        const action = createAction(false, true)
+        const action = createAction(false, true, false, true, false, "")
 
         await action.perform()
 
@@ -263,7 +284,7 @@ describe("Action", () => {
     })
 
     it("throws error when create fails", async () => {
-        const action = createAction(false, true)
+        const action = createAction(false, true, false, true, false, "")
         createMock.mockRejectedValue("error")
 
         expect.hasAssertions()
@@ -337,7 +358,7 @@ describe("Action", () => {
     })
 
     it("throws error when update fails", async () => {
-        const action = createAction(true, true)
+        const action = createAction(true, true, false, true, false, "", true, createDraft, "")
 
         updateMock.mockRejectedValue("error")
 
@@ -363,7 +384,7 @@ describe("Action", () => {
     })
 
     it("throws error when upload fails", async () => {
-        const action = createAction(false, true)
+        const action = createAction(false, true, false, true, false, "")
         const expectedError = { status: 404 }
         uploadMock.mockRejectedValue(expectedError)
 
@@ -389,7 +410,7 @@ describe("Action", () => {
     })
 
     it("updates draft release", async () => {
-        const action = createAction(true, true)
+        const action = createAction(true, true, false, true, false, "", true, createDraft, "")
         const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({
@@ -452,8 +473,33 @@ describe("Action", () => {
         })
     })
 
+    it("updates release with combined body and generated release notes", async () => {
+        const action = createAction(true, true, false, true, false, "", true, createDraft, updateBody)
+
+        await action.perform()
+
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag)
+        expect(updateMock).toHaveBeenCalledWith(
+            id,
+            tag,
+            `${updateBody}\n${generatedReleaseBody}`,
+            commit,
+            discussionCategory,
+            updateDraft,
+            makeLatest,
+            updateName,
+            updatePrerelease
+        )
+        expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
+        assertOutputApplied()
+        assertAssetUrlsApplied({
+            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+        })
+    })
+
     it("updates release but does not upload if no artifact", async () => {
-        const action = createAction(true, false)
+        const action = createAction(true, false, false, true, false, "", true, createDraft, "")
 
         await action.perform()
 
@@ -474,7 +520,7 @@ describe("Action", () => {
     })
 
     it("updates release then uploads artifact", async () => {
-        const action = createAction(true, true)
+        const action = createAction(true, true, false, true, false, "", true, createDraft, "")
 
         await action.perform()
 
@@ -530,7 +576,7 @@ describe("Action", () => {
     })
 
     it("does not publish immutable release when immutableCreate is false", async () => {
-        const action = createAction(false, true, false, true, false, createBody, false, false)
+        const action = createAction(false, true, false, true, false, "", false, false)
 
         await action.perform()
 
@@ -550,7 +596,7 @@ describe("Action", () => {
     })
 
     it("does not publish immutable release when createdDraft is true", async () => {
-        const action = createAction(false, true, false, true, false, createBody, true, true)
+        const action = createAction(false, true, false, true, false, "", true, true)
 
         await action.perform()
 
@@ -570,7 +616,7 @@ describe("Action", () => {
     })
 
     it("publishes immutable release when immutableCreate is true and createdDraft is false", async () => {
-        const action = createAction(false, true, false, true, false, createBody, true, false)
+        const action = createAction(false, true, false, true, false, "", true, false)
         const immutableReleaseResponse = {
             data: {
                 id: 999,
@@ -615,7 +661,7 @@ describe("Action", () => {
     })
 
     it("publishes immutable release when allowUpdates is true but release does not exist", async () => {
-        const action = createAction(true, true, false, true, false, createBody, true, false)
+        const action = createAction(true, true, false, true, false, "", true, false)
         const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({ data: [] }) // No draft releases found
@@ -690,7 +736,8 @@ describe("Action", () => {
         omitBodyDuringUpdate = false,
         createdReleaseBody = createBody,
         immutableCreate = true,
-        createdDraft = createDraft
+        createdDraft = createDraft,
+        updatedReleaseBody = updateBody
     ): Action {
         let inputArtifact: Artifact[]
 
@@ -773,7 +820,7 @@ describe("Action", () => {
                 tag,
                 token,
                 updatedDraft: updateDraft,
-                updatedReleaseBody: updateBody,
+                updatedReleaseBody: updatedReleaseBody,
                 updatedReleaseName: updateName,
                 updatedPrerelease: updatePrerelease,
                 updateOnlyUnreleased: updateOnlyUnreleased,
