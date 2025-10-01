@@ -60,7 +60,7 @@
         "jest": "^29.7.0",
         "jest-circus": "^30.2.0",
         "ts-jest": "^29.3.4",
-        "typescript": "^5.8.3"
+        "typescript": "^5.9.3"
     },
     "resolutions": {
         "jest-cli/yargs": "^17.3.1"
