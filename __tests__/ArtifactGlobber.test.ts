@@ -3,7 +3,7 @@ const warnMock = jest.fn()
 import { FileArtifactGlobber } from "../src/ArtifactGlobber"
 import { Globber } from "../src/Globber"
 import { Artifact } from "../src/Artifact"
-import untildify = require("untildify")
+import { expandTilde } from "../src/PathExpander"
 
 const contentType = "raw"
 const globMock = jest.fn()
@@ -39,7 +39,7 @@ describe("ArtifactGlobber", () => {
         const expectedArtifacts = globResults.map((path) => new Artifact(path, contentType))
 
         expect(globber.globArtifactString("~/path", "raw", false)).toEqual(expectedArtifacts)
-        expect(globMock).toHaveBeenCalledWith(untildify("~/path"))
+        expect(globMock).toHaveBeenCalledWith(expandTilde("~/path"))
         expect(warnMock).not.toHaveBeenCalled()
     })
 

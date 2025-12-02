@@ -349,15 +349,12 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.FileArtifactGlobber = void 0;
 const core = __importStar(__nccwpck_require__(5357));
 const Globber_1 = __nccwpck_require__(611);
 const Artifact_1 = __nccwpck_require__(5964);
-const untildify_1 = __importDefault(__nccwpck_require__(2120));
+const PathExpander_1 = __nccwpck_require__(4858);
 const ArtifactPathValidator_1 = __nccwpck_require__(8969);
 const PathNormalizer_1 = __nccwpck_require__(4802);
 class FileArtifactGlobber {
@@ -400,7 +397,7 @@ class FileArtifactGlobber {
         throw Error(`Artifact pattern :${pattern} did not match any files`);
     }
     static expandPath(path) {
-        return (0, untildify_1.default)(path);
+        return (0, PathExpander_1.expandTilde)(path);
     }
 }
 exports.FileArtifactGlobber = FileArtifactGlobber;
@@ -1024,6 +1021,24 @@ class CoreOutputs {
     }
 }
 exports.CoreOutputs = CoreOutputs;
+
+
+/***/ }),
+
+/***/ 4858:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.expandTilde = expandTilde;
+const os_1 = __importDefault(__nccwpck_require__(857));
+function expandTilde(path) {
+    return path.replace(/^~(?=$|\/|\\)/, os_1.default.homedir());
+}
 
 
 /***/ }),
@@ -31413,26 +31428,6 @@ function getUserAgent() {
 
 exports.getUserAgent = getUserAgent;
 //# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 2120:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const os = __nccwpck_require__(857);
-
-const homeDirectory = os.homedir();
-
-module.exports = pathWithTilde => {
-	if (typeof pathWithTilde !== 'string') {
-		throw new TypeError(`Expected a string, got ${typeof pathWithTilde}`);
-	}
-
-	return homeDirectory ? pathWithTilde.replace(/^~(?=$|\/|\\)/, homeDirectory) : pathWithTilde;
-};
 
 
 /***/ }),

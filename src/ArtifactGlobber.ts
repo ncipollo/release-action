@@ -1,7 +1,7 @@
 import * as core from "@actions/core"
 import { Globber, FileGlobber } from "./Globber"
 import { Artifact } from "./Artifact"
-import untildify from "untildify"
+import { expandTilde } from "./PathExpander"
 import { ArtifactPathValidator } from "./ArtifactPathValidator"
 import { PathNormalizer } from "./PathNormalizer"
 
@@ -55,6 +55,6 @@ export class FileArtifactGlobber implements ArtifactGlobber {
     }
 
     private static expandPath(path: string): string {
-        return untildify(path)
+        return expandTilde(path)
     }
 }
