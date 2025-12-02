@@ -8,10 +8,10 @@
         "build": "tsc",
         "clean": "rm -rf lib/*",
         "coverage": "jest --coverage",
-        "debug": "yarn clean && yarn install && yarn build && yarn package",
-        "format": "yarn biome format --write .",
+        "debug": "pnpm clean && pnpm install && pnpm build && pnpm package",
+        "format": "pnpm biome format --write .",
         "package": "ncc build --source-map --license licenses.txt",
-        "release": "yarn clean && yarn install --production && yarn build && yarn package",
+        "release": "pnpm clean && pnpm install --prod && pnpm build && pnpm package",
         "test": "jest"
     },
     "repository": {
@@ -62,10 +62,12 @@
         "ts-jest": "^29.4.5",
         "typescript": "^5.9.3"
     },
-    "resolutions": {
-        "jest-cli/yargs": "^17.3.1",
-        "glob": "^10.5.0",
-        "test-exclude": "^7.0.0",
-        "babel-plugin-istanbul": "^7.0.0"
+    "pnpm": {
+        "overrides": {
+            "jest-cli>yargs": "^17.3.1",
+            "glob": "^10.5.0",
+            "test-exclude": "^7.0.0",
+            "babel-plugin-istanbul": "^7.0.0"
+        }
     }
 }
