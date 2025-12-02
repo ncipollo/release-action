@@ -33,6 +33,12 @@ importers:
       '@biomejs/biome':
         specifier: 2.3.2
         version: 2.3.2
+      '@octokit/plugin-rest-endpoint-methods':
+        specifier: ^10.4.1
+        version: 10.4.1(@octokit/core@5.2.2)
+      '@octokit/types':
+        specifier: ^13.10.0
+        version: 13.10.0
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
