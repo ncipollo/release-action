@@ -1,5 +1,5 @@
 import * as core from "@actions/core"
-import { Context } from "@actions/github/lib/context"
+import * as github from "@actions/github"
 import { readFileSync } from "fs"
 import { ArtifactGlobber } from "./ArtifactGlobber.js"
 import { Artifact } from "./Artifact.js"
@@ -35,9 +35,9 @@ export interface Inputs {
 
 export class CoreInputs implements Inputs {
     private artifactGlobber: ArtifactGlobber
-    private context: Context
+    private context: typeof github.context
 
-    constructor(artifactGlobber: ArtifactGlobber, context: Context) {
+    constructor(artifactGlobber: ArtifactGlobber, context: typeof github.context) {
         this.artifactGlobber = artifactGlobber
         this.context = context
     }

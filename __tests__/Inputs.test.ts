@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import * as core from "@actions/core"
 import * as fs from "fs"
+import * as github from "@actions/github"
 
 vi.mock("@actions/core")
 vi.mock("fs")
 
 import { Artifact } from "../src/Artifact.js"
 import { ArtifactGlobber } from "../src/ArtifactGlobber.js"
-import { Context } from "@actions/github/lib/context"
 import { Inputs, CoreInputs } from "../src/Inputs.js"
 
 const mockGetInput = vi.mocked(core.getInput)
@@ -23,12 +23,33 @@ mockExistsSync.mockReturnValue(false)
 const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
 
 describe("Inputs", () => {
-    let context: Context
+    let context: typeof github.context
     let inputs: Inputs
     beforeEach(() => {
         mockGetInput.mockReset()
         mockGlob.mockClear()
-        context = new Context()
+        context = {
+            payload: {},
+            eventName: '',
+            sha: '',
+            ref: '',
+            workflow: '',
+            action: '',
+            actor: '',
+            job: '',
+            runNumber: 0,
+            runId: 0,
+            runAttempt: 0,
+            apiUrl: '',
+            serverUrl: '',
+            graphqlUrl: '',
+            get repo() {
+                const repo = process.env.GITHUB_REPOSITORY || '/'
+                const [owner, repoName] = repo.split('/')
+                return { owner: owner || '', repo: repoName || '' }
+            },
+            issue: { owner: '', repo: '', number: 0 }
+        } as any
         inputs = new CoreInputs(createGlobber(), context)
     })
 

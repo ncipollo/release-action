@@ -4,7 +4,7 @@
     "type": "module",
     "private": true,
     "description": "An action which manages a github release",
-    "main": "lib/main.js",
+    "main": "lib/src/Main.js",
     "scripts": {
         "build": "tsc",
         "clean": "rm -rf lib/*",
