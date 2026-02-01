@@ -1,6 +1,6 @@
+import * as fs from "node:fs"
 import { describe, expect, it, vi } from "vitest"
 import { Artifact } from "../src/Artifact.js"
-import * as fs from "fs"
 
 vi.mock("fs")
 
@@ -10,7 +10,9 @@ const fakeReadStream = {}
 const mockCreateReadStream = vi.mocked(fs.createReadStream)
 const mockStatSync = vi.mocked(fs.statSync)
 
+// biome-ignore lint/suspicious/noExplicitAny: Mock object for testing
 mockCreateReadStream.mockReturnValue(fakeReadStream as any)
+// biome-ignore lint/suspicious/noExplicitAny: Partial Stats object for testing
 mockStatSync.mockReturnValue({ size: contentLength } as any)
 
 describe("Artifact", () => {

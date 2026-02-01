@@ -1,14 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from "vitest"
-import { Action } from "../src/Action.js"
+import * as path from "node:path"
 import * as github from "@actions/github"
-import { Inputs } from "../src/Inputs.js"
-import { GithubReleases, ReleaseData } from "../src/Releases.js"
-import { GithubArtifactUploader } from "../src/ArtifactUploader.js"
-import * as path from "path"
-import { FileArtifactGlobber } from "../src/ArtifactGlobber.js"
-import { Outputs } from "../src/Outputs.js"
-import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer.js"
+import { beforeEach, describe, it, vi } from "vitest"
+import { Action } from "../src/Action.js"
 import { ReleaseActionSkipper } from "../src/ActionSkipper.js"
+import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer.js"
+import { FileArtifactGlobber } from "../src/ArtifactGlobber.js"
+import { GithubArtifactUploader } from "../src/ArtifactUploader.js"
+import type { Inputs } from "../src/Inputs.js"
+import type { Outputs } from "../src/Outputs.js"
+import { GithubReleases, type ReleaseData } from "../src/Releases.js"
 
 // This test is currently intended to be manually run during development. To run:
 // - Make sure you have an environment variable named GITHUB_TOKEN assigned to your token

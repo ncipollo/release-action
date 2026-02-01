@@ -35,7 +35,7 @@ const createDraft = true
 const createName = "createName"
 const commit = "commit"
 const discussionCategory = "discussionCategory"
-const generateReleaseNotes = true
+const _generateReleaseNotes = true
 const id = 100
 const createPrerelease = true
 const releaseId = 101
@@ -151,7 +151,18 @@ describe("Action", () => {
     })
 
     it("creates release with combined body and generated release notes using previous tag", async () => {
-        const action = createAction(false, false, false, true, false, createBody, true, createDraft, updateBody, previousTag)
+        const action = createAction(
+            false,
+            false,
+            false,
+            true,
+            false,
+            createBody,
+            true,
+            createDraft,
+            updateBody,
+            previousTag
+        )
 
         await action.perform()
 
@@ -211,8 +222,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -240,8 +251,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -264,8 +275,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -277,8 +288,8 @@ describe("Action", () => {
         expect(artifactDestroyMock).toHaveBeenCalledWith(releaseId)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -290,8 +301,8 @@ describe("Action", () => {
         expect(artifactDestroyMock).not.toHaveBeenCalled()
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -458,8 +469,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -490,8 +501,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -515,8 +526,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -580,8 +591,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -612,8 +623,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -697,8 +708,8 @@ describe("Action", () => {
         // Should apply the immutable release data instead of the original
         expect(applyReleaseDataMock).toHaveBeenCalledWith(immutableReleaseResponse.data)
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -707,7 +718,7 @@ describe("Action", () => {
         const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({ data: [] }) // No draft releases found
-        
+
         const immutableReleaseResponse = {
             data: {
                 id: 888,
@@ -751,8 +762,8 @@ describe("Action", () => {
         // Should apply the immutable release data instead of the original
         expect(applyReleaseDataMock).toHaveBeenCalledWith(immutableReleaseResponse.data)
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -837,8 +848,8 @@ describe("Action", () => {
             },
         })
         uploadMock.mockResolvedValue({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
 
         const MockInputs = vi.fn<() => Inputs>(() => {

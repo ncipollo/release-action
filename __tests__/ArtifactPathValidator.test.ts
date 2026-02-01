@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest"
+import * as fs from "node:fs"
 import * as core from "@actions/core"
-import * as fs from "fs"
+import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@actions/core")
 vi.mock("fs")
@@ -11,6 +11,7 @@ const warnMock = vi.mocked(core.warning)
 const mockStatSync = vi.mocked(fs.statSync)
 const directoryMock = vi.fn()
 
+// biome-ignore lint/suspicious/noExplicitAny: Partial Stats object for testing
 mockStatSync.mockReturnValue({ isDirectory: directoryMock } as any)
 
 const pattern = "pattern"
@@ -34,7 +35,7 @@ describe("ArtifactPathValidator", () => {
 
     it("warns when no glob results are produced and empty results shouldn't throw", () => {
         const validator = new ArtifactPathValidator(false, [], pattern)
-        const result = validator.validate()
+        const _result = validator.validate()
         expect(warnMock).toHaveBeenCalled()
     })
 

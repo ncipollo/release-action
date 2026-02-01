@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest"
 import { RequestError } from "@octokit/request-error"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { Artifact } from "../src/Artifact.js"
 import { GithubArtifactUploader } from "../src/ArtifactUploader.js"
 import type { Releases } from "../src/Releases.js"
@@ -20,7 +20,7 @@ const mockUploadResponse = (name: string) => ({
         browser_download_url: `https://github.com/octocat/Hello-World/releases/download/v1.0.0/${name}`,
         name: name,
         id: 1,
-    }
+    },
 })
 
 vi.mock("fs", async () => {
@@ -50,8 +50,8 @@ describe("ArtifactUploader", () => {
         const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
         expect(result).toEqual({
-            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+            art1: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            art2: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
         })
         expect(uploadMock).toHaveBeenCalledTimes(2)
     })
@@ -118,8 +118,8 @@ describe("ArtifactUploader", () => {
         const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
         expect(result).toEqual({
-            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+            art1: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            art2: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
         })
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
@@ -139,8 +139,8 @@ describe("ArtifactUploader", () => {
         const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
         expect(result).toEqual({
-            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+            art1: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            art2: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
         })
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
@@ -202,8 +202,8 @@ describe("ArtifactUploader", () => {
         const result = await uploader.uploadArtifacts(artifacts, releaseId, url)
 
         expect(result).toEqual({
-            "art1": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
+            art1: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art1",
+            art2: "https://github.com/octocat/Hello-World/releases/download/v1.0.0/art2",
         })
         expect(uploadMock).toHaveBeenCalledTimes(2)
         expect(uploadMock).toHaveBeenCalledWith(url, contentLength, "raw", fakeReadStream, "art1", releaseId)
@@ -228,11 +228,11 @@ describe("ArtifactUploader", () => {
         return new GithubArtifactUploader(MockReleases(), replaces, throws)
     }
 
-    function mockDeleteError(): any {
+    function mockDeleteError(): void {
         deleteMock.mockRejectedValue("error")
     }
 
-    function mockDeleteSuccess(): any {
+    function mockDeleteSuccess(): void {
         deleteMock.mockResolvedValue({})
     }
 

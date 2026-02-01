@@ -61,11 +61,11 @@ describe("ArtifactDestroyer", () => {
         return new GithubArtifactDestroyer(MockReleases())
     }
 
-    function mockDeleteError(): any {
+    function mockDeleteError(): void {
         deleteMock.mockRejectedValue("error")
     }
 
-    function mockDeleteSuccess(): any {
+    function mockDeleteSuccess(): void {
         deleteMock.mockResolvedValue({})
     }
 
