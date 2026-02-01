@@ -1,4 +1,5 @@
-import { GithubErrorDetail } from "../src/GithubErrorDetail"
+import { describe, expect, it } from "vitest"
+import { GithubErrorDetail } from "../src/GithubErrorDetail.js"
 
 describe("GithubErrorDetail", () => {
     it("provides error code", () => {

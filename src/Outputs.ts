@@ -1,5 +1,5 @@
 import * as core from "@actions/core"
-import { ReleaseData } from "./Releases"
+import { ReleaseData } from "./Releases.js"
 
 export interface Outputs {
     applyReleaseData(releaseData: ReleaseData): void

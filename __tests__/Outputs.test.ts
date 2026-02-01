@@ -1,8 +1,10 @@
-import { CoreOutputs, type Outputs } from "../src/Outputs"
-import type { ReleaseData } from "../src/Releases"
+import * as core from "@actions/core"
+import { describe, expect, it, vi } from "vitest"
+import { CoreOutputs, type Outputs } from "../src/Outputs.js"
+import type { ReleaseData } from "../src/Releases.js"
 
-jest.mock("@actions/core")
-const { setOutput: mockSetOutput } = jest.mocked(require("@actions/core"))
+vi.mock("@actions/core")
+const mockSetOutput = vi.mocked(core.setOutput)
 
 const TEST_URLS = {
     HTML_URL: "https://api.example.com/assets",

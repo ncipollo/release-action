@@ -1,13 +1,14 @@
-import { Action } from "../src/Action"
+import * as path from "node:path"
 import * as github from "@actions/github"
-import { Inputs } from "../src/Inputs"
-import { GithubReleases, ReleaseData } from "../src/Releases"
-import { GithubArtifactUploader } from "../src/ArtifactUploader"
-import * as path from "path"
-import { FileArtifactGlobber } from "../src/ArtifactGlobber"
-import { Outputs } from "../src/Outputs"
-import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer"
-import { ReleaseActionSkipper } from "../src/ActionSkipper"
+import { beforeEach, describe, it, vi } from "vitest"
+import { Action } from "../src/Action.js"
+import { ReleaseActionSkipper } from "../src/ActionSkipper.js"
+import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer.js"
+import { FileArtifactGlobber } from "../src/ArtifactGlobber.js"
+import { GithubArtifactUploader } from "../src/ArtifactUploader.js"
+import type { Inputs } from "../src/Inputs.js"
+import type { Outputs } from "../src/Outputs.js"
+import { GithubReleases, type ReleaseData } from "../src/Releases.js"
 
 // This test is currently intended to be manually run during development. To run:
 // - Make sure you have an environment variable named GITHUB_TOKEN assigned to your token
@@ -34,7 +35,7 @@ describe.skip("Integration Test", () => {
     })
 
     function getInputs(): Inputs {
-        const MockInputs = jest.fn<Inputs, any>(() => {
+        const MockInputs = vi.fn<() => Inputs>(() => {
             return {
                 allowUpdates: true,
                 artifactErrorsFailBuild: false,
@@ -62,11 +63,11 @@ describe.skip("Integration Test", () => {
                 updateOnlyUnreleased: false,
             }
         })
-        return new MockInputs()
+        return MockInputs()
     }
 
     function getOutputs(): Outputs {
-        const MockOutputs = jest.fn<Outputs, any>(() => {
+        const MockOutputs = vi.fn<() => Outputs>(() => {
             return {
                 applyReleaseData(releaseData: ReleaseData) {
                     console.log(`Release Data: ${releaseData}`)
@@ -76,7 +77,7 @@ describe.skip("Integration Test", () => {
                 },
             }
         })
-        return new MockOutputs()
+        return MockOutputs()
     }
 
     function artifacts() {

@@ -1,21 +1,20 @@
-const directoryMock = jest.fn()
-const warnMock = jest.fn()
+import * as fs from "node:fs"
+import * as core from "@actions/core"
+import { describe, expect, it, vi } from "vitest"
 
-import { ArtifactPathValidator } from "../src/ArtifactPathValidator"
+vi.mock("@actions/core")
+vi.mock("fs")
+
+import { ArtifactPathValidator } from "../src/ArtifactPathValidator.js"
+
+const warnMock = vi.mocked(core.warning)
+const mockStatSync = vi.mocked(fs.statSync)
+const directoryMock = vi.fn()
+
+// biome-ignore lint/suspicious/noExplicitAny: Partial Stats object for testing
+mockStatSync.mockReturnValue({ isDirectory: directoryMock } as any)
 
 const pattern = "pattern"
-
-jest.mock("@actions/core", () => {
-    return { warning: warnMock }
-})
-
-jest.mock("fs", () => {
-    return {
-        statSync: () => {
-            return { isDirectory: directoryMock }
-        },
-    }
-})
 
 describe("ArtifactPathValidator", () => {
     beforeEach(() => {
@@ -36,7 +35,7 @@ describe("ArtifactPathValidator", () => {
 
     it("warns when no glob results are produced and empty results shouldn't throw", () => {
         const validator = new ArtifactPathValidator(false, [], pattern)
-        const result = validator.validate()
+        const _result = validator.validate()
         expect(warnMock).toHaveBeenCalled()
     })
 

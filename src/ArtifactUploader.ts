@@ -1,6 +1,6 @@
 import * as core from "@actions/core"
-import { Artifact } from "./Artifact"
-import { Releases } from "./Releases"
+import { Artifact } from "./Artifact.js"
+import { Releases } from "./Releases.js"
 
 export interface ArtifactUploader {
     uploadArtifacts(artifacts: Artifact[], releaseId: number, uploadUrl: string): Promise<Record<string, string>>

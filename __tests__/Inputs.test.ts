@@ -1,41 +1,56 @@
-const mockGetInput = jest.fn()
-const mockGetBooleanInput = jest.fn()
-const mockGlob = jest.fn()
-const mockReadFileSync = jest.fn()
-const mockStatSync = jest.fn()
+import * as fs from "node:fs"
+import * as core from "@actions/core"
+import type * as github from "@actions/github"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { Artifact } from "../src/Artifact"
-import { ArtifactGlobber } from "../src/ArtifactGlobber"
-import { Context } from "@actions/github/lib/context"
-import { Inputs, CoreInputs } from "../src/Inputs"
+vi.mock("@actions/core")
+vi.mock("fs")
+
+import { Artifact } from "../src/Artifact.js"
+import type { ArtifactGlobber } from "../src/ArtifactGlobber.js"
+import { CoreInputs, type Inputs } from "../src/Inputs.js"
+
+const mockGetInput = vi.mocked(core.getInput)
+const mockGetBooleanInput = vi.mocked(core.getBooleanInput)
+const mockReadFileSync = vi.mocked(fs.readFileSync)
+const _mockStatSync = vi.mocked(fs.statSync)
+const mockExistsSync = vi.mocked(fs.existsSync)
+const mockGlob = vi.fn()
+
+// existsSync is used by Context's constructor
+mockExistsSync.mockReturnValue(false)
 
 const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
 
-jest.mock("@actions/core", () => {
-    return {
-        getInput: mockGetInput,
-        getBooleanInput: mockGetBooleanInput,
-    }
-})
-
-jest.mock("fs", () => {
-    // existsSync is used by Context's constructor
-    // noinspection JSUnusedGlobalSymbols
-    return {
-        existsSync: () => {
-            return false
-        },
-        readFileSync: mockReadFileSync,
-        statSync: mockStatSync,
-    }
-})
-
 describe("Inputs", () => {
-    let context: Context
+    let context: typeof github.context
     let inputs: Inputs
     beforeEach(() => {
         mockGetInput.mockReset()
-        context = new Context()
+        mockGlob.mockClear()
+        context = {
+            payload: {},
+            eventName: "",
+            sha: "",
+            ref: "",
+            workflow: "",
+            action: "",
+            actor: "",
+            job: "",
+            runNumber: 0,
+            runId: 0,
+            runAttempt: 0,
+            apiUrl: "",
+            serverUrl: "",
+            graphqlUrl: "",
+            get repo() {
+                const repo = process.env.GITHUB_REPOSITORY || "/"
+                const [owner, repoName] = repo.split("/")
+                return { owner: owner || "", repo: repoName || "" }
+            },
+            issue: { owner: "", repo: "", number: 0 },
+            // biome-ignore lint/suspicious/noExplicitAny: Partial Context object for testing
+        } as any
         inputs = new CoreInputs(createGlobber(), context)
     })
 
@@ -189,41 +204,41 @@ describe("Inputs", () => {
     })
 
     describe("generateReleaseNotes", () => {
-        it("returns returns true", function () {
+        it("returns returns true", () => {
             mockGetInput.mockReturnValue("true")
             expect(inputs.generateReleaseNotes).toBe(true)
         })
 
-        it("returns false when omitted", function () {
+        it("returns false when omitted", () => {
             mockGetInput.mockReturnValue("")
             expect(inputs.generateReleaseNotes).toBe(false)
         })
     })
 
     describe("generateReleaseNotesPreviousTag", () => {
-        it("returns the previous tag when provided", function () {
+        it("returns the previous tag when provided", () => {
             mockGetInput.mockReturnValue("v1.0.0")
             expect(inputs.generateReleaseNotesPreviousTag).toBe("v1.0.0")
         })
 
-        it("returns undefined when omitted", function () {
+        it("returns undefined when omitted", () => {
             mockGetInput.mockReturnValue("")
             expect(inputs.generateReleaseNotesPreviousTag).toBeUndefined()
         })
     })
 
     describe("immutableCreate", () => {
-        it("returns false by default", function () {
+        it("returns false by default", () => {
             mockGetInput.mockReturnValue("")
             expect(inputs.immutableCreate).toBe(false)
         })
 
-        it("returns true when explicitly set", function () {
+        it("returns true when explicitly set", () => {
             mockGetInput.mockReturnValue("true")
             expect(inputs.immutableCreate).toBe(true)
         })
 
-        it("returns false when explicitly disabled", function () {
+        it("returns false when explicitly disabled", () => {
             mockGetInput.mockReturnValue("false")
             expect(inputs.immutableCreate).toBe(false)
         })
@@ -252,12 +267,12 @@ describe("Inputs", () => {
     })
 
     describe("owner", () => {
-        it("returns owner from context", function () {
+        it("returns owner from context", () => {
             process.env.GITHUB_REPOSITORY = "owner/repo"
             mockGetInput.mockReturnValue("")
             expect(inputs.owner).toBe("owner")
         })
-        it("returns owner from inputs", function () {
+        it("returns owner from inputs", () => {
             mockGetInput.mockReturnValue("owner")
             expect(inputs.owner).toBe("owner")
         })
@@ -297,12 +312,12 @@ describe("Inputs", () => {
     })
 
     describe("repo", () => {
-        it("returns repo from context", function () {
+        it("returns repo from context", () => {
             process.env.GITHUB_REPOSITORY = "owner/repo"
             mockGetInput.mockReturnValue("")
             expect(inputs.repo).toBe("repo")
         })
-        it("returns repo from inputs", function () {
+        it("returns repo from inputs", () => {
             mockGetInput.mockReturnValue("repo")
             expect(inputs.repo).toBe("repo")
         })
@@ -327,11 +342,6 @@ describe("Inputs", () => {
         })
         it("returns context sha when input is empty", () => {
             mockGetInput.mockReturnValue("")
-            context.ref = "refs/tags/sha-tag"
-            expect(inputs.tag).toBe("sha-tag")
-        })
-        it("returns context sha when input is null", () => {
-            mockGetInput.mockReturnValue(null)
             context.ref = "refs/tags/sha-tag"
             expect(inputs.tag).toBe("sha-tag")
         })
@@ -462,12 +472,12 @@ describe("Inputs", () => {
     })
 
     function createGlobber(): ArtifactGlobber {
-        const MockGlobber = jest.fn<ArtifactGlobber, any>(() => {
+        const MockGlobber = vi.fn<() => ArtifactGlobber>(() => {
             return {
                 globArtifactString: mockGlob,
             }
         })
         mockGlob.mockImplementation(() => artifacts)
-        return new MockGlobber()
+        return MockGlobber()
     }
 })

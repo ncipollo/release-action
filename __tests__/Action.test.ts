@@ -1,11 +1,12 @@
-import { Action } from "../src/Action"
-import type { ActionSkipper } from "../src/ActionSkipper"
-import { Artifact } from "../src/Artifact"
-import type { ArtifactDestroyer } from "../src/ArtifactDestroyer"
-import type { ArtifactUploader } from "../src/ArtifactUploader"
-import type { Inputs } from "../src/Inputs"
-import type { Outputs } from "../src/Outputs"
-import type { Releases } from "../src/Releases"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { Action } from "../src/Action.js"
+import type { ActionSkipper } from "../src/ActionSkipper.js"
+import { Artifact } from "../src/Artifact.js"
+import type { ArtifactDestroyer } from "../src/ArtifactDestroyer.js"
+import type { ArtifactUploader } from "../src/ArtifactUploader.js"
+import type { Inputs } from "../src/Inputs.js"
+import type { Outputs } from "../src/Outputs.js"
+import type { Releases } from "../src/Releases.js"
 
 const TEST_URLS = {
     UPLOAD_URL: "http://api.example.com",
@@ -14,18 +15,18 @@ const TEST_URLS = {
     ZIPBALL_URL: "https://api.github.com/repos/owner/repo/zipball/v1.0.0",
 } as const
 
-const applyReleaseDataMock = jest.fn()
-const applyAssetUrlsMock = jest.fn()
-const artifactDestroyMock = jest.fn()
-const createMock = jest.fn()
-const deleteMock = jest.fn()
-const getMock = jest.fn()
-const listArtifactsMock = jest.fn()
-const listMock = jest.fn()
-const shouldSkipMock = jest.fn()
-const updateMock = jest.fn()
-const uploadMock = jest.fn()
-const genReleaseNotesMock = jest.fn()
+const applyReleaseDataMock = vi.fn()
+const applyAssetUrlsMock = vi.fn()
+const artifactDestroyMock = vi.fn()
+const createMock = vi.fn()
+const deleteMock = vi.fn()
+const getMock = vi.fn()
+const listArtifactsMock = vi.fn()
+const listMock = vi.fn()
+const shouldSkipMock = vi.fn()
+const updateMock = vi.fn()
+const uploadMock = vi.fn()
+const genReleaseNotesMock = vi.fn()
 
 const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
 
@@ -34,7 +35,7 @@ const createDraft = true
 const createName = "createName"
 const commit = "commit"
 const discussionCategory = "discussionCategory"
-const generateReleaseNotes = true
+const _generateReleaseNotes = true
 const id = 100
 const createPrerelease = true
 const releaseId = 101
@@ -55,6 +56,7 @@ describe("Action", () => {
     beforeEach(() => {
         applyReleaseDataMock.mockClear()
         applyAssetUrlsMock.mockClear()
+        artifactDestroyMock.mockClear()
         createMock.mockClear()
         genReleaseNotesMock.mockClear()
         getMock.mockClear()
@@ -149,7 +151,18 @@ describe("Action", () => {
     })
 
     it("creates release with combined body and generated release notes using previous tag", async () => {
-        const action = createAction(false, false, false, true, false, createBody, true, createDraft, updateBody, previousTag)
+        const action = createAction(
+            false,
+            false,
+            false,
+            true,
+            false,
+            createBody,
+            true,
+            createDraft,
+            updateBody,
+            previousTag
+        )
 
         await action.perform()
 
@@ -209,8 +222,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -238,8 +251,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -262,8 +275,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -275,8 +288,8 @@ describe("Action", () => {
         expect(artifactDestroyMock).toHaveBeenCalledWith(releaseId)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -288,8 +301,8 @@ describe("Action", () => {
         expect(artifactDestroyMock).not.toHaveBeenCalled()
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -456,8 +469,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -488,8 +501,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -513,8 +526,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -578,8 +591,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -610,8 +623,8 @@ describe("Action", () => {
         expect(uploadMock).toHaveBeenCalledWith(artifacts, releaseId, url)
         assertOutputApplied()
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -695,8 +708,8 @@ describe("Action", () => {
         // Should apply the immutable release data instead of the original
         expect(applyReleaseDataMock).toHaveBeenCalledWith(immutableReleaseResponse.data)
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -705,7 +718,7 @@ describe("Action", () => {
         const error = { status: 404 }
         getMock.mockRejectedValue(error)
         listMock.mockResolvedValue({ data: [] }) // No draft releases found
-        
+
         const immutableReleaseResponse = {
             data: {
                 id: 888,
@@ -749,8 +762,8 @@ describe("Action", () => {
         // Should apply the immutable release data instead of the original
         expect(applyReleaseDataMock).toHaveBeenCalledWith(immutableReleaseResponse.data)
         assertAssetUrlsApplied({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
     })
 
@@ -788,7 +801,7 @@ describe("Action", () => {
             inputArtifact = []
         }
 
-        const MockReleases = jest.fn<Releases, any>(() => {
+        const MockReleases = vi.fn<() => Releases>(() => {
             return {
                 create: createMock,
                 deleteArtifact: deleteMock,
@@ -796,7 +809,7 @@ describe("Action", () => {
                 listArtifactsForRelease: listArtifactsMock,
                 listReleases: listMock,
                 update: updateMock,
-                uploadArtifact: jest.fn(),
+                uploadArtifact: vi.fn(),
                 generateReleaseNotes: genReleaseNotesMock,
             }
         })
@@ -835,11 +848,11 @@ describe("Action", () => {
             },
         })
         uploadMock.mockResolvedValue({
-            "art1": "https://github.com/owner/repo/releases/download/v1.0.0/art1",
-            "art2": "https://github.com/owner/repo/releases/download/v1.0.0/art2",
+            art1: "https://github.com/owner/repo/releases/download/v1.0.0/art1",
+            art2: "https://github.com/owner/repo/releases/download/v1.0.0/art2",
         })
 
-        const MockInputs = jest.fn<Inputs, any>(() => {
+        const MockInputs = vi.fn<() => Inputs>(() => {
             return {
                 allowUpdates,
                 artifactErrorsFailBuild: true,
@@ -869,35 +882,35 @@ describe("Action", () => {
                 omitBodyDuringUpdate,
             }
         })
-        const MockOutputs = jest.fn<Outputs, any>(() => {
+        const MockOutputs = vi.fn<() => Outputs>(() => {
             return {
                 applyReleaseData: applyReleaseDataMock,
                 applyAssetUrls: applyAssetUrlsMock,
             }
         })
-        const MockUploader = jest.fn<ArtifactUploader, any>(() => {
+        const MockUploader = vi.fn<() => ArtifactUploader>(() => {
             return {
                 uploadArtifacts: uploadMock,
             }
         })
-        const MockArtifactDestroyer = jest.fn<ArtifactDestroyer, any>(() => {
+        const MockArtifactDestroyer = vi.fn<() => ArtifactDestroyer>(() => {
             return {
                 destroyArtifacts: artifactDestroyMock,
             }
         })
 
-        const MockActionSkipper = jest.fn<ActionSkipper, any>(() => {
+        const MockActionSkipper = vi.fn<() => ActionSkipper>(() => {
             return {
                 shouldSkip: shouldSkipMock,
             }
         })
 
-        const inputs = new MockInputs()
-        const outputs = new MockOutputs()
-        const releases = new MockReleases()
-        const uploader = new MockUploader()
-        const artifactDestroyer = new MockArtifactDestroyer()
-        const actionSkipper = new MockActionSkipper()
+        const inputs = MockInputs()
+        const outputs = MockOutputs()
+        const releases = MockReleases()
+        const uploader = MockUploader()
+        const artifactDestroyer = MockArtifactDestroyer()
+        const actionSkipper = MockActionSkipper()
 
         return new Action(inputs, outputs, releases, uploader, artifactDestroyer, actionSkipper)
     }

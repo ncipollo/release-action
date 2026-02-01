@@ -1,32 +1,33 @@
-const warnMock = jest.fn()
+import * as fs from "node:fs"
+import * as core from "@actions/core"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { FileArtifactGlobber } from "../src/ArtifactGlobber"
-import { Globber } from "../src/Globber"
-import { Artifact } from "../src/Artifact"
-import { expandTilde } from "../src/PathExpander"
+vi.mock("@actions/core")
+vi.mock("fs")
+
+import { Artifact } from "../src/Artifact.js"
+import { FileArtifactGlobber } from "../src/ArtifactGlobber.js"
+import type { Globber } from "../src/Globber.js"
+import { expandTilde } from "../src/PathExpander.js"
+
+const warnMock = vi.mocked(core.warning)
+const mockStatSync = vi.mocked(fs.statSync)
+// biome-ignore lint/suspicious/noExplicitAny: fs.realpathSync has overloads that are difficult to type
+const mockRealpathSync = vi.mocked(fs.realpathSync as any)
 
 const contentType = "raw"
-const globMock = jest.fn()
+const globMock = vi.fn()
 const globResults = ["file1", "file2"]
 
-jest.mock("@actions/core", () => {
-    return { warning: warnMock }
-})
+mockStatSync.mockReturnValue({
+    isDirectory(): boolean {
+        return false
+    },
+    // biome-ignore lint/suspicious/noExplicitAny: Partial Stats object for testing
+} as any)
 
-jest.mock("fs", () => {
-    return {
-        statSync: () => {
-            return {
-                isDirectory(): boolean {
-                    return false
-                },
-            }
-        },
-        realpathSync: () => {
-            return false
-        },
-    }
-})
+// biome-ignore lint/suspicious/noExplicitAny: Mock return value for testing
+mockRealpathSync.mockReturnValue(false as any)
 
 describe("ArtifactGlobber", () => {
     beforeEach(() => {
@@ -90,12 +91,12 @@ describe("ArtifactGlobber", () => {
     })
 
     function createArtifactGlobber(results: string[] = globResults): FileArtifactGlobber {
-        const MockGlobber = jest.fn<Globber, any>(() => {
+        const MockGlobber = vi.fn<() => Globber>(() => {
             return {
                 glob: globMock,
             }
         })
         globMock.mockReturnValue(results)
-        return new FileArtifactGlobber(new MockGlobber())
+        return new FileArtifactGlobber(MockGlobber())
     }
 })

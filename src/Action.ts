@@ -1,18 +1,18 @@
 import * as core from "@actions/core"
-import type { ActionSkipper } from "./ActionSkipper"
-import type { ArtifactDestroyer } from "./ArtifactDestroyer"
-import type { ArtifactUploader } from "./ArtifactUploader"
-import { GithubError } from "./GithubError"
-import type { Inputs } from "./Inputs"
-import type { Outputs } from "./Outputs"
-import { ReleaseValidator } from "./ReleaseValidator"
+import type { ActionSkipper } from "./ActionSkipper.js"
+import type { ArtifactDestroyer } from "./ArtifactDestroyer.js"
+import type { ArtifactUploader } from "./ArtifactUploader.js"
+import { GithubError } from "./GithubError.js"
+import type { Inputs } from "./Inputs.js"
+import type { Outputs } from "./Outputs.js"
+import { ReleaseValidator } from "./ReleaseValidator.js"
 import type {
     CreateOrUpdateReleaseResponse,
     CreateReleaseResponse,
     ReleaseByTagResponse,
     Releases,
     UpdateReleaseResponse,
-} from "./Releases"
+} from "./Releases.js"
 
 export class Action {
     private inputs: Inputs

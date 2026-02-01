@@ -1,4 +1,4 @@
-import { Releases } from "./Releases"
+import { Releases } from "./Releases.js"
 import * as core from "@actions/core"
 
 export interface ArtifactDestroyer {

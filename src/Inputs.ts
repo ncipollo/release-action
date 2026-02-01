@@ -1,8 +1,8 @@
+import { readFileSync } from "node:fs"
 import * as core from "@actions/core"
-import { Context } from "@actions/github/lib/context"
-import { readFileSync } from "fs"
-import { ArtifactGlobber } from "./ArtifactGlobber"
-import { Artifact } from "./Artifact"
+import type * as github from "@actions/github"
+import type { Artifact } from "./Artifact.js"
+import type { ArtifactGlobber } from "./ArtifactGlobber.js"
 
 export interface Inputs {
     readonly allowUpdates: boolean
@@ -35,16 +35,16 @@ export interface Inputs {
 
 export class CoreInputs implements Inputs {
     private artifactGlobber: ArtifactGlobber
-    private context: Context
+    private context: typeof github.context
 
-    constructor(artifactGlobber: ArtifactGlobber, context: Context) {
+    constructor(artifactGlobber: ArtifactGlobber, context: typeof github.context) {
         this.artifactGlobber = artifactGlobber
         this.context = context
     }
 
     get allowUpdates(): boolean {
         const allow = core.getInput("allowUpdates")
-        return allow == "true"
+        return allow === "true"
     }
 
     get artifacts(): Artifact[] {
@@ -64,7 +64,7 @@ export class CoreInputs implements Inputs {
 
     get artifactErrorsFailBuild(): boolean {
         const allow = core.getInput("artifactErrorsFailBuild")
-        return allow == "true"
+        return allow === "true"
     }
 
     private get body(): string | undefined {
@@ -83,12 +83,12 @@ export class CoreInputs implements Inputs {
 
     get createdDraft(): boolean {
         const draft = core.getInput("draft")
-        return draft == "true"
+        return draft === "true"
     }
 
     get createdPrerelease(): boolean {
         const preRelease = core.getInput("prerelease")
-        return preRelease == "true"
+        return preRelease === "true"
     }
 
     get createdReleaseBody(): string | undefined {
@@ -97,7 +97,7 @@ export class CoreInputs implements Inputs {
     }
 
     private static get omitBody(): boolean {
-        return core.getInput("omitBody") == "true"
+        return core.getInput("omitBody") === "true"
     }
 
     get createdReleaseName(): string | undefined {
@@ -106,7 +106,7 @@ export class CoreInputs implements Inputs {
     }
 
     private static get omitName(): boolean {
-        return core.getInput("omitName") == "true"
+        return core.getInput("omitName") === "true"
     }
 
     get commit(): string | undefined {
@@ -136,7 +136,7 @@ export class CoreInputs implements Inputs {
 
     get generateReleaseNotes(): boolean {
         const generate = core.getInput("generateReleaseNotes")
-        return generate == "true"
+        return generate === "true"
     }
 
     get generateReleaseNotesPreviousTag(): string | undefined {
@@ -146,12 +146,12 @@ export class CoreInputs implements Inputs {
 
     get immutableCreate(): boolean {
         const immutable = core.getInput("immutableCreate")
-        return immutable == "true"
+        return immutable === "true"
     }
 
     get makeLatest(): "legacy" | "true" | "false" | undefined {
-        let latest = core.getInput("makeLatest")
-        if (latest == "true" || latest == "false" || latest == "legacy") {
+        const latest = core.getInput("makeLatest")
+        if (latest === "true" || latest === "false" || latest === "legacy") {
             return latest
         }
 
@@ -159,7 +159,7 @@ export class CoreInputs implements Inputs {
     }
 
     get owner(): string {
-        let owner = core.getInput("owner")
+        const owner = core.getInput("owner")
         if (owner) {
             return owner
         }
@@ -168,16 +168,16 @@ export class CoreInputs implements Inputs {
 
     get removeArtifacts(): boolean {
         const removes = core.getInput("removeArtifacts")
-        return removes == "true"
+        return removes === "true"
     }
 
     get replacesArtifacts(): boolean {
         const replaces = core.getInput("replacesArtifacts")
-        return replaces == "true"
+        return replaces === "true"
     }
 
     get repo(): string {
-        let repo = core.getInput("repo")
+        const repo = core.getInput("repo")
         if (repo) {
             return repo
         }
@@ -196,7 +196,7 @@ export class CoreInputs implements Inputs {
 
         const ref = this.context.ref
         const tagPath = "refs/tags/"
-        if (ref && ref.startsWith(tagPath)) {
+        if (ref?.startsWith(tagPath)) {
             return ref.substr(tagPath.length, ref.length)
         }
 
@@ -213,7 +213,7 @@ export class CoreInputs implements Inputs {
     }
 
     private static get omitDraftDuringUpdate(): boolean {
-        return core.getInput("omitDraftDuringUpdate") == "true"
+        return core.getInput("omitDraftDuringUpdate") === "true"
     }
 
     get updatedPrerelease(): boolean | undefined {
@@ -222,7 +222,7 @@ export class CoreInputs implements Inputs {
     }
 
     private static get omitPrereleaseDuringUpdate(): boolean {
-        return core.getInput("omitPrereleaseDuringUpdate") == "true"
+        return core.getInput("omitPrereleaseDuringUpdate") === "true"
     }
 
     get updatedReleaseBody(): string | undefined {
@@ -231,7 +231,7 @@ export class CoreInputs implements Inputs {
     }
 
     get updateOnlyUnreleased(): boolean {
-        return core.getInput("updateOnlyUnreleased") == "true"
+        return core.getInput("updateOnlyUnreleased") === "true"
     }
 
     get updatedReleaseName(): string | undefined {
@@ -240,7 +240,7 @@ export class CoreInputs implements Inputs {
     }
 
     private static get omitBodyDuringUpdate(): boolean {
-        return core.getInput("omitBodyDuringUpdate") == "true"
+        return core.getInput("omitBodyDuringUpdate") === "true"
     }
 
     get omitBodyDuringUpdate(): boolean {
@@ -248,7 +248,7 @@ export class CoreInputs implements Inputs {
     }
 
     private static get omitNameDuringUpdate(): boolean {
-        return core.getInput("omitNameDuringUpdate") == "true"
+        return core.getInput("omitNameDuringUpdate") === "true"
     }
 
     stringFromFile(path: string): string {

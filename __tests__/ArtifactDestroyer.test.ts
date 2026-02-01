@@ -1,10 +1,11 @@
-import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer"
-import type { Releases } from "../src/Releases"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { GithubArtifactDestroyer } from "../src/ArtifactDestroyer.js"
+import type { Releases } from "../src/Releases.js"
 
 const releaseId = 100
 
-const deleteMock = jest.fn()
-const listArtifactsMock = jest.fn()
+const deleteMock = vi.fn()
+const listArtifactsMock = vi.fn()
 
 describe("ArtifactDestroyer", () => {
     beforeEach(() => {
@@ -45,26 +46,26 @@ describe("ArtifactDestroyer", () => {
     })
 
     function createDestroyer(): GithubArtifactDestroyer {
-        const MockReleases = jest.fn<Releases, any>(() => {
+        const MockReleases = vi.fn<() => Releases>(() => {
             return {
-                create: jest.fn(),
+                create: vi.fn(),
                 deleteArtifact: deleteMock,
-                getByTag: jest.fn(),
+                getByTag: vi.fn(),
                 listArtifactsForRelease: listArtifactsMock,
-                listReleases: jest.fn(),
-                update: jest.fn(),
-                uploadArtifact: jest.fn(),
-                generateReleaseNotes: jest.fn(),
+                listReleases: vi.fn(),
+                update: vi.fn(),
+                uploadArtifact: vi.fn(),
+                generateReleaseNotes: vi.fn(),
             }
         })
-        return new GithubArtifactDestroyer(new MockReleases())
+        return new GithubArtifactDestroyer(MockReleases())
     }
 
-    function mockDeleteError(): any {
+    function mockDeleteError(): void {
         deleteMock.mockRejectedValue("error")
     }
 
-    function mockDeleteSuccess(): any {
+    function mockDeleteSuccess(): void {
         deleteMock.mockResolvedValue({})
     }
 

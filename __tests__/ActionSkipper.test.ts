@@ -1,19 +1,20 @@
-import { ReleaseActionSkipper } from "../src/ActionSkipper"
-import type { Releases } from "../src/Releases"
+import { describe, expect, it, vi } from "vitest"
+import { ReleaseActionSkipper } from "../src/ActionSkipper.js"
+import type { Releases } from "../src/Releases.js"
 
 describe("shouldSkip", () => {
-    const getMock = jest.fn()
+    const getMock = vi.fn()
     const tag = "tag"
-    const MockReleases = jest.fn<Releases, any>(() => {
+    const MockReleases = vi.fn<() => Releases>(() => {
         return {
-            create: jest.fn(),
-            deleteArtifact: jest.fn(),
+            create: vi.fn(),
+            deleteArtifact: vi.fn(),
             getByTag: getMock,
-            listArtifactsForRelease: jest.fn(),
-            listReleases: jest.fn(),
-            update: jest.fn(),
-            uploadArtifact: jest.fn(),
-            generateReleaseNotes: jest.fn(),
+            listArtifactsForRelease: vi.fn(),
+            listReleases: vi.fn(),
+            update: vi.fn(),
+            uploadArtifact: vi.fn(),
+            generateReleaseNotes: vi.fn(),
         }
     })
 

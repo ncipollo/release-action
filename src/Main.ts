@@ -1,14 +1,14 @@
 import * as github from "@actions/github"
 import * as core from "@actions/core"
-import { CoreInputs } from "./Inputs"
-import { GithubReleases } from "./Releases"
-import { Action } from "./Action"
-import { GithubArtifactUploader } from "./ArtifactUploader"
-import { FileArtifactGlobber } from "./ArtifactGlobber"
-import { GithubError } from "./GithubError"
-import { CoreOutputs } from "./Outputs"
-import { GithubArtifactDestroyer } from "./ArtifactDestroyer"
-import { ActionSkipper, ReleaseActionSkipper } from "./ActionSkipper"
+import { CoreInputs } from "./Inputs.js"
+import { GithubReleases } from "./Releases.js"
+import { Action } from "./Action.js"
+import { GithubArtifactUploader } from "./ArtifactUploader.js"
+import { FileArtifactGlobber } from "./ArtifactGlobber.js"
+import { GithubError } from "./GithubError.js"
+import { CoreOutputs } from "./Outputs.js"
+import { GithubArtifactDestroyer } from "./ArtifactDestroyer.js"
+import { ActionSkipper, ReleaseActionSkipper } from "./ActionSkipper.js"
 
 async function run() {
     try {

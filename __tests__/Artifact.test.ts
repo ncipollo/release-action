@@ -1,16 +1,19 @@
-import { Artifact } from "../src/Artifact"
+import * as fs from "node:fs"
+import { describe, expect, it, vi } from "vitest"
+import { Artifact } from "../src/Artifact.js"
+
+vi.mock("fs")
 
 const contentLength = 42
 const fakeReadStream = {}
 
-jest.mock("fs", () => {
-    return {
-        createReadStream: () => fakeReadStream,
-        statSync: () => {
-            return { size: contentLength }
-        },
-    }
-})
+const mockCreateReadStream = vi.mocked(fs.createReadStream)
+const mockStatSync = vi.mocked(fs.statSync)
+
+// biome-ignore lint/suspicious/noExplicitAny: Mock object for testing
+mockCreateReadStream.mockReturnValue(fakeReadStream as any)
+// biome-ignore lint/suspicious/noExplicitAny: Partial Stats object for testing
+mockStatSync.mockReturnValue({ size: contentLength } as any)
 
 describe("Artifact", () => {
     it("defaults contentType to raw", () => {

@@ -1,4 +1,4 @@
-import { GithubErrorDetail } from "./GithubErrorDetail"
+import { GithubErrorDetail } from "./GithubErrorDetail.js"
 
 export class GithubError {
     private error: any

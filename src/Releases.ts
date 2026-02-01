@@ -1,7 +1,7 @@
-import type { GitHub } from "@actions/github/lib/utils"
+import * as github from "@actions/github"
 import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods"
 import type { OctokitResponse } from "@octokit/types"
-import type { Inputs } from "./Inputs"
+import type { Inputs } from "./Inputs.js"
 
 export type CreateReleaseResponse = RestEndpointMethodTypes["repos"]["createRelease"]["response"]
 export type ReleaseByTagResponse = RestEndpointMethodTypes["repos"]["getReleaseByTag"]["response"]
@@ -65,10 +65,10 @@ export interface Releases {
 }
 
 export class GithubReleases implements Releases {
-    git: InstanceType<typeof GitHub>
+    git: ReturnType<typeof github.getOctokit>
     inputs: Inputs
 
-    constructor(inputs: Inputs, git: InstanceType<typeof GitHub>) {
+    constructor(inputs: Inputs, git: ReturnType<typeof github.getOctokit>) {
         this.inputs = inputs
         this.git = git
     }
