@@ -1,4 +1,5 @@
-import { GithubError } from "../src/GithubError"
+import { describe, expect, it, vi } from "vitest"
+import { GithubError } from "../src/GithubError.js"
 
 describe("ErrorMessage", () => {
     describe("has error with code", () => {

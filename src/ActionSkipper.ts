@@ -1,4 +1,4 @@
-import { Releases } from "./Releases"
+import { Releases } from "./Releases.js"
 
 export interface ActionSkipper {
     shouldSkip(): Promise<boolean>

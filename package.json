@@ -1,54 +1,36 @@
 {
     "name": "release-action",
     "version": "1.1.0",
+    "type": "module",
     "private": true,
     "description": "An action which manages a github release",
     "main": "lib/main.js",
     "scripts": {
         "build": "tsc",
         "clean": "rm -rf lib/*",
-        "coverage": "jest --coverage",
+        "coverage": "vitest run --coverage",
         "debug": "pnpm clean && pnpm install && pnpm build && pnpm package",
         "format": "pnpm biome format --write .",
         "package": "ncc build --source-map --license licenses.txt",
         "release": "pnpm clean && pnpm install --prod && pnpm build && pnpm package",
-        "test": "jest"
+        "test": "vitest run"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/ncipollo/release-action.git"
     },
-    "keywords": ["actions", "node", "setup"],
+    "keywords": [
+        "actions",
+        "node",
+        "setup"
+    ],
     "author": "GitHub",
     "license": "MIT",
     "engines": {
         "node": ">=20"
     },
-    "jest": {
-        "clearMocks": true,
-        "collectCoverage": true,
-        "coveragePathIgnorePatterns": ["src/Globber.ts", "src/Releases.ts"],
-        "coverageThreshold": {
-            "global": {
-                "branches": 95,
-                "functions": 100,
-                "lines": 100,
-                "statements": 100
-            }
-        },
-        "moduleFileExtensions": ["js", "ts"],
-        "testEnvironment": "node",
-        "testMatch": ["**/*.test.ts"],
-        "testRunner": "jest-circus/runner",
-        "transform": {
-            "^.+\\.ts$": ["ts-jest", {
-                "tsconfig": "tsconfig.test.json"
-            }]
-        },
-        "verbose": true
-    },
     "dependencies": {
-        "@actions/core": "^2.0.1",
+        "@actions/core": "^3.0.0",
         "@actions/github": "^6.0.1",
         "@types/node": "^25.1.0",
         "glob": "^13.0.0"
@@ -56,19 +38,10 @@
     "devDependencies": {
         "@biomejs/biome": "2.3.13",
         "@octokit/plugin-rest-endpoint-methods": "^10.4.1",
+        "@octokit/request-error": "^7.1.0",
         "@octokit/types": "^16.0.0",
-        "@types/jest": "30.0.0",
-        "jest": "^30.2.0",
-        "jest-circus": "^30.2.0",
-        "ts-jest": "^29.4.5",
-        "typescript": "^5.9.3"
-    },
-    "pnpm": {
-        "overrides": {
-            "jest-cli>yargs": "^17.3.1",
-            "glob": "^10.5.0",
-            "test-exclude": "^7.0.0",
-            "babel-plugin-istanbul": "^7.0.0"
-        }
+        "@vitest/coverage-v8": "^4.0.18",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18"
     }
 }

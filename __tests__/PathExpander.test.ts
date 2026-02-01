@@ -1,5 +1,6 @@
+import { describe, expect, it, vi } from "vitest"
 import os from "os"
-import { expandTilde } from "../src/PathExpander"
+import { expandTilde } from "../src/PathExpander.js"
 
 describe("PathExpander", () => {
     describe("expandTilde", () => {

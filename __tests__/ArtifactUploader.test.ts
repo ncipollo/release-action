@@ -1,7 +1,8 @@
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { RequestError } from "@octokit/request-error"
-import { Artifact } from "../src/Artifact"
-import { GithubArtifactUploader } from "../src/ArtifactUploader"
-import type { Releases } from "../src/Releases"
+import { Artifact } from "../src/Artifact.js"
+import { GithubArtifactUploader } from "../src/ArtifactUploader.js"
+import type { Releases } from "../src/Releases.js"
 
 const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
 const fakeReadStream = {}
@@ -9,9 +10,9 @@ const contentLength = 42
 const releaseId = 100
 const url = "http://api.example.com"
 
-const deleteMock = jest.fn()
-const listArtifactsMock = jest.fn()
-const uploadMock = jest.fn()
+const deleteMock = vi.fn()
+const listArtifactsMock = vi.fn()
+const uploadMock = vi.fn()
 
 // Mock response with browser_download_url
 const mockUploadResponse = (name: string) => ({
@@ -22,8 +23,8 @@ const mockUploadResponse = (name: string) => ({
     }
 })
 
-jest.mock("fs", () => {
-    const originalFs = jest.requireActual("fs")
+vi.mock("fs", async () => {
+    const originalFs = await vi.importActual<typeof import("fs")>("fs")
     return {
         ...originalFs,
         promises: {},
@@ -212,19 +213,19 @@ describe("ArtifactUploader", () => {
     })
 
     function createUploader(replaces: boolean, throws = false): GithubArtifactUploader {
-        const MockReleases = jest.fn<Releases, any>(() => {
+        const MockReleases = vi.fn<() => Releases>(() => {
             return {
-                create: jest.fn(),
+                create: vi.fn(),
                 deleteArtifact: deleteMock,
-                getByTag: jest.fn(),
+                getByTag: vi.fn(),
                 listArtifactsForRelease: listArtifactsMock,
-                listReleases: jest.fn(),
-                update: jest.fn(),
+                listReleases: vi.fn(),
+                update: vi.fn(),
                 uploadArtifact: uploadMock,
-                generateReleaseNotes: jest.fn(),
+                generateReleaseNotes: vi.fn(),
             }
         })
-        return new GithubArtifactUploader(new MockReleases(), replaces, throws)
+        return new GithubArtifactUploader(MockReleases(), replaces, throws)
     }
 
     function mockDeleteError(): any {

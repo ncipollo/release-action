@@ -1,8 +1,8 @@
 import * as core from "@actions/core"
 import { Context } from "@actions/github/lib/context"
 import { readFileSync } from "fs"
-import { ArtifactGlobber } from "./ArtifactGlobber"
-import { Artifact } from "./Artifact"
+import { ArtifactGlobber } from "./ArtifactGlobber.js"
+import { Artifact } from "./Artifact.js"
 
 export interface Inputs {
     readonly allowUpdates: boolean

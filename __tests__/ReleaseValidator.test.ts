@@ -1,4 +1,5 @@
-import { ReleaseValidator } from "../src/ReleaseValidator"
+import { describe, expect, it, vi } from "vitest"
+import { ReleaseValidator } from "../src/ReleaseValidator.js"
 
 describe("validateReleaseUpdate", () => {
     describe("updateOnlyUnreleased is disabled", () => {

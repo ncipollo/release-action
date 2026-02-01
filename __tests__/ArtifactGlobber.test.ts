@@ -1,32 +1,30 @@
-const warnMock = jest.fn()
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import * as core from "@actions/core"
+import * as fs from "fs"
 
-import { FileArtifactGlobber } from "../src/ArtifactGlobber"
-import { Globber } from "../src/Globber"
-import { Artifact } from "../src/Artifact"
-import { expandTilde } from "../src/PathExpander"
+vi.mock("@actions/core")
+vi.mock("fs")
+
+import { FileArtifactGlobber } from "../src/ArtifactGlobber.js"
+import { Globber } from "../src/Globber.js"
+import { Artifact } from "../src/Artifact.js"
+import { expandTilde } from "../src/PathExpander.js"
+
+const warnMock = vi.mocked(core.warning)
+const mockStatSync = vi.mocked(fs.statSync)
+const mockRealpathSync = vi.mocked(fs.realpathSync as any)
 
 const contentType = "raw"
-const globMock = jest.fn()
+const globMock = vi.fn()
 const globResults = ["file1", "file2"]
 
-jest.mock("@actions/core", () => {
-    return { warning: warnMock }
-})
+mockStatSync.mockReturnValue({
+    isDirectory(): boolean {
+        return false
+    },
+} as any)
 
-jest.mock("fs", () => {
-    return {
-        statSync: () => {
-            return {
-                isDirectory(): boolean {
-                    return false
-                },
-            }
-        },
-        realpathSync: () => {
-            return false
-        },
-    }
-})
+mockRealpathSync.mockReturnValue(false as any)
 
 describe("ArtifactGlobber", () => {
     beforeEach(() => {
@@ -90,12 +88,12 @@ describe("ArtifactGlobber", () => {
     })
 
     function createArtifactGlobber(results: string[] = globResults): FileArtifactGlobber {
-        const MockGlobber = jest.fn<Globber, any>(() => {
+        const MockGlobber = vi.fn<() => Globber>(() => {
             return {
                 glob: globMock,
             }
         })
         globMock.mockReturnValue(results)
-        return new FileArtifactGlobber(new MockGlobber())
+        return new FileArtifactGlobber(MockGlobber())
     }
 })

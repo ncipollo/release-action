@@ -92,7 +92,7 @@ fabric.properties
 # Markdown Navigator plugin
 .idea/**/markdown-navigator.xml
 .idea/**/markdown-navigator/
-
+.idea/copilot.*
 # End of https://www.gitignore.io/api/webstorm
 
 # Coverage
@@ -100,3 +100,6 @@ coverage
 
 # Ignore lib, it contains intermediates
 /lib
+
+# Claude
+.claude/settings.local.json

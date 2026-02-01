@@ -1,21 +1,19 @@
-const directoryMock = jest.fn()
-const warnMock = jest.fn()
+import { describe, expect, it, vi } from "vitest"
+import * as core from "@actions/core"
+import * as fs from "fs"
 
-import { ArtifactPathValidator } from "../src/ArtifactPathValidator"
+vi.mock("@actions/core")
+vi.mock("fs")
+
+import { ArtifactPathValidator } from "../src/ArtifactPathValidator.js"
+
+const warnMock = vi.mocked(core.warning)
+const mockStatSync = vi.mocked(fs.statSync)
+const directoryMock = vi.fn()
+
+mockStatSync.mockReturnValue({ isDirectory: directoryMock } as any)
 
 const pattern = "pattern"
-
-jest.mock("@actions/core", () => {
-    return { warning: warnMock }
-})
-
-jest.mock("fs", () => {
-    return {
-        statSync: () => {
-            return { isDirectory: directoryMock }
-        },
-    }
-})
 
 describe("ArtifactPathValidator", () => {
     beforeEach(() => {

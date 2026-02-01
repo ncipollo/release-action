@@ -1,40 +1,33 @@
-const mockGetInput = jest.fn()
-const mockGetBooleanInput = jest.fn()
-const mockGlob = jest.fn()
-const mockReadFileSync = jest.fn()
-const mockStatSync = jest.fn()
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import * as core from "@actions/core"
+import * as fs from "fs"
 
-import { Artifact } from "../src/Artifact"
-import { ArtifactGlobber } from "../src/ArtifactGlobber"
+vi.mock("@actions/core")
+vi.mock("fs")
+
+import { Artifact } from "../src/Artifact.js"
+import { ArtifactGlobber } from "../src/ArtifactGlobber.js"
 import { Context } from "@actions/github/lib/context"
-import { Inputs, CoreInputs } from "../src/Inputs"
+import { Inputs, CoreInputs } from "../src/Inputs.js"
+
+const mockGetInput = vi.mocked(core.getInput)
+const mockGetBooleanInput = vi.mocked(core.getBooleanInput)
+const mockReadFileSync = vi.mocked(fs.readFileSync)
+const mockStatSync = vi.mocked(fs.statSync)
+const mockExistsSync = vi.mocked(fs.existsSync)
+const mockGlob = vi.fn()
+
+// existsSync is used by Context's constructor
+mockExistsSync.mockReturnValue(false)
 
 const artifacts = [new Artifact("a/art1"), new Artifact("b/art2")]
-
-jest.mock("@actions/core", () => {
-    return {
-        getInput: mockGetInput,
-        getBooleanInput: mockGetBooleanInput,
-    }
-})
-
-jest.mock("fs", () => {
-    // existsSync is used by Context's constructor
-    // noinspection JSUnusedGlobalSymbols
-    return {
-        existsSync: () => {
-            return false
-        },
-        readFileSync: mockReadFileSync,
-        statSync: mockStatSync,
-    }
-})
 
 describe("Inputs", () => {
     let context: Context
     let inputs: Inputs
     beforeEach(() => {
         mockGetInput.mockReset()
+        mockGlob.mockClear()
         context = new Context()
         inputs = new CoreInputs(createGlobber(), context)
     })
@@ -462,12 +455,12 @@ describe("Inputs", () => {
     })
 
     function createGlobber(): ArtifactGlobber {
-        const MockGlobber = jest.fn<ArtifactGlobber, any>(() => {
+        const MockGlobber = vi.fn<() => ArtifactGlobber>(() => {
             return {
                 globArtifactString: mockGlob,
             }
         })
         mockGlob.mockImplementation(() => artifacts)
-        return new MockGlobber()
+        return MockGlobber()
     }
 })
