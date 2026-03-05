@@ -197,7 +197,7 @@ export class Action {
             return body
         }
 
-        const response = await this.releases.generateReleaseNotes(this.inputs.tag, this.inputs.generateReleaseNotesPreviousTag)
+        const response = await this.releases.generateReleaseNotes(this.inputs.tag, this.inputs.generateReleaseNotesPreviousTag, this.inputs.commit)
         const releaseNotes = response.data.body
 
         if (!body || body.trim() === "") {

@@ -71,7 +71,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -92,7 +92,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -134,7 +134,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             `${createBody}\n${generatedReleaseBody}`,
@@ -166,7 +166,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, previousTag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, previousTag, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             `${createBody}\n${generatedReleaseBody}`,
@@ -185,7 +185,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -208,7 +208,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -237,7 +237,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -261,7 +261,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -327,7 +327,7 @@ describe("Action", () => {
             expect(error).toEqual("error")
         }
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -428,7 +428,7 @@ describe("Action", () => {
             expect(error).toEqual(expectedError)
         }
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(createMock).toHaveBeenCalledWith(
             tag,
             generatedReleaseBody,
@@ -511,7 +511,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, undefined, commit)
         expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
@@ -536,7 +536,7 @@ describe("Action", () => {
 
         await action.perform()
 
-        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, previousTag)
+        expect(genReleaseNotesMock).toHaveBeenCalledWith(tag, previousTag, commit)
         expect(updateMock).toHaveBeenCalledWith(
             id,
             tag,
