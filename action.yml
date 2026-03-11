@@ -137,7 +137,7 @@ outputs:
   assets:
     description: 'JSON string containing a map of asset names to download URLs for uploaded assets.'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 branding:
   icon: 'tag'
