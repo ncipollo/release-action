@@ -3,4 +3,4 @@ enable_commit = true
 tag_pattern = "v{version}"
 
 [scripts]
-before_commit = "yarn release"
+before_commit = "pnpm release"
