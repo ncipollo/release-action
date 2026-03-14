@@ -35,14 +35,19 @@
         "@types/node": "^25.1.0",
         "glob": "^13.0.6"
     },
+    "pnpm": {
+        "overrides": {
+            "undici": ">=6.24.0"
+        }
+    },
     "devDependencies": {
         "@biomejs/biome": "2.4.4",
         "@octokit/plugin-rest-endpoint-methods": "^10.4.1",
         "@octokit/request-error": "^7.1.0",
         "@octokit/types": "^16.0.0",
         "@vercel/ncc": "^0.38.4",
-        "@vitest/coverage-v8": "^4.0.18",
+        "@vitest/coverage-v8": "^4.1.0",
         "typescript": "^5.9.3",
-        "vitest": "^4.0.18"
+        "vitest": "^4.1.0"
     }
 }
