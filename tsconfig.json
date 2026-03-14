@@ -4,11 +4,13 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "outDir": "./lib",
+        "rootDir": ".",
         "strict": true,
         "skipLibCheck": true,
         "noImplicitAny": true,
         "esModuleInterop": true,
         "types": ["node"]
     },
-    "exclude": ["node_modules", "**/*.test.ts"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.test.ts", "__mocks__/**/*", "vitest.config.ts"]
 }

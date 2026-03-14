@@ -12,7 +12,7 @@
         "debug": "pnpm clean && pnpm install && pnpm build && pnpm package",
         "format": "pnpm biome format --write .",
         "package": "ncc build --source-map --license licenses.txt",
-        "release": "pnpm clean && pnpm install --prod && pnpm build && pnpm package",
+        "release": "pnpm clean && pnpm install && pnpm build && pnpm package",
         "test": "vitest run"
     },
     "repository": {
@@ -40,6 +40,7 @@
         "@octokit/plugin-rest-endpoint-methods": "^10.4.1",
         "@octokit/request-error": "^7.1.0",
         "@octokit/types": "^16.0.0",
+        "@vercel/ncc": "^0.38.4",
         "@vitest/coverage-v8": "^4.0.18",
         "typescript": "^5.9.3",
         "vitest": "^4.0.18"
