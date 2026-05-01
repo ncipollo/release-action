@@ -31,7 +31,7 @@
     },
     "dependencies": {
         "@actions/core": "^3.0.0",
-        "@actions/github": "^9.0.0",
+        "@actions/github": "^9.1.1",
         "@types/node": "^25.6.0",
         "glob": "^13.0.6"
     },
