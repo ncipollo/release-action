@@ -43,7 +43,7 @@
         }
     },
     "devDependencies": {
-        "@biomejs/biome": "2.4.4",
+        "@biomejs/biome": "2.4.13",
         "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
         "@octokit/request-error": "^7.1.0",
         "@octokit/types": "^16.0.0",
