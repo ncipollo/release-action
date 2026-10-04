@@ -83,5 +83,4 @@ jobs:
 
 - 您必须通过 Action 输入或 git ref 提供一个标签（即推送/创建标签）。如果不提供标签，Action 将会失败。
 - 如果您正在创建的版本的标签不存在，您应该同时设置标签和提交 Action 输入。 commit 可以指向提交 Hash 或分支名称（例如 - main）。
-- 创建、更新发布以及上传资源需要 `contents: write` 权限。设置 `discussionCategory` 还需要 `discussions: write` 权限。
 - 在上面的示例中，只需要指定操作的权限（即 contents: write）。 如果您将其他操作添加到同一工作流程，则应相应地扩展权限。
