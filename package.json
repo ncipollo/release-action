@@ -33,7 +33,7 @@
         "@actions/core": "^3.0.0",
         "@actions/github": "^9.0.0",
         "@types/node": "^26.1.2",
-        "glob": "^13.0.6"
+        "glob": "^14.0.2"
     },
     "devDependencies": {
         "@biomejs/biome": "2.5.6",
