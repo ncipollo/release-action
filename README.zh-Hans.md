@@ -23,7 +23,7 @@
 | body                       | 发布的可选主体。注意：此处输入的首尾空格会被去除。如果您需要特殊的 markdown 内容，请使用 `bodyFile`。                                                                         | false | ""                   |
 | bodyFile                   | 发布的可选正文文件。 这应该是文件的路径。                                                                                                                                  | false | ""                   |
 | commit                     | 一个可选的提交 ref。 如果标签不存在，将用于创建标签。                                                                                                                      | false | ""                   |
-| discussionCategory         | 当提供该选项时，将生成指定类别的 discussion。指定的类别必须存在，否则将导致 Action 失败。这对草案状态的发布不生效。API 不支持默认的 Announcement 分类，使用这个分类会引发错误。     | false | ""                   |
+| discussionCategory         | 当提供该选项时，将生成指定类别的 discussion。指定的类别必须存在，否则将导致 Action 失败。这对草案状态的发布不生效。需要 `discussions: write` 权限。     | false | ""                   |
 | draft                      | 可选择将此版本标记为草稿版本。 设置为 true 以启用。                                                                                                                        | false | ""                   |
 | generateReleaseNotes       | 指示是否应自动生成发行说明。                                                                                                                                               | false | false                |
 | immutableCreate            | 指示是否应使用不可变发布创建。启用时，操作将首先创建草稿，上传产出文件，然后发布版本。                                                                                                          | false | false                |
@@ -84,4 +84,3 @@ jobs:
 - 您必须通过 Action 输入或 git ref 提供一个标签（即推送/创建标签）。如果不提供标签，Action 将会失败。
 - 如果您正在创建的版本的标签不存在，您应该同时设置标签和提交 Action 输入。 commit 可以指向提交 Hash 或分支名称（例如 - main）。
 - 在上面的示例中，只需要指定操作的权限（即 contents: write）。 如果您将其他操作添加到同一工作流程，则应相应地扩展权限。
-- 有关于此 action 无法支持 discussion 的 Announcement 分类的原因的更多信息，请参见此处：https://github.com/goreleaser/goreleaser/issues/2304
