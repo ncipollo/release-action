@@ -39,8 +39,8 @@ importers:
         specifier: ^16.0.0
         version: 16.0.0
       '@vercel/ncc':
-        specifier: ^0.38.4
-        version: 0.38.4
+        specifier: ^0.44.1
+        version: 0.44.1
       '@vitest/coverage-v8':
         specifier: ^4.1.2
         version: 4.1.7(vitest@4.1.7)
@@ -336,8 +336,8 @@ packages:
   '@types/node@26.1.2':
     resolution: {integrity: sha512-Vu4a5UFA9rIIFJ7rB/Vaafh9lrCQszopTCx6KjFboXTGQbPNasehVR5TEiithSDGyd1DEiUByggTZsg8jukeIg==}
 
-  '@vercel/ncc@0.38.4':
-    resolution: {integrity: sha512-8LwjnlP39s08C08J5NstzriPvW1SP8Zfpp1BvC2sI35kPeZnHfxVkCwu4/+Wodgnd60UtT1n8K8zw+Mp7J9JmQ==}
+  '@vercel/ncc@0.44.1':
+    resolution: {integrity: sha512-cUjIE5P2YY1n+Kt9rFIazMMpGoPn1Fic04rOmTkElMkiDP5oszGfERMpo2shVkFKDL7rVppdM2pqJKC59shQWQ==}
     hasBin: true
 
   '@vitest/coverage-v8@4.1.7':
@@ -987,7 +987,7 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
-  '@vercel/ncc@0.38.4': {}
+  '@vercel/ncc@0.44.1': {}
 
   '@vitest/coverage-v8@4.1.7(vitest@4.1.7)':
     dependencies:
