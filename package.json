@@ -32,11 +32,11 @@
     "dependencies": {
         "@actions/core": "^3.0.0",
         "@actions/github": "^9.0.0",
-        "@types/node": "^26.0.1",
+        "@types/node": "^26.1.2",
         "glob": "^13.0.6"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.5.1",
+        "@biomejs/biome": "2.5.6",
         "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
         "@octokit/request-error": "^7.1.0",
         "@octokit/types": "^16.0.0",
