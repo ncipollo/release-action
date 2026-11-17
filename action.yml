@@ -52,7 +52,7 @@ inputs:
     required: false
     default: ''
   immutableCreate:
-    description: 'Indicates if immutable release creation should be used. When enabled, the action will first create a draft, upload artifacts, then publish the release.'
+    description: 'Indicates if immutable release creation should be used. When enabled, the action will first create a draft, upload artifacts, then publish the release. The repo owner must enable immutable releases in Settings->General->Releases otherwise a mutable release will be created.'
     required: false
     default: 'false'
   makeLatest:
